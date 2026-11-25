@@ -171,7 +171,7 @@ public class TaLeadersHandler {
                         + " from exploring "
                         + Helper.getPlanetRepresentationPlusEmoji(planetName)
                         + " due to Zul, the Ta commander.");
-        if (TaAbilityHandler.planetHasAnyAttachment(tile, planetName) && commoditiesGained > 0) {
+        if (TaAbilityHandler.planetHasNonWorldshaperAttachment(tile, planetName) && commoditiesGained > 0) {
             List<Button> buttons = new ArrayList<>(List.of(Buttons.green(
                     player.factionButtonChecker() + COMMANDER_CONVERT_PREFIX + tile.getPosition() + "|" + planetName,
                     "Convert Commodity to Trade Good",
@@ -212,7 +212,7 @@ public class TaLeadersHandler {
                 || planet == null
                 || player.getCommodities() < 1
                 || !game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")
-                || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                || !TaAbilityHandler.planetHasNonWorldshaperAttachment(tile, planetName)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

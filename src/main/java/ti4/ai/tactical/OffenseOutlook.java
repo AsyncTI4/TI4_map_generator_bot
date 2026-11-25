@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.Hostility;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FactionAggression;
@@ -539,7 +540,7 @@ final class OffenseOutlook {
         double denialGrievance = scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
         double grievance = (estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
         double relief = Grievance.relief(standings.winThreat(opponent), standings.winThreat(seat), ownObjective / VP);
-        double fear = TacticalStrength.angerWeight(game, seat, opponent);
+        double fear = TacticalStrength.angerWeight(game, seat, opponent) * Hostility.spreadFactor(game, seat, opponent);
         double nearTerm = ANGER_SHARE * grievance * retaliation(strike, estimate) * relief * fear;
         if (!remembersAttacks()) return nearTerm;
         double ledgerGrievance =

@@ -14,7 +14,6 @@ import ti4.ai.perception.AiPrompt;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.ButtonHelper;
 import ti4.service.combat.SpaceCannonOffenceWindow;
 
 @UtilityClass
@@ -28,6 +27,7 @@ class SpaceCannonWait {
 
     static Optional<AiDecision> next(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
         if (!movementFinished(context, turn)) return Optional.empty();
+        if (!offenceWindowPosted(turn, tile)) return Optional.empty();
         List<Player> pending = pending(context.game(), context.seat(), tile);
         if (pending.isEmpty()) return Optional.empty();
         String key = EXPECTED_KEY + TacticalRules.actionKey(context);
@@ -47,11 +47,18 @@ class SpaceCannonWait {
     static List<Player> pending(Game game, Player seat, Tile tile) {
         if (game.isL1Hero() || tile.isScar(game) || !BoardView.hasOwnShips(seat, tile)) return List.of();
         Set<String> resolved = SpaceCannonOffenceWindow.resolvedBy(game, tile.getPosition());
-        return ButtonHelper.getPlayersWithPds2Cover(seat, game, tile.getPosition()).stream()
+        return OffenceCover.of(game, seat, tile.getPosition()).stream()
                 .filter(covering -> covering != seat)
                 .filter(covering -> !seat.getAllianceMembers().contains(covering.getFaction()))
                 .filter(covering -> !resolved.contains(covering.getFaction()))
                 .toList();
+    }
+
+    private static boolean offenceWindowPosted(List<AiPrompt> turn, Tile tile) {
+        String roll = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        return turn.stream()
+                .flatMap(prompt -> prompt.buttons().stream())
+                .anyMatch(button -> roll.equals(button.handlerId()));
     }
 
     private static boolean movementFinished(AiTurnContext context, List<AiPrompt> turn) {

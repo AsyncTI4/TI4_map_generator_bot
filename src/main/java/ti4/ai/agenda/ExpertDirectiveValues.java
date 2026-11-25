@@ -77,7 +77,6 @@ class ExpertDirectiveValues {
     private static final int INFANTRY_SUPPLY = 12;
     private static final int ONE_TOKEN = 1;
     private static final int CLANDESTINE_TOKENS = 2;
-    private static final int SPARE_FLEET_POOL = 3;
 
     @Nullable
     static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
@@ -418,8 +417,9 @@ class ExpertDirectiveValues {
     }
 
     private static double fleetRemovalCost(Game game, Player player, int fleet) {
-        double token = fleet > SPARE_FLEET_POOL ? CardValueScale.TOKEN_FLOOR : CardValueScale.HELD_TOKEN;
-        return token + shipsOverLimitValue(game, player, fleet - 1) - shipsOverLimitValue(game, player, fleet);
+        return CardValueScale.HELD_TOKEN
+                + shipsOverLimitValue(game, player, fleet - 1)
+                - shipsOverLimitValue(game, player, fleet);
     }
 
     static double shipsOverLimitValue(Game game, Player player, int fleetTokens) {

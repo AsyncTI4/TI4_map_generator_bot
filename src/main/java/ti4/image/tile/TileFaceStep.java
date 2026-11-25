@@ -10,7 +10,7 @@ final class TileFaceStep implements TileStepPainter {
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {
-        TileArtwork.draw(scene.game(), layer);
+        TileArtwork.draw(scene, layer);
         if (!annotated) {
             return;
         }

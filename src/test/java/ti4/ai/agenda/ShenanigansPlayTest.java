@@ -151,4 +151,28 @@ class ShenanigansPlayTest extends BaseTi4Test {
 
         assertThat(answers(plots(), hand())).containsExactlyInAnyOrder("generic_button_id_1", "generic_button_id_2");
     }
+
+    // On the first agenda Mecatol Rex's votes keep Deadly Plot in hand (see above); a 3 TG bounty for playing it,
+    // posted by Xxcha, tips it, since the payment counts toward the swing.
+    @Test
+    void aBountyTipsAFirstAgendaDeadlyPlot() {
+        test.nekro.setActionCard("deadly_plot", DEADLY_PLOT_INDEX);
+        test.place("18", "000");
+        test.nekro.addPlanet("mr");
+        ti4.ai.agenda.DiscardBounties.save(
+                test.game,
+                new ti4.ai.agenda.DiscardBounties.Bounty(
+                        test.game.getRound(),
+                        PromisedVotes.agendaKey(test.game),
+                        xxcha.getFaction(),
+                        0,
+                        0,
+                        0,
+                        "",
+                        -1,
+                        ti4.ai.agenda.DiscardBounties.Status.OPEN,
+                        ti4.ai.agenda.DiscardBounties.DEADLY_PLOT_CAP));
+
+        assertThat(answers(plots(), hand())).contains(PLAY_DEADLY_PLOT);
+    }
 }

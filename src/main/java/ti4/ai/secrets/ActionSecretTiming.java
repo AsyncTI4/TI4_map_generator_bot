@@ -4,6 +4,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.Desperation;
 import ti4.ai.tactical.CannonWipeRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,6 +20,7 @@ public class ActionSecretTiming {
         return NEVER_SAVED.contains(secretId)
                 || !AiSettings.isSecretHoldEnabled()
                 || GameHorizon.endInSight(game)
+                || Desperation.forActionSecrets(game, seat)
                 || holdsAStandingDustTarget(game, seat, secretId)
                 || worriedAboutTheBoard(game, seat, secretId);
     }

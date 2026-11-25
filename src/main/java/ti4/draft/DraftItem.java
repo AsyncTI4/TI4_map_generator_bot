@@ -190,37 +190,57 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
-        List<TextDisplay> textFields = new ArrayList<>();
+        List<TextDisplay> textFields =
+                new ArrayList<>(getTextDisplaysWithoutLinkedComponents(game, player, showDescr, useAlternateText));
 
+        if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
+            textFields.addAll(getLinkedComponentTextDisplays(
+                    Errata.getAdditionalComponents(),
+                    "Additional Added Components",
+                    "+",
+                    game,
+                    player,
+                    useAlternateText));
+        }
+
+        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
+        if (!optionalSwaps.isEmpty() && (game == null || !game.isTwilightsFallMode())) {
+            textFields.addAll(getLinkedComponentTextDisplays(
+                    optionalSwaps, "Optional Component Swaps", "♻️", game, player, useAlternateText));
+        }
+        return textFields;
+    }
+
+    private List<TextDisplay> getLinkedComponentTextDisplays(
+            List<DraftErrataModel> linkedComponents,
+            String title,
+            String marker,
+            Game game,
+            Player player,
+            boolean useAlternateText) {
+        List<TextDisplay> textDisplays = new ArrayList<>(List.of(TextDisplay.of("**__" + title + ":__**")));
+        for (DraftErrataModel linkedComponent : linkedComponents) {
+            DraftItem item = generate(linkedComponent.getItemCategory(), linkedComponent.getItemId());
+            String description = item.getDisplayDescription(game, item.getLongDescriptionImpl(game), useAlternateText)
+                    .trim()
+                    .replace("\n> ", "\n")
+                    .replace("\n", "\n> ");
+            textDisplays.add(TextDisplay.of(
+                    "> " + marker + " " + item.getTitle(game) + System.lineSeparator() + "> " + description));
+        }
+        return textDisplays;
+    }
+
+    @JsonIgnore
+    public List<TextDisplay> getTextDisplaysWithoutLinkedComponents(
+            Game game, Player player, boolean showDescr, boolean useAlternateText) {
         String details = getTitle(game);
         if (showDescr || DraftCategory.showDescrByDefault()) {
             String descr = getDisplayDescription(game, getLongDescriptionImpl(game), useAlternateText);
             descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
-        textFields.add(TextDisplay.of(details));
-
-        if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
-            List<String> adds = new ArrayList<>();
-            adds.add("**__Additional Added Components:__**");
-            for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                adds.add("> + " + item2.getTitle(game));
-            }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), adds)));
-        }
-
-        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
-        if (!optionalSwaps.isEmpty() && (game == null || !game.isTwilightsFallMode())) {
-            List<String> swaps = new ArrayList<>();
-            swaps.add("**__Optional Component Swaps:__**");
-            for (DraftErrataModel i2 : optionalSwaps) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                swaps.add("> ♻️ " + item2.getTitle(game));
-            }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
-        }
-        return textFields;
+        return List.of(TextDisplay.of(details));
     }
 
     @JsonIgnore
@@ -280,7 +300,7 @@ public abstract class DraftItem {
         return sb.toString();
     }
 
-    private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
+    public List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
         return Errata.getOptionalSwaps().stream()
                 .filter(item -> item.getItemCategory() != DraftCategory.MONUMENT
                         || game == null

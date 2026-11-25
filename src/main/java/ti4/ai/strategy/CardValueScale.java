@@ -11,10 +11,9 @@ public class CardValueScale {
     public static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
     public static final double TRADE_GOOD = ValueScale.TRADE_GOOD;
     static final double COMMODITY = ValueScale.COMMODITY;
-    public static final double TOKEN_FLOOR = 1.5;
     public static final double HELD_TOKEN = TokenPurchase.INFLUENCE_PER_TOKEN * ValueScale.INFLUENCE;
     static final double TOKEN_ACTION_SHARE = 0.6;
-    static final double STRATEGY_TOKEN = 1.0;
+    static final double STRATEGY_TOKEN = HELD_TOKEN;
     static final double ACTION_CARD = ActionCardPrior.AVERAGE_CARD;
     static final double SPEAKER = 1.5;
     static final double FIRST_PICK_SHARE = 1.0;
@@ -23,7 +22,7 @@ public class CardValueScale {
     static final double DOCK_EARLY = 4.0;
     static final double DOCK_LATE = 2.0;
     static final int LAST_EARLY_DOCK_ROUND = 3;
-    static final double PDS = 1.0;
+    static final double PDS = 2.0;
     static final double THREATENED_PDS = 1.0;
     static final double FRONTIER_PDS = 0.2;
     static final double CONSTRUCTION_FOLLOW_MARGIN = 0.5;

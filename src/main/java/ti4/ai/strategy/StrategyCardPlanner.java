@@ -22,18 +22,17 @@ public class StrategyCardPlanner {
 
     private static CardPlan evaluate(PlanInputs in, int initiative) {
         StrategyCard card = StrategyCard.of(in.game(), initiative);
-        List<Benefit> benefits =
-                switch (card) {
-                    case LEADERSHIP -> LeadershipUses.benefits(in, initiative);
-                    case DIPLOMACY -> DiplomacyUses.benefits(in, initiative);
-                    case POLITICS -> PoliticsUses.benefits(in, initiative);
-                    case CONSTRUCTION -> ConstructionUses.benefits(in, initiative);
-                    case TRADE -> TradeUses.benefits(in, initiative);
-                    case WARFARE -> WarfareUses.benefits(in, initiative);
-                    case TECHNOLOGY -> TechnologyUses.benefits(in, initiative);
-                    case IMPERIAL -> ImperialUses.benefits(in, initiative);
-                    case OTHER -> List.of(new Benefit(CardUse.OTHER_CARD, CardValueScale.OTHER_CARD));
-                };
+        List<Benefit> benefits = switch (card) {
+            case LEADERSHIP -> LeadershipUses.benefits(in, initiative);
+            case DIPLOMACY -> DiplomacyUses.benefits(in, initiative);
+            case POLITICS -> PoliticsUses.benefits(in, initiative);
+            case CONSTRUCTION -> ConstructionUses.benefits(in, initiative);
+            case TRADE -> TradeUses.benefits(in, initiative);
+            case WARFARE -> WarfareUses.benefits(in, initiative);
+            case TECHNOLOGY -> TechnologyUses.benefits(in, initiative);
+            case IMPERIAL -> ImperialUses.benefits(in, initiative);
+            case OTHER -> List.of(new Benefit(CardUse.OTHER_CARD, CardValueScale.OTHER_CARD));
+        };
         return new CardPlan(
                 card,
                 initiative,

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -27,6 +28,8 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
             game.setFowMode(true);
             MapSegment.put(game, new MapSegment("far", "1237", 2));
             MapSegment.put(game, MapSegment.cluster("edge", "1201", 1));
+            MapSegment.put(game, MapSegment.shape("wedge", Set.of("1210", "1211", "1310")));
+            MapSegment.rename(game, "wedge", "sliver");
             List<MapSegment> stored = MapSegment.stored(game);
             MapSegment.setAutoSectors(game, true);
             String autoName = MapSegment.all(game).stream()
@@ -41,6 +44,8 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
             Game reloaded = harness.load();
 
             assertThat(MapSegment.stored(reloaded)).isEqualTo(stored);
+            assertThat(MapSegment.find(reloaded, "sliver").orElseThrow().positions())
+                    .containsExactlyInAnyOrder("1210", "1211", "1310");
             assertThat(MapSegment.all(reloaded).stream().map(MapSegment::name)).contains("homeland");
             assertThat(GalaxyNames.name(reloaded, "a")).isEqualTo("frontier");
         }

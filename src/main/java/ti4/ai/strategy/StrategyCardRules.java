@@ -23,6 +23,7 @@ import ti4.ai.naalu.MindsieveFollow;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ExpectedReadying;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
@@ -328,9 +329,9 @@ public class StrategyCardRules {
                 .filter(button -> button.isOwnedBy(context.faction())
                         && button.handlerId().startsWith(REMOVE_TOKEN_PREFIX))
                 .toList();
-        if (!removals.isEmpty() && !CardMessages.done(context, "warfareRemoved")) {
+        if (CardMessages.done(context, "warfareRemoved")) return gainTheRemovedToken(context);
+        if (!removals.isEmpty()) {
             CardMessages.markDone(context, "warfareRemoved");
-            CardMessages.markDone(context, WARFARE_FINISHED);
             List<String> offered = removals.stream()
                     .map(StrategyCardRules::positionOf)
                     .distinct()
@@ -349,6 +350,12 @@ public class StrategyCardRules {
         }
         CardMessages.markDone(context, WARFARE_FINISHED);
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> gainTheRemovedToken(AiTurnContext context) {
+        Optional<AiDecision> gain = WarfareTokens.gainAndRebalance(context);
+        if (WarfareTokens.finished(context)) CardMessages.markDone(context, WARFARE_FINISHED);
+        return gain;
     }
 
     private static String positionOf(PromptButton removeButton) {
@@ -391,20 +398,17 @@ public class StrategyCardRules {
             Optional<AiPrompt> card = CardMessages.cardMessage(context, initiative);
             if (card.isEmpty()) continue;
             Map<String, String> before = context.memory().snapshot();
-            Optional<AiDecision> decision =
-                    switch (StrategyCard.of(game, initiative)) {
-                        case IMPERIAL -> followImperial(context, card.get());
-                        case TECHNOLOGY ->
-                            busyPaying(context) ? Optional.empty() : followTechnology(context, card.get());
-                        case DIPLOMACY -> busyPaying(context) ? Optional.empty() : followDiplomacy(context, card.get());
-                        case WARFARE -> busyPaying(context) ? Optional.empty() : followWarfare(context, card.get());
-                        case CONSTRUCTION -> followConstruction(context, card.get());
-                        case POLITICS -> followPolitics(context, card.get());
-                        case TRADE -> followTrade(context, card.get(), initiative);
-                        case LEADERSHIP ->
-                            busyPaying(context) ? Optional.empty() : followLeadership(context, card.get());
-                        default -> Optional.empty();
-                    };
+            Optional<AiDecision> decision = switch (StrategyCard.of(game, initiative)) {
+                case IMPERIAL -> followImperial(context, card.get());
+                case TECHNOLOGY -> busyPaying(context) ? Optional.empty() : followTechnology(context, card.get());
+                case DIPLOMACY -> busyPaying(context) ? Optional.empty() : followDiplomacy(context, card.get());
+                case WARFARE -> busyPaying(context) ? Optional.empty() : followWarfare(context, card.get());
+                case CONSTRUCTION -> followConstruction(context, card.get());
+                case POLITICS -> followPolitics(context, card.get());
+                case TRADE -> followTrade(context, card.get(), initiative);
+                case LEADERSHIP -> busyPaying(context) ? Optional.empty() : followLeadership(context, card.get());
+                default -> Optional.empty();
+            };
             if (decision.isPresent()) {
                 Optional<AiDecision> scepter = ScepterFollow.exhaustFirst(context, initiative, decision.get());
                 if (scepter.isPresent()) {
@@ -651,26 +655,25 @@ public class StrategyCardRules {
                     context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
         }
         FollowChoice choice = TradeCardRules.followChoice(context, holder);
-        Optional<AiDecision> press =
-                switch (choice) {
-                    case FREE ->
-                        CardMessages.pressOnce(
-                                context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
-                    case TOKEN ->
-                        hasSpareStrategyToken(context, StrategyCard.TRADE)
-                                ? CardMessages.pressOnce(
-                                        context,
-                                        card,
-                                        TRADE_TOKEN_BUTTON,
-                                        "follow Trade with a strategy token to replenish commodities")
-                                : Optional.empty();
-                    case DECLINE -> Optional.empty();
-                };
+        Optional<AiDecision> press = switch (choice) {
+            case FREE ->
+                CardMessages.pressOnce(
+                        context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
+            case TOKEN ->
+                hasSpareStrategyToken(context, StrategyCard.TRADE)
+                        ? CardMessages.pressOnce(
+                                context,
+                                card,
+                                TRADE_TOKEN_BUTTON,
+                                "follow Trade with a strategy token to replenish commodities")
+                        : Optional.empty();
+            case DECLINE -> Optional.empty();
+        };
         press.ifPresent(ignored -> TradeCardRules.followPressed(context, holder, choice));
         return press;
     }
 
-    private static boolean busyPaying(AiTurnContext context) {
+    public static boolean busyPaying(AiTurnContext context) {
         return java.util.stream.Stream.of(
                         PaymentRules.pendingSince(context),
                         tokenGain(context).map(TokenGain::since),
@@ -1273,10 +1276,19 @@ public class StrategyCardRules {
     }
 
     public static boolean worthPayingForResearch(Game game, Player seat, int cost, double worth, Wallet wallet) {
-        if (ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
-                .isEmpty()) return false;
+        Optional<Wallet.Payment> payment =
+                ScoringReserve.planAfterReserve(game, seat, wallet, SpendCost.resources(cost));
+        if (payment.isEmpty()) return false;
         boolean idleCoversIt = IdleTradeGoods.surplus(game, seat) * Wallet.tradeGoodValue(seat) >= cost;
-        return worthResearching(game, seat, idleCoversIt ? worth * ResearchPolicy.IDLE_WORTH_SHARE : worth);
+        boolean cheap = idleCoversIt || readiedAgainCovers(game, seat, wallet, payment.get(), cost);
+        return worthResearching(game, seat, cheap ? worth * ResearchPolicy.IDLE_WORTH_SHARE : worth);
+    }
+
+    static boolean readiedAgainCovers(Game game, Player seat, Wallet wallet, Wallet.Payment payment, int cost) {
+        int readied = ExpectedReadying.readiedAgain(game, seat, wallet, payment).stream()
+                .mapToInt(Wallet.PlanetValue::resources)
+                .sum();
+        return readied >= cost;
     }
 
     static boolean worthResearching(Game game, Player seat, double worth) {
@@ -1335,9 +1347,7 @@ public class StrategyCardRules {
     private static Optional<Double> diplomacyFollowValue(Game game, Player seat) {
         double readying = DiplomacyUse.bestToFollow(game, seat)
                 .filter(choice -> DiplomacyUse.readyingWorthFollowing(game, seat))
-                .map(choice -> choice.unlocksScore()
-                        ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
-                        : CardValueScale.READY_SHARE * choice.use())
+                .map(choice -> DiplomacyUse.readyingValue(game, seat, choice))
                 .orElse(0.0);
         double claim = DiplomacyUse.claimsWorthFollowing(game, seat)
                 ? CardValueScale.PEACE_ACCORDS_SHARE * PeaceAccords.bestValue(game, seat)

@@ -94,7 +94,8 @@ public class AgendaCardRules {
         Game game = context.game();
         Player seat = context.seat();
         String title = entry.get().title();
-        if (placed(game, seat, title) || canceled(game, seat, title, entry.get().playsBefore())) return false;
+        if (hasPlacedRider(game, seat, title)
+                || canceled(game, seat, title, entry.get().playsBefore())) return false;
         if (!playedSince(game, seat, title, entry.get().playsBefore())) return false;
         return context.now() - playedSeenAt(context) < GIVE_UP_MILLIS;
     }
@@ -295,7 +296,7 @@ public class AgendaCardRules {
             if (options.isEmpty()) continue;
             String title = riderTitleOf(options.getFirst()).orElseThrow();
             int playsBefore = entry(context).map(Entry::playsBefore).orElse(0);
-            if (placed(game, seat, title) || canceled(game, seat, title, playsBefore)) continue;
+            if (hasPlacedRider(game, seat, title) || canceled(game, seat, title, playsBefore)) continue;
             return Optional.of(AiDecision.press(prompt, bestPlacement(context, options, title), "place its " + title));
         }
         return Optional.empty();
@@ -335,7 +336,7 @@ public class AgendaCardRules {
         return List.of(StringUtils.substringAfter(middle, ";"));
     }
 
-    private static boolean placed(Game game, Player seat, String title) {
+    public static boolean hasPlacedRider(Game game, Player seat, String title) {
         for (Map.Entry<String, String> votes : game.getCurrentAgendaVotes().entrySet()) {
             for (String piece : votes.getValue().split(";")) {
                 if (piece.equalsIgnoreCase(seat.getFaction() + SEPARATOR + title)) return true;

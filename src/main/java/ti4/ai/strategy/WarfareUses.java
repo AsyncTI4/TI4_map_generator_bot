@@ -195,11 +195,11 @@ class WarfareUses {
         if (affordable >= ranked.size()) {
             return Optional.of(new Benefit(
                     CardUse.WARFARE_EXTRA_ACTION,
-                    CardValueScale.TOKEN_FLOOR,
+                    CardValueScale.HELD_TOKEN,
                     ranked.getFirst().target()));
         }
         TacticalPlan next = ranked.get(affordable);
         return Optional.of(new Benefit(
-                CardUse.WARFARE_EXTRA_ACTION, Math.max(CardValueScale.TOKEN_FLOOR, next.score()), next.target()));
+                CardUse.WARFARE_EXTRA_ACTION, Math.max(CardValueScale.HELD_TOKEN, next.score()), next.target()));
     }
 }

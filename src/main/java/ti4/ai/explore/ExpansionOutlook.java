@@ -12,6 +12,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.ShipSpeed;
+import ti4.ai.eval.ValueScale;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -21,24 +22,31 @@ import ti4.helpers.Units.UnitType;
 final class ExpansionOutlook {
 
     private static final int MAX_ACTIVATIONS = 3;
+    private static final int EARLY_ROUND = 2;
+    private static final double EARLY_CLAIM_FACTOR = 1.5;
 
     private record Transport(Tile tile, UnitType type) {}
 
-    private record Claim(Tile tile, List<Double> planetValues) {
+    private record Claim(Tile tile, List<Planet> planets) {
         double value() {
-            return planetValues.stream().mapToDouble(Double::doubleValue).sum();
+            return planets.stream().mapToDouble(BoardView::planetValue).sum();
         }
 
-        double unfundedValue(int infantry) {
-            return planetValues.stream()
+        double delayCost(Game game, int infantry) {
+            return planets.stream()
                     .skip(Math.max(0, infantry))
-                    .mapToDouble(Double::doubleValue)
+                    .mapToDouble(planet -> delayedClaimCost(game, planet))
                     .sum();
         }
 
-        int planets() {
-            return planetValues.size();
+        int planetCount() {
+            return planets.size();
         }
+    }
+
+    static double delayedClaimCost(Game game, Planet planet) {
+        double best = planet.getMaxResInf() * ValueScale.RESOURCE;
+        return game.getRound() <= EARLY_ROUND ? EARLY_CLAIM_FACTOR * best : best;
     }
 
     private record Launch(Claim claim, Transport transport, int move) {}
@@ -61,10 +69,10 @@ final class ExpansionOutlook {
         if (holdingTile == null || !pool.contains(holdingTile.getPosition())) return 0;
         int spare = groundForcesIn(pool) - 1;
         for (Launch launch : launches) {
-            if (spare < launch.claim().planets()) {
-                return ExploreValues.EXPANSION_SHARE * launch.claim().unfundedValue(spare);
+            if (spare < launch.claim().planetCount()) {
+                return launch.claim().delayCost(game, spare);
             }
-            spare -= launch.claim().planets();
+            spare -= launch.claim().planetCount();
         }
         return 0;
     }
@@ -182,8 +190,9 @@ final class ExpansionOutlook {
             found.add(new Claim(
                     tile,
                     open.stream()
-                            .map(BoardView::planetValue)
-                            .sorted(Comparator.reverseOrder())
+                            .sorted(Comparator.comparingDouble(BoardView::planetValue)
+                                    .thenComparingDouble(planet -> delayedClaimCost(game, planet))
+                                    .reversed())
                             .toList()));
         }
         found.sort(Comparator.comparingDouble(Claim::value).reversed());

@@ -343,13 +343,12 @@ public class MiltyDraftManager {
         String category = draftPick.substring(0, draftPick.indexOf('_'));
         String item = draftPick.substring(draftPick.indexOf('_') + 1);
 
-        String errorMessage =
-                switch (category) {
-                    case "slice" -> draftSlice(userId, item);
-                    case "faction" -> draftFaction(userId, item);
-                    case "order" -> draftSpeakerOrder(userId, item);
-                    default -> "Error parsing milty button press: " + buttonID;
-                };
+        String errorMessage = switch (category) {
+            case "slice" -> draftSlice(userId, item);
+            case "faction" -> draftFaction(userId, item);
+            case "order" -> draftSpeakerOrder(userId, item);
+            default -> "Error parsing milty button press: " + buttonID;
+        };
 
         // Oopsiedoops
         if (errorMessage != null) {
@@ -461,14 +460,13 @@ public class MiltyDraftManager {
             PlayerDraft current = getPlayerDraft(player);
             String category = pick.substring(0, pick.indexOf('_'));
             String item = pick.substring(pick.indexOf('_') + 1);
-            boolean noError =
-                    switch (category) {
-                        case "slice" -> current.getSlice() == null && !isSliceTaken(item) && getSlice(item) != null;
-                        case "faction" ->
-                            current.getFaction() == null && !isFactionTaken(item) && Mapper.getFaction(item) != null;
-                        case "order" -> current.getPosition() == null && !isOrderTaken(Integer.parseInt(item));
-                        default -> false;
-                    };
+            boolean noError = switch (category) {
+                case "slice" -> current.getSlice() == null && !isSliceTaken(item) && getSlice(item) != null;
+                case "faction" ->
+                    current.getFaction() == null && !isFactionTaken(item) && Mapper.getFaction(item) != null;
+                case "order" -> current.getPosition() == null && !isOrderTaken(Integer.parseInt(item));
+                default -> false;
+            };
             if (noError) {
                 legitPick = "miltyQueue_" + pick;
                 break;

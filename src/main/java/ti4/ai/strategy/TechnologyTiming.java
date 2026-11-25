@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.tactical.TacticalPlan;
@@ -94,7 +95,7 @@ public class TechnologyTiming {
         if (StrategyCardRules.cannotResearch(seat)) return 0;
         return ResearchPolicy.bestResearchable(game, seat)
                 .map(alias -> ResearchPolicy.TECH_TEMPO * ResearchPolicy.researchValue(game, seat, alias)
-                        - StrategyCardRules.FOLLOW_TECH_COST
+                        - ValueScale.RESOURCE * StrategyCardRules.FOLLOW_TECH_COST
                         - CardValueScale.STRATEGY_TOKEN)
                 .map(surplus -> Math.max(0, surplus))
                 .orElse(0.0);

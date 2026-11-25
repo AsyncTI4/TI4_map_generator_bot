@@ -99,16 +99,18 @@ class ConstructionFollowTest extends BaseTi4Test {
         assertThat(follow()).isEmpty();
     }
 
+    // A late dock (2 trade goods) is no longer worth a strategy token (2.4), which is worth a held command token.
     @Test
-    void stillFollowsTheFirstExtraDockLate() {
+    void doesNotFollowForTheFirstExtraDockLate() {
         test.game.setRound(LATE_ROUND);
         forwardPlanet("26", "101", "lodor");
 
-        assertThat(follow()).contains(DOCK_BUTTON);
+        assertThat(follow()).isEmpty();
     }
 
     // The first dock past the home one is worth the full dock value and each further one splits it again, so with a
-    // plentiful strategy pool a third dock late in the game no longer pays for its token.
+    // plentiful strategy pool a third dock late in the game no longer pays for its token. A PDS can then be the best
+    // secondary, but it does not pay for a token either.
     @Test
     void halvesTheDockValueForEachDockAlreadyPlacedBeyondTheFirst() {
         test.game.setRound(LATE_ROUND);
@@ -125,7 +127,7 @@ class ConstructionFollowTest extends BaseTi4Test {
                 .orElseThrow();
 
         assertThat(first).isCloseTo(CardValueScale.DOCK_LATE, within(1e-9));
-        assertThat(second).isLessThanOrEqualTo(CardValueScale.DOCK_LATE / 2 + 1e-9);
+        assertThat(second).isLessThanOrEqualTo(Math.max(CardValueScale.DOCK_LATE / 2, CardValueScale.PDS) + 1e-9);
         assertThat(follow()).isEmpty();
     }
 

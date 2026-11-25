@@ -41,9 +41,13 @@ public class AiExperiments {
         PAY_THE_ANSWERER,
         BOAT_FLOAT,
         AVOIDANCE_BRIBES,
+        DESPERATION_PUBLIC,
+        DESPERATION_STATUS_SECRET,
+        DESPERATION_ACTION_SECRET,
         RELATIONS_ANGER,
         VOTE_ANGER,
         STRENGTH_WEIGHTED_ANGER,
+        ANGER_SPREAD,
         POOLED_BOOST_RESPLIT
     }
 
@@ -51,11 +55,28 @@ public class AiExperiments {
     private static final Set<Experiment> OFF_EVERYWHERE =
             parse(System.getProperty(OFF_PROPERTY)).orElse(EnumSet.noneOf(Experiment.class));
 
+    public static final String ENABLED_KEY = "aiExperimentsOn";
+    private static final Set<Experiment> OFF_BY_DEFAULT = EnumSet.of(
+            Experiment.DESPERATION_PUBLIC, Experiment.DESPERATION_STATUS_SECRET, Experiment.DESPERATION_ACTION_SECRET);
+    private static final Set<Experiment> UNDER_TEST = abExperiments().orElse(EnumSet.noneOf(Experiment.class));
+
     public static boolean enabled(Player seat, Experiment experiment) {
         if (OFF_EVERYWHERE.contains(experiment)) return false;
-        String disabled = seat.getStoredValue(DISABLED_KEY);
-        if (disabled.isEmpty()) return true;
-        return !Arrays.asList(disabled.split(",")).contains(experiment.name());
+        if (OFF_BY_DEFAULT.contains(experiment) && !switchedOn(seat, experiment)) return false;
+        return !listed(seat.getStoredValue(DISABLED_KEY), experiment);
+    }
+
+    public static void enable(Player seat, Set<Experiment> experiments) {
+        seat.setStoredValue(
+                ENABLED_KEY, experiments.stream().map(Experiment::name).collect(Collectors.joining(",")));
+    }
+
+    private static boolean switchedOn(Player seat, Experiment experiment) {
+        return UNDER_TEST.contains(experiment) || listed(seat.getStoredValue(ENABLED_KEY), experiment);
+    }
+
+    private static boolean listed(String names, Experiment experiment) {
+        return !names.isEmpty() && Arrays.asList(names.split(",")).contains(experiment.name());
     }
 
     public static void disable(Player seat, Set<Experiment> experiments) {
@@ -69,6 +90,10 @@ public class AiExperiments {
 
     public static boolean isControlSeat(Player seat) {
         return !seat.getStoredValue(DISABLED_KEY).isEmpty();
+    }
+
+    public static Set<Experiment> offByDefault() {
+        return EnumSet.copyOf(OFF_BY_DEFAULT);
     }
 
     public static Optional<Set<Experiment>> abExperiments() {

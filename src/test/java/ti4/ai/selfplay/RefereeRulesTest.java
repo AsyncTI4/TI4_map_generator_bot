@@ -230,7 +230,8 @@ class RefereeRulesTest extends BaseTi4Test {
                 .isTrue();
     }
 
-    // The speaker AI breaks a tie itself (NekroBrain#breakAgendaTie); the referee only steps in once the tie has stood
+    // The speaker AI breaks a tie itself (StandardBrain#breakAgendaTie); the referee only steps in once the tie has
+    // stood
     // for ten minutes. The agenda harness counts the presses that land (SelfPlayEnvironment) as defects.
     @Test
     void breaksAnAgendaTieOnlyAfterTheSpeakerHadTenMinutes() {

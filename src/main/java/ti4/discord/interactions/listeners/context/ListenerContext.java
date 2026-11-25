@@ -25,8 +25,11 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
+import ti4.service.franken.AuctionFrankenDraftService;
 import ti4.service.game.GameNameService;
+import ti4.service.megagame.MegagameGmAccess;
 import ti4.service.testbed.TestBedService;
+import ti4.service.tournament.TournamentSetupAccess;
 import ti4.settings.users.UserSettingsManager;
 
 @Getter
@@ -63,8 +66,12 @@ public abstract class ListenerContext {
     private boolean allowsNonPlayerInteraction() {
         String componentID = getComponentID();
         return "showGameAgain".equalsIgnoreCase(componentID)
+                || (componentID != null && componentID.contains("refreshViewOfSystem"))
+                || (AuctionFrankenDraftService.ACTION_PREFIX + ";showDrafted").equals(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
-                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
+                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)
+                || MegagameGmAccess.allowsSeatlessGm(game, event.getMember(), componentID)
+                || TournamentSetupAccess.allowsSeatlessAdmin(game, event.getMember(), componentID);
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {

@@ -139,12 +139,11 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startMilty" -> startDraft(event);
-                    case "startRandomSetup" -> startRandomSetup(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startMilty" -> startDraft(event);
+            case "startRandomSetup" -> startRandomSetup(event);
+            default -> null;
+        };
         return (error == null ? "success" : error);
     }
 

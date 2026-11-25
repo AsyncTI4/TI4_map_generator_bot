@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +35,9 @@ public class PersistedGameStateService {
                             titlesByGame.getOrDefault(gameName, List.of())));
         }
         return states;
+    }
+
+    public static PersistedGameStateService getBean() {
+        return SpringContext.getBean(PersistedGameStateService.class);
     }
 }

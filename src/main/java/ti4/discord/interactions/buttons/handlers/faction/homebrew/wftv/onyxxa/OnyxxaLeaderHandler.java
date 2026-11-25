@@ -37,7 +37,7 @@ public class OnyxxaLeaderHandler {
     // "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas."
     public static void checkCommanderUnlock(Game game, Player player, Player holder) {
         if (!player.hasLeader("onyxxacommander") || player.hasLeaderUnlocked("onyxxacommander")) return;
-        if (!player.isNeighboursWith(holder)) return;
+        if (!player.getAbilityNeighbours().contains(holder)) return;
         UnlockLeaderService.unlockLeader("onyxxacommander", game, player);
     }
 

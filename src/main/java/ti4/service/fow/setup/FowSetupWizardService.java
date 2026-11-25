@@ -21,6 +21,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.JimboHandlers;
@@ -28,13 +29,13 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FOWPlusService;
-import ti4.service.fow.FogStandardService;
+import ti4.service.fow.FogPreset;
+import ti4.service.fow.FogPresetService;
 import ti4.service.fow.GMService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.map.AddTileListService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.option.FOWOptionService;
-import ti4.service.option.FOWOptionService.FOWOption;
 
 /**
  * Orchestrates the GM-only `/fow setup` wizard: a redrawable panel of buttons in the GM room that
@@ -45,6 +46,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 public final class FowSetupWizardService {
 
     private static final String STORE_KEY = "fowSetupWizard";
+    private static final String FOG_TYPE_PREFIX = "fowSetupFogType_";
+    private static final String FOG_TYPE_APPLY_PREFIX = "fowSetupFogTypeApply_";
 
     private FowSetupWizardService() {}
 
@@ -76,12 +79,32 @@ public final class FowSetupWizardService {
     /** Every call to `/fow setup` (or the Refresh button) deletes the old panel and reposts the current step. */
     public static void openOrRefresh(Game game) {
         FowSetupWizardState state = loadState(game);
+        if (state.getPanelStyle() == FowSetupWizardState.PanelStyle.CONTAINER) {
+            FowSetupPanel.repost(game);
+            return;
+        }
         TextChannel gmChannel = GMService.getGMChannel(game);
         postIntroOnce(game, gmChannel, state);
         if (state.getPanelMessageId() != null) {
             gmChannel.deleteMessageById(state.getPanelMessageId()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         renderStep(game, gmChannel, state);
+    }
+
+    public static void openLegacy(Game game) {
+        usePanelStyle(game, FowSetupWizardState.PanelStyle.LEGACY);
+        openOrRefresh(game);
+    }
+
+    public static void openContainerPanel(Game game) {
+        usePanelStyle(game, FowSetupWizardState.PanelStyle.CONTAINER);
+        openOrRefresh(game);
+    }
+
+    private static void usePanelStyle(Game game, FowSetupWizardState.PanelStyle style) {
+        FowSetupWizardState state = loadState(game);
+        state.setPanelStyle(style);
+        saveState(game, state);
     }
 
     /**
@@ -99,7 +122,7 @@ public final class FowSetupWizardService {
     }
 
     /** Posted once ever per game, the first time the wizard opens - a step list plus prep advice. */
-    private static void postIntroOnce(Game game, TextChannel gmChannel, FowSetupWizardState state) {
+    static void postIntroOnce(Game game, TextChannel gmChannel, FowSetupWizardState state) {
         if (state.isIntroShown()) return;
         String intro = "## Welcome to the FoW Game Setup Wizard\n"
                 + "This walks you through setting up a Fog of War game step by step, entirely in this GM "
@@ -194,7 +217,7 @@ public final class FowSetupWizardService {
         postStepInfoThreadOnce(game, state);
     }
 
-    private static String stepTitle(FowSetupStep step) {
+    static String stepTitle(FowSetupStep step) {
         return switch (step) {
             case GAME_TYPE -> "Game Type & Scenario";
             case GAME_OPTIONS -> "Game Options";
@@ -244,7 +267,11 @@ public final class FowSetupWizardService {
         saveState(game, state);
     }
 
-    private static void postStepInfoThreadOnce(Game game, FowSetupWizardState state) {
+    static boolean hasStepInfo(FowSetupStep step) {
+        return stepInfo(step) != null;
+    }
+
+    static void postStepInfoThreadOnce(Game game, FowSetupWizardState state) {
         String info = stepInfo(state.getStep());
         if (info == null || state.getInfoThreadsPosted().contains(state.getStep())) return;
         postInfoToThread(game, state.getStep(), info);
@@ -305,14 +332,15 @@ public final class FowSetupWizardService {
                 """;
             case FOG_TYPE -> """
                 ### Choosing a preset vs. fine-tuning
-                The three preset buttons (Normal/Fog Lite/Fog+) set a curated bundle of individual FoW \
-                options in one click - "Fine-tune Options" opens `/fow fow_options`, the full per-option \
-                menu, so you can start from a preset and then flip specific options afterward instead of \
-                configuring everything from scratch.
-                Once you've picked something, use `/fow show_game_as` (targeting one of the real players) \
-                to sanity-check what that player would actually see on the map/board - it's the fastest way \
-                to catch a fog setting that's more (or less) restrictive than you intended before players \
-                start looking at things themselves.
+                The four preset buttons (Standard/Fog+/Normal/Beginner) each set every fog option in one \
+                click, so the result never depends on what was picked before. GM turn map, Fog QoL 01, \
+                Status summary, the map layout options and the rules options are only changed by presets \
+                that turn them on. "Fine-tune Options" opens `/fow fow_options`, the full per-option menu, \
+                so you can start from a preset and then flip specific options afterward.
+                Once you've picked something, use the **Show Game As...** button in `/fow gm` (targeting \
+                one of the real players) to sanity-check what that player would actually see on the \
+                map/board - it's the fastest way to catch a fog setting that's more (or less) restrictive \
+                than you intended before players start looking at things themselves.
                 """;
             case MAP_LOAD -> """
                 ### Load the map before you place anyone
@@ -486,11 +514,15 @@ public final class FowSetupWizardService {
     @ButtonHandler("fowSetupChooseExpTE")
     public static void chooseExpThundersEdge(ButtonInteractionEvent event, Game game) {
         if (!requireGM(event, game)) return;
-        game.removeStoredValue("useOldPok");
-        WeirdGameSetup.applyThundersEdgeMode(event, game, true);
+        applyThundersEdge(event, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "Set game to use Thunder's Edge + New PoK components.");
         openOrRefresh(game);
+    }
+
+    static void applyThundersEdge(GenericInteractionCreateEvent event, Game game) {
+        game.removeStoredValue("useOldPok");
+        WeirdGameSetup.applyThundersEdgeMode(event, game, true);
     }
 
     @ButtonHandler("fowSetupBaseGameOnly")
@@ -599,54 +631,39 @@ public final class FowSetupWizardService {
     // ---------------------------------------------------------------------------------------
 
     private static void renderFogType(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
-        sb.append("Pick a fog preset, then fine-tune individual options if you want.\n\n")
-                .append("- **Standard**: what new fog games start with - FoW+ plus managed comms, new transactions, ")
-                .append("Fog QoL 01, GM turn map, hidden AC discard, map connections and ghost hexes.\n")
-                .append("- **Normal**: FoW+ off, no extra visibility relaxations.\n")
-                .append("- **Fog Lite**: easier for new GMs/players - novas always visible, unexplored map, ")
-                .append("explore decks and stats-from-HS-only restrictions relaxed.\n")
-                .append("- **")
-                .append(FOWOption.FOW_PLUS.getTitle())
-                .append("**: see \"Fine-tune Options\" below for details.\n\n")
-                .append("Currently active: FoW+ = ")
-                .append(FOWPlusService.isActive(game))
+        sb.append("Pick a fog preset, then fine-tune individual options if you want. ")
+                .append("Each preset shows what it changes before you apply it.\n\n")
+                .append(FogPresetService.presetList())
+                .append("\n\n")
+                .append(FogPresetService.status(game))
+                .append(" · FoW+ ")
+                .append(FOWPlusService.isActive(game) ? "on" : "off")
                 .append("\n");
 
-        buttons.add(Buttons.green("fowSetupFogType_standard", "Standard"));
-        buttons.add(Buttons.gray("fowSetupFogType_normal", "Normal"));
-        buttons.add(Buttons.blue("fowSetupFogType_lite", "Fog Lite"));
-        buttons.add(Buttons.blue("fowSetupFogType_plus", "Fog+"));
+        for (FogPreset preset : FogPreset.values()) {
+            buttons.add(Buttons.blue(FOG_TYPE_PREFIX + preset.getId(), preset.getTitle()));
+        }
         buttons.add(Buttons.gray("fowSetupFogOptions", "Fine-tune Options"));
     }
 
-    @ButtonHandler("fowSetupFogType_")
+    @ButtonHandler(value = FOG_TYPE_PREFIX, save = false)
     public static void chooseFogType(ButtonInteractionEvent event, Game game, String buttonID) {
         if (!requireGM(event, game)) return;
-        String type = buttonID.replace("fowSetupFogType_", "");
-        switch (type) {
-            case "standard" -> {
-                FogStandardService.reapply(game, GMService.getGMChannel(game), game.getMainGameChannel());
-            }
-            case "normal" -> {
-                FOWPlusService.setActive(game, false);
-                game.setFowOption(FOWOption.BRIGHT_NOVAS, false);
-                game.setFowOption(FOWOption.HIDE_MAP, false);
-                game.setFowOption(FOWOption.HIDE_EXPLORES, false);
-                game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, false);
-            }
-            case "lite" -> {
-                FOWPlusService.setActive(game, false);
-                game.setFowOption(FOWOption.BRIGHT_NOVAS, true);
-                game.setFowOption(FOWOption.HIDE_MAP, false);
-                game.setFowOption(FOWOption.HIDE_EXPLORES, false);
-                game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, false);
-            }
-            case "plus" -> FOWPlusService.setActive(game, true);
-            default -> {
-                return;
-            }
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Fog type set to **" + type + "**.");
+        FogPreset preset = FogPreset.fromId(buttonID.substring(FOG_TYPE_PREFIX.length()));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                FogPresetService.preview(game, preset),
+                List.of(
+                        Buttons.green(FOG_TYPE_APPLY_PREFIX + preset.getId(), "Apply " + preset.getTitle()),
+                        Buttons.CANCEL));
+    }
+
+    @ButtonHandler(FOG_TYPE_APPLY_PREFIX)
+    public static void applyFogType(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!requireGM(event, game)) return;
+        FogPreset preset = FogPreset.fromId(buttonID.substring(FOG_TYPE_APPLY_PREFIX.length()));
+        FogPresetService.applyAndAnnounce(game, preset);
+        ButtonHelper.deleteMessage(event);
         openOrRefresh(game);
     }
 
@@ -669,7 +686,7 @@ public final class FowSetupWizardService {
     @ButtonHandler("fowSetupDealSO")
     public static void dealSO(ButtonInteractionEvent event, Game game) {
         if (!requireGM(event, game)) return;
-        DrawSecretService.dealSOToAll(event, 2, game);
+        DrawSecretService.dealStartingSecretObjectives(event, game);
     }
 
     @ButtonHandler("fowSetupStartGame")
@@ -700,6 +717,7 @@ public final class FowSetupWizardService {
         // Closing means "fully done" - the next /fow setup starts a fresh review from step 1. This only
         // resets which step is displayed; every other saved answer (factions, map, dice rolls, etc.) stays.
         state.setStep(FowSetupStep.GAME_TYPE);
+        state.setSubView(null);
         saveState(game, state);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

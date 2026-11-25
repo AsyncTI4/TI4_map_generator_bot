@@ -167,11 +167,13 @@ final class AnchorStats {
         PlayerTokens.drawCommandCounters(
                 g2, ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), player, false, false);
 
-        if (player.isSpeaker()) {
+        BufferedImage groupSpeakerToken = SpeakerOffset.groupSpeakerToken(player);
+        if (player.isSpeaker() || groupSpeakerToken != null) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
             String speakerFile = ImageResources.token(speakerID);
             if (speakerFile != null) {
-                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+                BufferedImage bufferedImage =
+                        groupSpeakerToken != null ? groupSpeakerToken : ImageHelper.read(speakerFile);
                 point = MapPositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
                 int negativeDelta = 0;
                 g2.drawImage(

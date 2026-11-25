@@ -11,8 +11,7 @@ public class StrategyTokenCost {
 
     private static final int PLENTIFUL = 3;
     private static final double PLENTIFUL_SHARE = 0.75;
-    private static final double LAST_TOKEN_SHARE = 1.5;
-    public static final double UNSPARED = 2.0;
+    public static final double UNSPARED = 2 * CardValueScale.STRATEGY_TOKEN;
 
     public static OptionalDouble toSpend(Game game, Player seat) {
         if (!canSpare(game, seat)) return OptionalDouble.empty();
@@ -26,7 +25,6 @@ public class StrategyTokenCost {
     }
 
     private static double scarcity(int strategyTokens) {
-        if (strategyTokens >= PLENTIFUL) return PLENTIFUL_SHARE;
-        return strategyTokens <= 1 ? LAST_TOKEN_SHARE : 1.0;
+        return strategyTokens >= PLENTIFUL ? PLENTIFUL_SHARE : 1.0;
     }
 }

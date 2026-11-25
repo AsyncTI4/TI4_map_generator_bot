@@ -200,7 +200,7 @@ public class TaAbilityHandler {
                 tile,
                 parts[2],
                 player.getRepresentationNoPing() + " resolved _" + explore.getName()
-                        + " with **Perfect Architecture**.",
+                        + "_ with **Perfect Architecture**.",
                 player,
                 game);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
@@ -317,6 +317,15 @@ public class TaAbilityHandler {
         Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
         return planet != null
                 && planet.getTokenList().stream().anyMatch(token -> Mapper.getAttachmentInfo(token) != null);
+    }
+
+    public static boolean planetHasNonWorldshaperAttachment(Tile tile, String planetName) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        return planet != null
+                && planet.getTokenList().stream()
+                        .map(Mapper::getAttachmentInfo)
+                        .anyMatch(attachment ->
+                                attachment != null && !attachment.getAlias().startsWith("worldshaper"));
     }
 
     public static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {

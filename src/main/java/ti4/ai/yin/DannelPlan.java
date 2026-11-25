@@ -1,16 +1,20 @@
 package ti4.ai.yin;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.WinOdds;
 import ti4.ai.tactical.CombatForecast;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -26,7 +30,11 @@ public class DannelPlan {
     static final String UNOWNED = "unowned";
     static final int MAX_INFANTRY = 3;
     static final double VP = ObjectiveValue.VICTORY_POINT_VALUE;
-    static final double HERO_VALUE = 0.5 * VP;
+    static final double HERO_VALUE = 0.25 * VP;
+    static final double POINT_PLAY = VP;
+    static final double FLEET_LOGISTICS_BONUS = 0.25 * VP;
+    static final String FLEET_LOGISTICS = "fl";
+    static final String OVERRULE = "overrule";
     private static final String DMZ = "dmz";
     private static final String MALLICE = "mallice";
 
@@ -34,7 +42,12 @@ public class DannelPlan {
 
     public record Plan(List<Landing> landings, double net) {}
 
-    private record Candidate(Planet planet, Tile tile, String owner, double stake) {}
+    private record Candidate(Planet planet, Tile tile, String owner, double stake) {
+
+        boolean pointPlay() {
+            return stake >= POINT_PLAY;
+        }
+    }
 
     public static Optional<Plan> best(Game game, Player seat) {
         if (!seat.hasLeaderUnlocked(HERO)) return Optional.empty();
@@ -43,16 +56,27 @@ public class DannelPlan {
         double[] value = new double[budget + 1];
         List<List<Landing>> picks = new ArrayList<>();
         for (int i = 0; i <= budget; i++) picks.add(List.of());
-        for (Candidate candidate : candidates(game, seat)) {
+        List<Candidate> candidates = candidates(game, seat);
+        int conversions = IndoctrinationBudget.conversions(game, seat);
+        List<Candidate> converted = candidates.stream()
+                .filter(Candidate::pointPlay)
+                .sorted(Comparator.comparingDouble(Candidate::stake).reversed())
+                .limit(conversions)
+                .toList();
+        for (Candidate candidate : candidates) {
+            Optional<UnitType> conversion = converted.contains(candidate)
+                    ? Optional.of(IndoctrinationBudget.replacement(game, seat))
+                    : Optional.empty();
             List<Landing> options = new ArrayList<>();
             for (int infantry = 1; infantry <= budget; infantry++) {
-                double win = CombatForecast.landingWin(
+                double win = CombatForecast.landingWinWithConversion(
                         game,
                         seat,
                         candidate.tile().getPosition(),
                         candidate.planet().getName(),
                         Map.of(UnitType.Infantry, infantry),
-                        false);
+                        false,
+                        conversion);
                 options.add(new Landing(
                         candidate.planet().getName(), candidate.owner(), infantry, win * candidate.stake()));
                 if (win >= 1) break;
@@ -70,11 +94,13 @@ public class DannelPlan {
             }
         }
         if (picks.get(budget).isEmpty()) return Optional.empty();
-        return Optional.of(new Plan(picks.get(budget), value[budget] - holdValue(game)));
+        List<Landing> chosen = picks.get(budget);
+        boolean pointPlay = chosen.stream().anyMatch(landing -> landing.value() >= POINT_PLAY * WinOdds.MAJORITY);
+        return Optional.of(new Plan(chosen, value[budget] - holdValue(game, pointPlay)));
     }
 
-    static double holdValue(Game game) {
-        return GameHorizon.roundsLeft(game) > 1 ? HERO_VALUE : 0;
+    static double holdValue(Game game, boolean pointPlay) {
+        return GameHorizon.roundsLeft(game) > 1 && !pointPlay ? HERO_VALUE : 0;
     }
 
     static int infantryInReinforcements(Game game, Player seat) {
@@ -99,6 +125,7 @@ public class DannelPlan {
                 double stake = BoardView.planetValue(planet)
                         + Math.max(0, own.gain(own.before().withPlanet(name)))
                         + holder.map(found -> denial(game, rivals, found, name)).orElse(0.0)
+                        + fracture(game, seat, planet, holder)
                         + mecatol(game, seat, planet);
                 String owner = holder.map(Player::getFaction).orElse(UNOWNED);
                 candidates.add(new Candidate(planet, tile, owner, stake));
@@ -125,8 +152,25 @@ public class DannelPlan {
         return Math.clamp(-theirs.gain(theirs.before().withoutPlanet(planet)), 0, VP);
     }
 
+    private static double fracture(Game game, Player seat, Planet planet, Optional<Player> holder) {
+        if (!FracturePrize.isFracturePlanet(planet)) return 0;
+        double relic =
+                holder.filter(found -> !found.isNeutral()).isPresent() ? 0 : FracturePrize.relic(game, seat, planet);
+        return relic + FracturePrize.point(planet);
+    }
+
     private static double mecatol(Game game, Player seat, Planet planet) {
         if (!game.mecatols().contains(planet.getName())) return 0;
-        return MecatolStake.holdValue(game, seat) + (BoardView.hasCustodians(planet) ? VP : 0);
+        double custodians = BoardView.hasCustodians(planet) ? VP : 0;
+        return MecatolStake.holdValue(game, seat) + custodians + imperialPoint(game, seat);
+    }
+
+    static double imperialPoint(Game game, Player seat) {
+        boolean imperial = seat.getSCs().stream()
+                .anyMatch(initiative -> StrategyCard.of(game, initiative) == StrategyCard.IMPERIAL
+                        && !game.getPlayedSCs().contains(initiative));
+        boolean overrule = seat.getActionCards().keySet().stream().anyMatch(id -> id.startsWith(OVERRULE));
+        if (!imperial && !overrule) return 0;
+        return VP + (seat.hasTech(FLEET_LOGISTICS) ? FLEET_LOGISTICS_BONUS : 0);
     }
 }

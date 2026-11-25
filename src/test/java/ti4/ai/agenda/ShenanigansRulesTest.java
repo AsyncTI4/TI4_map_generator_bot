@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
@@ -131,9 +131,9 @@ class ShenanigansRulesTest extends BaseTi4Test {
     @Test
     void theBrainAnswersThem() {
         AiPrompt plots = deadlyPlotAndBribery(NOW);
-        new NekroBrain().decide(context(NOW, Set.of(), plots));
+        new StandardBrain().decide(context(NOW, Set.of(), plots));
 
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(context(LATE, Set.of(), plots))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(context(LATE, Set.of(), plots))))
                 .startsWith("generic_button_id_");
     }
 }

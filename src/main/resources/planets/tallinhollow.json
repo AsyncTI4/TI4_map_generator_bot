@@ -13,6 +13,7 @@
     "resources": 3,
     "influence": 0,
     "factionHomeworld": "obsidian",
+    "flavourText": "*The oceans lie as dead as the hearts of the populace.*",
     "planetTypes": [
         "FACTION"
     ],

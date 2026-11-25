@@ -1,0 +1,27 @@
+{
+  "id": "20261110-win-break-denial",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Leave-one-out: what does denying a rival's winning break add?",
+  "date": "2026-11-10",
+  "code": {
+    "commit": "before 14bebc007b",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "baseSeed": 7000,
+    "experimentsUnderTest": [
+      "WIN_BREAK_DENIAL"
+    ]
+  },
+  "estimate": {
+    "completePairs": 24,
+    "pointDifference": "+0.29 ± 0.20",
+    "treatmentWinShare": "0.66 ± 0.08"
+  },
+  "batch": null,
+  "verdict": "Kept.",
+  "notes": "Same stack-overflow caveat as the other 2026-11-10 leave-one-out runs."
+}

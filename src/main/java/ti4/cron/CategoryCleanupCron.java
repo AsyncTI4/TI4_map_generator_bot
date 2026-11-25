@@ -1,18 +1,23 @@
 package ti4.cron;
 
-import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
+// TODO: Disabled 2026-11-16, register() is no longer called from JdaService.startBot. Until #6088 the
+// 6h-after-boot delay meant it almost never fired; its first fixed-time run deleted 56 PBD categories at
+// once, some still in use, because it trusts the cached getChannels(). EndGameService already deletes a
+// game's category when its last channels leave. Re-enable only with a check that no game still maps to
+// the category. Recover with /developer restore_game_categories.
 @UtilityClass
 public class CategoryCleanupCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(
-                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 6, 24, TimeUnit.HOURS);
+        CronManager.schedulePeriodicallyAtTime(
+                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 5, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanupCategories() {

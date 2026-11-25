@@ -3,11 +3,13 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -35,6 +37,12 @@ class SeatCaptureTest extends BaseTi4Test {
         rex = board.test.place("18", MECATOL);
         sardakk().addPlanet("mr");
         board.test.units(rex, "mr", sardakk(), UnitType.Infantry, 1);
+        AiExperiments.disable(
+                nekro(),
+                EnumSet.of(
+                        AiExperiments.Experiment.DESPERATION_PUBLIC,
+                        AiExperiments.Experiment.DESPERATION_STATUS_SECRET,
+                        AiExperiments.Experiment.DESPERATION_ACTION_SECRET));
     }
 
     private Player nekro() {

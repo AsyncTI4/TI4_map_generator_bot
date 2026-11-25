@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
@@ -14,11 +15,13 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.HydromorphicHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -36,7 +39,9 @@ class ActionCardHandButtonHandler {
 
     @ButtonHandler("getACFrom_")
     static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = buttonID.replace("getACFrom_", "");
+        boolean lieInWait = buttonID.endsWith(TeHelperActionCards.LIE_IN_WAIT_SUFFIX);
+        String faction =
+                StringUtils.removeEnd(buttonID.replace("getACFrom_", ""), TeHelperActionCards.LIE_IN_WAIT_SUFFIX);
         Player victim = game.getPlayerFromColorOrFaction(faction);
         if (victim == null || XinTechHandler.hasAstromanticCloakSteel(victim)) {
             MessageHelper.sendMessageToChannel(
@@ -47,6 +52,7 @@ class ActionCardHandButtonHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        if (lieInWait) ActionCardTargets.record(game, "Lie in Wait", player, victim);
         List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(

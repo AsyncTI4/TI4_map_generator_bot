@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -174,7 +175,8 @@ public class SarcosaBreakthroughHandler {
         if (game == null || player == null || targetTile == null || game.getActivePlayer() != player) {
             return false;
         }
-        for (String position : FoWHelper.getAdjacentTiles(game, targetTile.getPosition(), player, false, true)) {
+        for (String position :
+                Adjacency.of(game, player).forEffects().withSelf().into(targetTile.getPosition())) {
             Tile tile = game.getTileByPosition(position);
             if (tile == null || tile.isScar(game)) {
                 continue;

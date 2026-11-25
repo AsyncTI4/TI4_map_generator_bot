@@ -50,7 +50,7 @@ class SecretObjectiveButtonHandler {
             }
 
             String msg = player.getRepresentationNoPing() + " discarded a secret objective";
-            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 1) {
+            if (game.getRound() == 1 && !game.isFowMode() && !game.isSecretsOnlyMode() && player.getSo() > 1) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.getSo() > 1 && (!game.isErwansGambitMode() || !"mentak".equalsIgnoreCase(p2.getFaction()))) {
@@ -160,7 +160,7 @@ class SecretObjectiveButtonHandler {
             return;
         }
 
-        DrawSecretService.dealSOToAll(event, 2, game);
+        DrawSecretService.dealStartingSecretObjectives(event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -176,7 +176,7 @@ class SecretObjectiveButtonHandler {
         event.getMessageChannel()
                 .deleteMessageById(dealButtonMessageId)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
-        DrawSecretService.dealSOToAll(event, 2, game);
+        DrawSecretService.dealStartingSecretObjectives(event, game);
         ButtonHelper.deleteMessage(event);
     }
 

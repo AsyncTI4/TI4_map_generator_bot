@@ -13,6 +13,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -25,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.player.PlayerStatsService;
 import ti4.service.strategycard.PickStrategyCardService;
 
@@ -100,6 +102,7 @@ public class PickStrategyCardButtonHandler {
                     if (pdValue.contains(p2.getFaction())
                             && p2.getPlayableActionCards().contains("disgrace")) {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
+                        ActionCardTargets.record(game, "Public Disgrace", p2, player);
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "
                                 + game.getSCEmojiWordRepresentation(scpick) + ".";
@@ -234,8 +237,9 @@ public class PickStrategyCardButtonHandler {
         if (minNumOfSCs == maxSCsPerPlayer) {
             return buttons;
         }
+        boolean scGroups = MegagameGroupService.isActive(game);
         for (Player p2 : activePlayers) {
-            if (p2 == player) {
+            if (p2 == player || (scGroups && !MegagameGroupService.sameGroup(game, p2, scPicked))) {
                 continue;
             }
             if (p2.getSCs().size() < maxSCsPerPlayer) {

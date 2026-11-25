@@ -21,7 +21,7 @@ public class ArvaxiAbilityHandler {
     @ButtonHandler("underhandedManeuverPickNeighbor")
     public static void underhandedManeuverPickNeighbor(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+        for (Player neighbor : player.getAbilityNeighbours()) {
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_underhandedManeuverTarget_" + neighbor.getFaction(),
                     neighbor.getFactionNameOrColor(),

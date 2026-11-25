@@ -11,7 +11,7 @@ public record PlayerSearchCriteria(
         boolean tigl,
         List<String> tiglRanks) {
 
-    public int maxPlayerCount() {
+    int maxPlayerCount() {
         return playerCounts.stream().mapToInt(Integer::parseInt).max().orElse(0);
     }
 }

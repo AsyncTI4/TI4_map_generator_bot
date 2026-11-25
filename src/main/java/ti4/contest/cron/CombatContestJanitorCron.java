@@ -12,6 +12,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 class CombatContestJanitorCron {
 
+    // Intentionally off: not registered in JdaService.registerAndStartCronJobs at the moment.
     public static void register() {
         CronManager.schedulePeriodically(
                 CombatContestJanitorCron.class,

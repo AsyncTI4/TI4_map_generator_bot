@@ -12,11 +12,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
@@ -38,7 +38,7 @@ class MatchmakerServiceTest extends BaseTi4Test {
     void setup() {
         queueStore = mock(MatchmakingQueueStore.class);
         when(queueStore.loadQueuedParties()).thenReturn(parties);
-        matchmakerService = new MatchmakerService(queueStore);
+        matchmakerService = new MatchmakerService(queueStore, new PendingMatchPosts());
 
         MatchmakingRatingEventService ratingServiceMock = mock(MatchmakingRatingEventService.class);
         when(ratingServiceMock.getPlayerRatings(any())).thenReturn(Map.of());
@@ -66,28 +66,125 @@ class MatchmakerServiceTest extends BaseTi4Test {
         assertThat(expiredCaptor.getValue())
                 .extracting(queuedParty -> queuedParty.party().getId())
                 .containsExactly(partyId);
-        ArgumentCaptor<List<MatchedGame>> gamesCaptor = ArgumentCaptor.captor();
-        notifier.verify(() -> MatchmakingNotifier.postMatchedGames(gamesCaptor.capture()));
-        assertThat(gamesCaptor.getValue()).isEmpty();
+        assertThat(capturePostedMatches().games()).isEmpty();
     }
 
+    // Matched parties used to be deleted before the post was attempted, so a missing forum, a Discord error or the
+    // bot stopping mid-post silently dropped every player in the match. They now leave the queue only once the
+    // forum post exists.
     @Test
-    void processQueueDeletesMatchedPartiesBeforePosting() {
+    void matchedPartiesStayQueuedUntilThePostSucceeds() {
         long firstPartyId = addSoloParty("p1", Duration.ZERO);
         long secondPartyId = addSoloParty("p2", Duration.ZERO);
         long thirdPartyId = addSoloParty("p3", Duration.ZERO);
 
         matchmakerService.processQueue();
 
-        InOrder inOrder = Mockito.inOrder(queueStore, MatchmakingNotifier.class);
+        verify(queueStore, never()).deleteParties(any());
+        PostedMatches posted = capturePostedMatches();
+        assertThat(posted.games()).hasSize(1);
+        notifier.verify(() -> MatchmakingNotifier.notifyExpired(any()), never());
+
+        posted.outcome().posted(posted.games().getFirst());
+
         ArgumentCaptor<List<Long>> deletedPartyIdsCaptor = ArgumentCaptor.captor();
-        inOrder.verify(queueStore).deleteParties(deletedPartyIdsCaptor.capture());
+        verify(queueStore).deleteParties(deletedPartyIdsCaptor.capture());
         assertThat(deletedPartyIdsCaptor.getValue())
                 .containsExactlyInAnyOrder(firstPartyId, secondPartyId, thirdPartyId);
+    }
+
+    // While the post is in flight the parties are still in the database, so they must not be matched a second time
+    // by the next queue run (or picked up by a standing player search).
+    @Test
+    void partiesWithAPostInFlightAreNotMatchedAgain() {
+        addSoloParty("p1", Duration.ZERO);
+        addSoloParty("p2", Duration.ZERO);
+        addSoloParty("p3", Duration.ZERO);
+
+        matchmakerService.processQueue();
+        matchmakerService.processQueue();
+
+        List<PostedMatches> runs = capturePostedMatchesPerRun(2);
+        assertThat(runs.get(0).games()).hasSize(1);
+        assertThat(runs.get(1).games()).isEmpty();
+    }
+
+    @Test
+    void aFailedPostKeepsThePartiesQueuedForTheNextRun() {
+        addSoloParty("p1", Duration.ZERO);
+        addSoloParty("p2", Duration.ZERO);
+        addSoloParty("p3", Duration.ZERO);
+
+        matchmakerService.processQueue();
+        PostedMatches firstRun = capturePostedMatches();
+        firstRun.outcome().notPosted(firstRun.games().getFirst());
+        matchmakerService.processQueue();
+
+        verify(queueStore, never()).deleteParties(any());
+        List<PostedMatches> runs = capturePostedMatchesPerRun(2);
+        assertThat(runs.get(1).games()).hasSize(1);
+    }
+
+    @Test
+    void aMemberWhoLeftTheServerOnlyRemovesTheirOwnParty() {
+        long departedPartyId = addSoloParty("p1", Duration.ZERO);
+        addSoloParty("p2", Duration.ZERO);
+        addSoloParty("p3", Duration.ZERO);
+
+        matchmakerService.processQueue();
+        PostedMatches firstRun = capturePostedMatches();
+        firstRun.outcome().membersLeftGuild(firstRun.games().getFirst(), List.of(departedPartyId));
+
+        verify(queueStore).deleteParties(List.of(departedPartyId));
+        // The deleted party is gone from the real store; drop it from the fake one so the next run sees the rest.
+        parties.removeIf(party -> party.party().getId() == departedPartyId);
+        addSoloParty("p4", Duration.ZERO);
+        matchmakerService.processQueue();
+
+        List<PostedMatches> runs = capturePostedMatchesPerRun(2);
+        assertThat(runs.get(1).games())
+                .singleElement()
+                .satisfies(game -> assertThat(game.members())
+                        .extracting(MatchmakingQueueMember::getUserId)
+                        .containsExactlyInAnyOrder("p2", "p3", "p4"));
+    }
+
+    // Groups used to be refused with "You cannot queue for TIGL as a group".
+    @Test
+    void aFormedGroupCanQueueForTigl() {
+        MatchmakingQueueMember member = new MatchmakingQueueMember();
+        member.setUserId("p1");
+        member.setPartyId(7L);
+        MatchmakingQueueParty group = new MatchmakingQueueParty();
+        group.setId(7L);
+        when(queueStore.findMember("p1")).thenReturn(Optional.of(member));
+        when(queueStore.findParty(7L)).thenReturn(Optional.of(group));
+
+        Optional<String> error = matchmakerService.queue("p1", true);
+
+        assertThat(error).isEmpty();
+        verify(queueStore).markQueued(group, "p1", true);
+    }
+
+    private record PostedMatches(List<MatchedGame> games, MatchmakingNotifier.MatchPostOutcome outcome) {}
+
+    private PostedMatches capturePostedMatches() {
+        return capturePostedMatchesPerRun(1).getFirst();
+    }
+
+    private List<PostedMatches> capturePostedMatchesPerRun(int runs) {
         ArgumentCaptor<List<MatchedGame>> gamesCaptor = ArgumentCaptor.captor();
-        inOrder.verify(notifier, () -> MatchmakingNotifier.postMatchedGames(gamesCaptor.capture()));
-        assertThat(gamesCaptor.getValue()).hasSize(1);
-        notifier.verify(() -> MatchmakingNotifier.notifyExpired(any()), never());
+        ArgumentCaptor<MatchmakingNotifier.MatchPostOutcome> outcomeCaptor = ArgumentCaptor.captor();
+        notifier.verify(
+                () -> MatchmakingNotifier.postMatchedGames(gamesCaptor.capture(), outcomeCaptor.capture()),
+                Mockito.times(runs));
+        List<PostedMatches> posted = new ArrayList<>();
+        for (int run = 0; run < runs; run++) {
+            posted.add(new PostedMatches(
+                    gamesCaptor.getAllValues().get(run),
+                    outcomeCaptor.getAllValues().get(run)));
+        }
+        return posted;
     }
 
     private long addSoloParty(String userId, Duration queueWait) {

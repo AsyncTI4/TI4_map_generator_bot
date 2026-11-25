@@ -50,14 +50,13 @@ public class ThirtyKCards {
         return DECK_HAS_THIRTYK.computeIfAbsent(deckID, id -> {
             DeckModel deck = Mapper.getDeck(id);
             if (deck == null || deck.getType() == null) return false;
-            Predicate<String> isThirtyKCard =
-                    switch (deck.getType()) {
-                        case ACTION_CARD -> ThirtyKCards::isActionCard;
-                        case EXPLORE -> ThirtyKCards::isExplore;
-                        case RELIC -> ThirtyKCards::isRelic;
-                        case SECRET_OBJECTIVE -> ThirtyKCards::isSecretObjective;
-                        default -> cardID -> false;
-                    };
+            Predicate<String> isThirtyKCard = switch (deck.getType()) {
+                case ACTION_CARD -> ThirtyKCards::isActionCard;
+                case EXPLORE -> ThirtyKCards::isExplore;
+                case RELIC -> ThirtyKCards::isRelic;
+                case SECRET_OBJECTIVE -> ThirtyKCards::isSecretObjective;
+                default -> cardID -> false;
+            };
             return deck.getCardIDs().stream().anyMatch(isThirtyKCard);
         });
     }

@@ -13,22 +13,14 @@ import ti4.ai.tactical.TacticalPlan;
 @UtilityClass
 class TokenValue {
 
-    static double tacticTokens(PlanInputs in, int gained) {
-        return tokens(in, gained, CardValueScale.TOKEN_FLOOR);
-    }
-
     static double savedTacticToken(PlanInputs in) {
         int index = Math.max(0, in.seat().getTacticalCC());
         List<TacticalPlan> ranked = in.ranked();
         double planValue = index < ranked.size() ? ranked.get(index).score() * CardValueScale.TOKEN_ACTION_SHARE : 0;
-        return Math.max(CardValueScale.TOKEN_FLOOR, planValue);
+        return Math.max(CardValueScale.HELD_TOKEN, planValue);
     }
 
-    static double carriedTokens(PlanInputs in, int gained) {
-        return tokens(in, gained, CardValueScale.HELD_TOKEN);
-    }
-
-    private static double tokens(PlanInputs in, int gained, double floor) {
+    static double tacticTokens(PlanInputs in, int gained) {
         int usable = Math.min(gained, in.reinforcements());
         int start = Math.max(0, in.seat().getTacticalCC());
         List<TacticalPlan> ranked = in.ranked();
@@ -37,7 +29,7 @@ class TokenValue {
             int index = start + i;
             double planValue =
                     index < ranked.size() ? ranked.get(index).score() * CardValueScale.TOKEN_ACTION_SHARE : 0;
-            value += Math.max(floor, planValue);
+            value += Math.max(CardValueScale.HELD_TOKEN, planValue);
         }
         return value;
     }

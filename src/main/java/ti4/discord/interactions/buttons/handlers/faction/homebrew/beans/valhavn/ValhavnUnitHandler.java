@@ -15,10 +15,10 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.service.tactical.LandingContext;
 import ti4.service.unit.AddUnitService;
@@ -149,7 +149,9 @@ public class ValhavnUnitHandler {
 
     private static boolean canSupportInvasion(LandingContext ctx, Tile pdsTile) {
         return pdsTile == ctx.tile
-                || FoWHelper.getAdjacentTiles(ctx.game, ctx.tile.getPosition(), ctx.mainPlayer, false)
+                || Adjacency.of(ctx.game, ctx.mainPlayer)
+                        .forMovement()
+                        .into(ctx.tile.getPosition())
                         .contains(pdsTile.getPosition());
     }
 }

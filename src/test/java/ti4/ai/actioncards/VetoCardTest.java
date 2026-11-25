@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
@@ -32,7 +32,7 @@ class VetoCardTest extends BaseTi4Test {
     private static final long SETTLED = NOW + 11_000L;
     private static final String VETO = "veto";
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
     private Player nekro;
     private Player sol;

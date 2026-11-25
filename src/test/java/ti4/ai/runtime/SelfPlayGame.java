@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,6 @@ final class SelfPlayGame {
     private static final int RELICS_PER_SEAT = Integer.getInteger("ai.selfplay.relics", 0);
     private static final long FRACTURE_SEED = Long.getLong("ai.selfplay.fractureseed", 7L);
     private static final String OWNER_ID = "300000000000000001";
-    private static final String AGENDA_FLIP_STAMP = "lastAgendaReactTime";
-    private static final long AGENDA_FLIP_AGE_MILLIS = 10 * 60 * 1000L;
 
     enum Ending {
         STOP_CONDITION,
@@ -197,16 +194,24 @@ final class SelfPlayGame {
     private final SelfPlayEnvironment env;
     final String name;
     private TextChannel actions;
-    private long issuedTurnStamp = -1;
     private final List<String> victoryPointsByRound = new ArrayList<>();
     private final List<Map<String, Integer>> pointsAfterRound = new ArrayList<>();
     private final List<Map<String, Double>> stateAtRoundStart = new ArrayList<>();
     private int recordedRound;
     private long wallStart = System.nanoTime();
+    private TurnDurations turnDurations;
     private final int slot;
     // Every random draw the game thread makes (dice, decks, seat ids, AI profile seeds) comes from this seed, so a game
     // replays from -Dai.selfplay.seed=<printed seed> with its slot. Without the property each batch picks a base seed.
     static final long BASE_SEED = Long.getLong("ai.selfplay.seed", System.nanoTime() & 0xFFFFFFFFL);
+    // Every game starts its virtual clock here and is named after its seed, so a printed seed replays the same game:
+    // game names and message times feed the AI.
+    static final long CLOCK_START = 1_790_000_000_000L;
+
+    static String seededName(String prefix, long seed) {
+        return prefix + Math.floorMod(seed, 1_000_000L);
+    }
+
     final long seed;
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
@@ -251,6 +256,7 @@ final class SelfPlayGame {
         this.slot = slot;
         this.seed = seed;
         this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + seed);
+        this.turnDurations = new TurnDurations(name);
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -478,6 +484,7 @@ final class SelfPlayGame {
             agendas.observe(game, now);
             relics.observe(game);
             env.leaders.observe(game);
+            env.factionComponents.observe(game, env.discord);
             if (fracture.due(game)) force(game, fracture::enter);
             if (relicsDue(game)) {
                 relicsHandedOut = true;
@@ -488,6 +495,7 @@ final class SelfPlayGame {
             logFleets(game);
             logResearchPlans(game);
             closeOverrulePicks(game, false);
+            turnDurations.observe(game, now);
             ti4.ai.trace.TimingReport.recordOutside("harness.observe", System.nanoTime() - observeStart);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
@@ -508,15 +516,15 @@ final class SelfPlayGame {
             }
             if (lane.watchdogDue(now, AiSettings.WATCHDOG_PERIOD.toMillis())) lane.markDirty(now);
             if (lane.isDue(now) && lane.tryStart()) {
+                long tickStart = System.nanoTime();
                 try {
                     AiTickRunner.tick(lane, now);
                 } finally {
                     lane.finish();
+                    turnDurations.ticked(System.nanoTime() - tickStart);
                 }
                 ticks++;
                 recordHands(game);
-                stampTurnStart(now);
-                ageAgendaFlipGuard();
             }
             env.advance(STEP_MILLIS);
         }
@@ -555,16 +563,10 @@ final class SelfPlayGame {
         return false;
     }
 
-    // Changes the game between ticks the way a test scenario needs, and saves it. A turn the change started counts as
-    // started now on the virtual clock, like a turn a press started, so its messages belong to it.
+    // Changes the game between ticks the way a test scenario needs, and saves it. A turn the change starts is stamped
+    // by the engine on the game clock, which is the virtual clock here, so its messages belong to it.
     void force(Game game, java.util.function.Consumer<Game> change) {
-        Date before = game.getLastActivePlayerChange();
         change.accept(game);
-        Date after = game.getLastActivePlayerChange();
-        if (after != null && !after.equals(before)) {
-            game.setLastActivePlayerChange(new Date(env.now()));
-            issuedTurnStamp = env.now();
-        }
         saveObserved(game, "AI self-play scenario");
     }
 
@@ -578,8 +580,7 @@ final class SelfPlayGame {
             AiGameState.Snapshot aiState,
             AiLane lane,
             long clock,
-            byte[] random,
-            long issuedTurnStamp) {}
+            byte[] random) {}
 
     Snapshot snapshot() {
         Game game = observed(GameManager.getManagedGame(name));
@@ -590,8 +591,7 @@ final class SelfPlayGame {
                 AiGameState.snapshot(name),
                 lane == null ? null : lane.copy(),
                 env.now(),
-                serialized(RandomHelper.current()),
-                issuedTurnStamp);
+                serialized(RandomHelper.current()));
     }
 
     void restore(Snapshot snapshot) {
@@ -605,7 +605,6 @@ final class SelfPlayGame {
         lane = snapshot.lane() == null ? null : snapshot.lane().copy();
         env.clock.set(snapshot.clock());
         RandomHelper.useForThisThread((java.util.Random) deserialized(snapshot.random()));
-        issuedTurnStamp = snapshot.issuedTurnStamp();
     }
 
     private static byte[] serialized(java.io.Serializable value) {
@@ -653,19 +652,6 @@ final class SelfPlayGame {
     // An interaction from the game's owner in the actions channel, for engine calls a scenario makes itself.
     GenericInteractionCreateEvent ownerEvent() {
         return setupEvent();
-    }
-
-    // The engine stamps a new turn with the wall clock; the AI compares it with message times from the virtual
-    // clock, so every turn change is re-stamped with the virtual time of the tick that caused it.
-    private void stampTurnStart(long tickTime) {
-        Game game = observed(GameManager.getManagedGame(name));
-        if (game == null) return;
-        Date changed = game.getLastActivePlayerChange();
-        long stamp = changed == null ? -1 : changed.getTime();
-        if (stamp == issuedTurnStamp) return;
-        game.setLastActivePlayerChange(new Date(tickTime));
-        issuedTurnStamp = tickTime;
-        saveObserved(game, "AI self-play clock");
     }
 
     // One line per round, taken when the next round starts, so the report shows how fast each seat scores.
@@ -766,29 +752,21 @@ final class SelfPlayGame {
         return lines;
     }
 
-    // The engine refuses to flip an agenda within 6 wall-clock seconds of the previous flip. The referee waits 20
-    // seconds of game time, which the virtual clock covers in a few real milliseconds, so the stamp is aged here to
-    // keep the guard's meaning: in game time, the previous flip was long ago. The AI reads the same stamp against the
-    // virtual clock (has the reveal settled? was this prompt made in this agenda?), so it must never be ahead of
-    // that clock: a seeded batch starts its clock in September 2026, and a wall-clock stamp then looked a month in the
-    // future, so a Veto was never resolved and riders never placed (seeds 15 and 21 stalled in "agendawaiting").
-    private void ageAgendaFlipGuard() {
-        Game game = observed(GameManager.getManagedGame(name));
-        if (game == null) return;
-        String flippedAt = game.getStoredValue(AGENDA_FLIP_STAMP);
-        if (flippedAt.isEmpty() || !flippedAt.chars().allMatch(Character::isDigit)) return;
-        long aged = Math.min(env.now(), System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS);
-        if (Long.parseLong(flippedAt) <= aged) return;
-        game.setStoredValue(AGENDA_FLIP_STAMP, String.valueOf(aged));
-        saveObserved(game, "AI self-play clock");
-    }
-
     private static String progressOf(Game game, ManagedGame managed) {
         return managed.getLastModifiedDate() + "|" + game.getRound() + "|" + game.getPhaseOfGame() + "|"
                 + game.getActivePlayerID();
     }
 
+    private void printTurnDurations() {
+        List<TurnDurations.Turn> turns = turnDurations.finish(env.now());
+        synchronized (System.out) {
+            turns.forEach(turn -> System.out.println(turn.line()));
+            TurnDurations.summary(turns).forEach(System.out::println);
+        }
+    }
+
     private Outcome outcome(Ending ending, Game game, int ticks) {
+        printTurnDurations();
         if (env.trajectory != null) env.trajectory.finish(ending.name(), seed, game);
         return new Outcome(
                 ending,
@@ -1142,7 +1120,11 @@ final class SelfPlayGame {
         appendTail(report, "Fake Discord action failures", env.discord.actionFailures(), 15);
         appendTail(report, "Fake Discord callback failures", env.discord.callbackFailures(), 15);
         appendTail(report, "Unsupported JDA calls (distinct)", distinct(env.discord.unsupportedCalls()), 30);
-        if (!env.watched.isEmpty()) appendTail(report, "Watched trace", env.watched, 400);
+        if (!env.idleOnTurn.isEmpty()) appendTail(report, "Idle on its turn", env.idleOnTurn, 200);
+        if (!env.watched.isEmpty()) {
+            appendTail(report, "Watched trace", env.watched, 400);
+            report.append("Full watched trace: ").append(writeWatchedTrace()).append('\n');
+        }
         if (SelfPlayEnvironment.WATCH != null) {
             appendTail(
                     report,
@@ -1204,6 +1186,21 @@ final class SelfPlayGame {
 
     private static List<String> distinct(List<String> lines) {
         return lines.stream().distinct().toList();
+    }
+
+    // The report keeps only the tail of the watched trace; the whole game's trace goes to a file beside the build
+    // output.
+    private String writeWatchedTrace() {
+        java.nio.file.Path file = java.nio.file.Path.of("target", "selfplay-watched", name + ".log");
+        try {
+            java.nio.file.Files.createDirectories(file.getParent());
+            synchronized (env) {
+                java.nio.file.Files.write(file, env.watched);
+            }
+            return file.toAbsolutePath().toString();
+        } catch (java.io.IOException e) {
+            return "not written (" + e.getMessage() + ")";
+        }
     }
 
     private static void appendTail(StringBuilder report, String title, List<String> lines, int count) {

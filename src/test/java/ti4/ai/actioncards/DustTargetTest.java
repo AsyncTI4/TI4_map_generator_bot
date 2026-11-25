@@ -13,7 +13,9 @@ import ti4.testUtils.BaseTi4Test;
 
 // Pirate Contract for Turn Their Fleets to Dust: post the neutral destroyer where our space cannon covers it, so that a
 // zero-move activation can kill it. A system next to our planets is normally off limits (the destroyer would block our
-// own lanes); the point it could score outweighs that, but not the cost of two raids, the card and the action.
+// own lanes); the point it could score outweighs that, but not the cost of the raids it expects (a second only if the
+// first misses), the card and the
+// action.
 class DustTargetTest extends BaseTi4Test {
 
     private static final String CARD = "piratecontract1";
@@ -70,9 +72,9 @@ class DustTargetTest extends BaseTi4Test {
     @Test
     void avoidsOurDockWhenAnEquallyCoveredSystemHasNone() {
         table.nekro.setSecret("ttfd");
-        Tile docked = coveredSystem("25", "quann", neighbours.get(0), 2);
+        Tile docked = coveredSystem("25", "quann", neighbours.get(0), 3);
         table.test.units(docked, "quann", table.nekro, UnitType.Spacedock, 1);
-        coveredSystem("26", "lodor", neighbours.get(1), 2);
+        coveredSystem("26", "lodor", neighbours.get(1), 3);
 
         assertThat(plan().orElseThrow().target()).isEqualTo(neighbours.get(1));
     }

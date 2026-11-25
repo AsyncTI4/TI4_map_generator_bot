@@ -1,6 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -149,7 +150,8 @@ public class ThronesThroneHandler {
     public static List<Button> getSkarnathSystems(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (!FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+            if (!FoWHelper.playerHasActualShipsInSystem(player, tile)
+                    || getSkarnathEligibleShipTypes(player, tile).size() < 2) {
                 continue;
             }
 
@@ -169,7 +171,12 @@ public class ThronesThroneHandler {
 
         String tilePos = buttonID.replace(USE_SKARNATH, "");
         Tile tile = game.getTileByPosition(tilePos);
-        if (tile == null || !FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+        Set<String> eligibleShipTypes = tile == null ? Set.of() : getSkarnathEligibleShipTypes(player, tile);
+        if (!player.hasPlanet("skarnath")
+                || !player.getExhaustedPlanetsAbilities().contains("skarnath")
+                || tile == null
+                || !FoWHelper.playerHasActualShipsInSystem(player, tile)
+                || eligibleShipTypes.size() < 2) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -192,7 +199,10 @@ public class ThronesThroneHandler {
             String unitAsyncId = unitAndTile.substring(0, separatorIndex);
             UnitModel unit = player.getUnitFromUnitKey(
                     Mapper.getUnitKey(AliasHandler.resolveUnit(unitAsyncId.replace("2", "")), player.getColorID()));
-            if (unit != null && unit.getIsShip() && !Character.isDigit(unitAsyncId.charAt(0))) {
+            if (unit != null
+                    && unit.getIsShip()
+                    && eligibleShipTypes.contains(unit.getBaseType())
+                    && !Character.isDigit(unitAsyncId.charAt(0))) {
                 productionButtons.add(button.withCustomId(customId.replace("place_", PLACE_SKARNATH)));
             }
         }
@@ -203,7 +213,7 @@ public class ThronesThroneHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Produce 2 different ships. Their cost is reduced by 2 if a neighbor owns both types.",
+                "Produce 2 different ship types that a neighbor owns in this system. Their cost is reduced by 2.",
                 productionButtons);
 
         ButtonHelper.deleteMessage(event);
@@ -226,25 +236,28 @@ public class ThronesThroneHandler {
         Tile tile = game.getTileByPosition(tilePosition);
         UnitModel unit = player.getUnitFromUnitKey(
                 Mapper.getUnitKey(AliasHandler.resolveUnit(unitAsyncId.replace("2", "")), player.getColorID()));
-        Set<String> producedShips = new java.util.HashSet<>();
+        Set<String> producedShips = new HashSet<>();
         String storedShips = game.getStoredValue(SKARNATH_PRODUCED_SHIPS + player.getFaction());
         if (!storedShips.isEmpty()) {
             producedShips.addAll(List.of(storedShips.split(",")));
         }
-        if (tile == null
+        if (!player.hasPlanet("skarnath")
+                || !player.getExhaustedPlanetsAbilities().contains("skarnath")
+                || tile == null
                 || !tilePosition.equals(game.getStoredValue(SKARNATH_TARGET_SYSTEM + player.getFaction()))
                 || unit == null
                 || !unit.getIsShip()
                 || Character.isDigit(unitAsyncId.charAt(0))
-                || producedShips.contains(unitAsyncId)
-                || producedShips.size() >= 2) {
+                || producedShips.contains(unit.getBaseType())
+                || producedShips.size() >= 2
+                || !neighborOwnsShipTypes(player, tile, withShipType(producedShips, unit.getBaseType()))) {
             MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Skarnath can produce 2 different ships in its selected system.");
+                    event, "Skarnath can produce 2 different ship types that a neighbor owns in its selected system.");
             return;
         }
 
         ButtonHelperModifyUnits.genericPlaceUnit("place_" + unitAndTile, event, game, player);
-        producedShips.add(unitAsyncId);
+        producedShips.add(unit.getBaseType());
         game.setStoredValue(SKARNATH_PRODUCED_SHIPS + player.getFaction(), String.join(",", producedShips));
     }
 
@@ -260,26 +273,49 @@ public class ThronesThroneHandler {
             return 0;
         }
 
-        Set<String> producedAliases = producedUnits.keySet().stream()
-                .map(k -> k.split("_")[0])
-                .filter(s -> s != null && !s.isBlank())
+        Set<String> producedShipTypes = producedUnits.keySet().stream()
+                .map(unit -> unit.split("_")[0])
+                .filter(unit -> unit != null && !unit.isBlank())
+                .map(unit -> player.getUnitFromUnitKey(
+                        Mapper.getUnitKey(AliasHandler.resolveUnit(unit.replace("2", "")), player.getColorID())))
+                .filter(java.util.Objects::nonNull)
+                .map(UnitModel::getBaseType)
                 .collect(Collectors.toSet());
-        if (producedAliases.size() != 2) return 0;
+        return producedShipTypes.size() == 2
+                        && neighborOwnsShipTypes(player, game.getTileByPosition(targetSystem), producedShipTypes)
+                ? 2
+                : 0;
+    }
 
-        for (Player neighbour : player.getNeighbouringPlayers(true)) {
-            boolean neighbourHasAll = true;
-            for (String alias : producedAliases) {
-                int neighbourCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, neighbour, alias, false);
-                if (neighbourCount < 1) {
-                    neighbourHasAll = false;
-                    break;
-                }
-            }
-            if (neighbourHasAll) {
-                return 2;
-            }
-        }
-        return 0;
+    private static Set<String> getSkarnathEligibleShipTypes(Player player, Tile tile) {
+        return player.getAbilityNeighbours().stream()
+                .map(neighbor -> getShipTypesInSystem(neighbor, tile))
+                .filter(shipTypes -> shipTypes.size() >= 2)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean neighborOwnsShipTypes(Player player, Tile tile, Set<String> shipTypes) {
+        return tile != null
+                && player.getAbilityNeighbours().stream()
+                        .map(neighbor -> getShipTypesInSystem(neighbor, tile))
+                        .anyMatch(neighborShipTypes -> neighborShipTypes.containsAll(shipTypes));
+    }
+
+    private static Set<String> getShipTypesInSystem(Player player, Tile tile) {
+        return tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
+                .filter(unitKey -> tile.getSpaceUnitHolder().getUnitCount(unitKey) > 0)
+                .map(player::getUnitFromUnitKey)
+                .filter(java.util.Objects::nonNull)
+                .filter(UnitModel::getIsShip)
+                .map(UnitModel::getBaseType)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<String> withShipType(Set<String> shipTypes, String shipType) {
+        Set<String> allShipTypes = new HashSet<>(shipTypes);
+        allShipTypes.add(shipType);
+        return allShipTypes;
     }
 
     public static void clearSkarnathDiscount(Game game, Player player) {

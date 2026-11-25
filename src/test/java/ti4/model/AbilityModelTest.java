@@ -39,7 +39,7 @@ class AbilityModelTest extends BaseTi4Test {
     @Test
     void testPermanentEffect() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
-        String permanentEffect = "Your space docks cannot produce infantry";
+        String permanentEffect = "Your space docks cannot produce infantry.";
         assertEquals(Optional.of(permanentEffect), abilityModel.getPermanentEffect());
     }
 

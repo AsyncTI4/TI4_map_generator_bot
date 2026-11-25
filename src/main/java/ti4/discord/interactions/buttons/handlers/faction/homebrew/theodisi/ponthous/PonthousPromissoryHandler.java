@@ -33,6 +33,7 @@ public class PonthousPromissoryHandler {
     private static final String THUNDERBIRD_PROTOTYPE = "thpnponthous";
     private static final String USE_THUNDERBIRD_PROTOTYPE = "useThunderbirdPrototype_";
     private static final String SELECT_THUNDERBIRD_GROUND_FORCE = "selectThunderbirdGroundForce_";
+    private static final String SET_THUNDERBIRD_GALVANIZED = "setThunderbirdGalvanized_";
     private static final String THUNDERBIRD_PROTOTYPE_STATE = "thunderbirdPrototype_";
 
     public static void offerThunderbirdPrototypeAtSpaceCombatStart(
@@ -119,8 +120,6 @@ public class PonthousPromissoryHandler {
             return;
         }
 
-        int galvanizedBefore = holder.getGalvanizedUnitCount(unitKey);
-        int galvanizedAdded = holder.addGalvanizedUnit(unitKey, 1);
         player.addPromissoryNoteToPlayArea(THUNDERBIRD_PROTOTYPE);
         game.setStoredValue(
                 getStateKey(player),
@@ -129,8 +128,8 @@ public class PonthousPromissoryHandler {
                         tile.getPosition(),
                         holder.getName(),
                         unitKey.asyncID(),
-                        Integer.toString(galvanizedBefore),
-                        Integer.toString(galvanizedAdded)));
+                        Integer.toString(holder.getGalvanizedUnitCount(unitKey)),
+                        "0"));
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
 
         Player owner = game.getPNOwner(THUNDERBIRD_PROTOTYPE);
@@ -140,11 +139,54 @@ public class PonthousPromissoryHandler {
                     owner.getRepresentationNoPing() + ", _Thunderbird Prototype_ was played by "
                             + player.getRepresentationNoPing() + ".");
         }
+        sendThunderbirdGalvanizedButtons(event.getMessageChannel(), game, player, tile, holder, unitKey);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SET_THUNDERBIRD_GALVANIZED)
+    public static void setThunderbirdGalvanized(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values =
+                buttonID.substring(SET_THUNDERBIRD_GALVANIZED.length()).split("\\|", 4);
+        if (values.length != 4) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Tile tile = game.getTileByPosition(values[1]);
+        UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[2]);
+        UnitKey unitKey = holder == null
+                ? null
+                : holder.getUnitKeysForPlayer(player).stream()
+                        .filter(key -> key.asyncID().equals(values[3]))
+                        .findFirst()
+                        .orElse(null);
+        if (!hasActiveThunderbirdPrototype(game, player, tile, holder, unitKey)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String[] state = game.getStoredValue(getStateKey(player)).split("\\|", 5);
+        if (!"0".equals(state[4])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if ("yes".equals(values[0])) {
+            int galvanizedAdded = holder.addGalvanizedUnit(unitKey, 1);
+            game.setStoredValue(
+                    getStateKey(player),
+                    String.join("|", state[0], state[1], state[2], state[3], Integer.toString(galvanizedAdded)));
+        } else if ("no".equals(values[0])) {
+            game.setStoredValue(getStateKey(player), String.join("|", state[0], state[1], state[2], state[3], "-1"));
+        } else {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " selected 1 " + unitKey.humanReadableName() + " on "
                         + holder.getRepresentation(game)
-                        + " to participate in this space combat as a ship and made it Galvanized until the combat ends.");
+                        + " to participate in this space combat as a ship"
+                        + ("yes".equals(values[0]) ? " and made it Galvanized until the combat ends." : "."));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -193,7 +235,7 @@ public class PonthousPromissoryHandler {
                             .orElse(null);
             if (unitKey != null) {
                 int baseline = NumberUtils.toInt(values[3]);
-                int added = NumberUtils.toInt(values[4]);
+                int added = Math.max(0, NumberUtils.toInt(values[4]));
                 int toRemove = Math.min(added, Math.max(0, holder.getGalvanizedUnitCount(unitKey) - baseline));
                 holder.removeGalvanizedUnit(unitKey, toRemove);
             }
@@ -227,6 +269,24 @@ public class PonthousPromissoryHandler {
                 && player.hasPlayablePromissoryInHand(THUNDERBIRD_PROTOTYPE);
     }
 
+    private static boolean hasActiveThunderbirdPrototype(
+            Game game, Player player, Tile tile, UnitHolder holder, UnitKey unitKey) {
+        if (game == null
+                || player == null
+                || tile == null
+                || holder == null
+                || unitKey == null
+                || !player.getPromissoryNotesInPlayArea().contains(THUNDERBIRD_PROTOTYPE)) {
+            return false;
+        }
+        String[] state = game.getStoredValue(getStateKey(player)).split("\\|", 5);
+        return state.length == 5
+                && tile.getPosition().equals(state[0])
+                && holder.getName().equals(state[1])
+                && unitKey.asyncID().equals(state[2])
+                && holder.getUnitCount(unitKey) > 0;
+    }
+
     private static Tile getThunderbirdCombatTile(Game game) {
         return game == null ? null : game.getTileByPosition(game.getCurrentActiveSystem());
     }
@@ -237,6 +297,24 @@ public class PonthousPromissoryHandler {
         String prefix = player.factionButtonChecker() + SELECT_THUNDERBIRD_GROUND_FORCE;
         MessageHelper.sendMessageToChannelWithButtons(
                 channel, message, NewStuffHelper.buttonPagination(buttons, prefix, 0));
+    }
+
+    private static void sendThunderbirdGalvanizedButtons(
+            MessageChannel channel, Game game, Player player, Tile tile, UnitHolder holder, UnitKey unitKey) {
+        String payload = tile.getPosition() + "|" + holder.getName() + "|" + unitKey.asyncID();
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                player.getRepresentationNoPing()
+                        + ", you may treat that "
+                        + unitKey.humanReadableName()
+                        + " as Galvanized until this combat ends.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + SET_THUNDERBIRD_GALVANIZED + "yes|" + payload,
+                                "Treat as Galvanized"),
+                        Buttons.red(
+                                player.factionButtonChecker() + SET_THUNDERBIRD_GALVANIZED + "no|" + payload,
+                                "Do Not Galvanize")));
     }
 
     private static List<Button> getEligibleThunderbirdGroundForceButtons(Game game, Player player, Tile tile) {

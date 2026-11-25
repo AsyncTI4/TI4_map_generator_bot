@@ -14,8 +14,7 @@ public class ThirtyKDistance {
 
     public static boolean isMoreThanFiveAway(Game game, String fromPosition, String toPosition) {
         if (fromPosition == null || toPosition == null) return false;
-        Map<String, Integer> distances =
-                CheckDistanceHelper.getTileDistances(game, null, fromPosition, FAR_AWAY + 1, true);
+        Map<String, Integer> distances = CheckDistanceHelper.getBoardDistances(game, fromPosition, FAR_AWAY + 1);
         Integer distance = distances.get(toPosition);
         return distance == null || distance > FAR_AWAY;
     }

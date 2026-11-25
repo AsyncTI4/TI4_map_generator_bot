@@ -99,6 +99,10 @@ class StrikeEvaluator {
 
     private static StrikeEstimate estimate(
             Game game, Player seat, Strike strike, boolean openingFire, CombatHand hand) {
+        if (SkippedSpaceCombat.assumedFor(seat)
+                && !strike.target().getPlanetUnitHolders().isEmpty()) {
+            return skippingSpaceCombat(game, seat, strike, hand);
+        }
         StrikeEstimate plain = estimate(game, seat, strike, openingFire, hand, false);
         if (!guardsTransports(game, seat, strike)) return plain;
         StrikeEstimate guarded = estimate(game, seat, strike, openingFire, hand, true);
@@ -146,7 +150,7 @@ class StrikeEvaluator {
         if (fight.win() == 0) return lost(seat, strike, fight, spaceCombat);
         Map<UnitType, Integer> survivors = survivors(seat, strike.ships(), fight.ourLossIfWin(), guardTransports);
         CombatHand groundHand = spaceCombat && !escaped ? afterCannon.afterSpaceCombat() : afterCannon;
-        Ground ground = ground(game, seat, strike, fight, survivors, BoardView.ships(space, seat), groundHand);
+        Ground ground = ground(game, seat, strike, fight, survivors, BoardView.ships(space, seat), groundHand, true);
         double cargoLoss =
                 (1 - fight.win()) * shipCost(seat, strike.cargo()) + fight.win() * shipCost(seat, ground.dropped());
         return new StrikeEstimate(
@@ -411,15 +415,17 @@ class StrikeEvaluator {
             Space fight,
             Map<UnitType, Integer> survivors,
             Map<UnitType, Integer> present,
-            CombatHand hand) {
+            CombatHand hand,
+            boolean bombardmentStep) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         StrikeRules rules = strike.rules();
         double spaceWin = fight.win();
         List<Planet> planets = landingPlanets(game, seat, strike);
         boolean landing = !planets.isEmpty();
-        Optional<BombardmentRules.Target> bombardment =
-                BombardmentRules.target(game, seat, target, merged(present, strike.ships()));
+        Optional<BombardmentRules.Target> bombardment = bombardmentStep
+                ? BombardmentRules.target(game, seat, target, merged(present, strike.ships()))
+                : Optional.empty();
         Map<UnitType, Integer> remaining = new EnumMap<>(UnitType.class);
         remaining.putAll(strike.cargo());
         Map<UnitType, Integer> dropped = dropExcessCargo(seat, remaining, survivors, landing, nonFighterCount(present));
@@ -747,11 +753,33 @@ class StrikeEvaluator {
         return BoardView.model(player, type).map(UnitModel::getCost).orElse(0f);
     }
 
+    private static StrikeEstimate skippingSpaceCombat(Game game, Player seat, Strike strike, CombatHand hand) {
+        Space skipped = new Space(1, 0, 0, 0, 0, 0, Map.of(strike.ships(), 1.0));
+        Map<UnitType, Integer> present = BoardView.ships(BoardView.space(strike.target()), seat);
+        Ground ground = ground(game, seat, strike, skipped, strike.ships(), present, hand, false);
+        double shipsReturned = shipCost(seat, strike.ships()) + shipCost(seat, present);
+        return new StrikeEstimate(
+                1,
+                false,
+                false,
+                ground.fought(),
+                ground.landings(),
+                ground.wins(),
+                ground.sent(),
+                shipsReturned + ground.ourLoss() + shipCost(seat, ground.dropped()),
+                shipsReturned,
+                ground.theirLoss(),
+                0,
+                1 - ground.noKill(),
+                1,
+                Map.of());
+    }
+
     static StrikeEstimate afterSpaceWon(Game game, Player seat, Strike strike, double spaceWin) {
         Space won = new Space(spaceWin, 0, 0, 0, 0, 0, Map.of(strike.ships(), spaceWin));
         UnitHolder space = BoardView.space(strike.target());
         Ground ground = ground(
-                game, seat, strike, won, strike.ships(), BoardView.ships(space, seat), CombatHand.of(game, seat));
+                game, seat, strike, won, strike.ships(), BoardView.ships(space, seat), CombatHand.of(game, seat), true);
         Map<String, Integer> landings = new LinkedHashMap<>();
         Map<String, Double> wins = new LinkedHashMap<>();
         Map<String, Integer> sent = new LinkedHashMap<>();

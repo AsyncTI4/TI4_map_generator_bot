@@ -15,14 +15,13 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.LieInWaitService;
 
 class SendCommodities extends GameStateSubcommand {
 
     SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Send commodities to player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count")
-                .setRequiredRange(1, 999)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.TARGET_FACTION_OR_COLOR,
@@ -96,5 +95,6 @@ class SendCommodities extends GameStateSubcommand {
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, commString, null);
         }
         TransactionHelper.checkTransactionLegality(game, player, targetPlayer);
+        LieInWaitService.check(player, targetPlayer, game);
     }
 }

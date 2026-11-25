@@ -230,6 +230,33 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEqualTo("deleteButtons");
     }
 
+    // Self-play seed 9700a round 6: destroying its only carrier left the edited loss message with just the "All"
+    // buttons and Done. With no single-unit loss left on it, it must still close the prompt instead of stalling.
+    @Test
+    void closesTheAssaultCannonLossOnceItsLastShipButtonIsGone() {
+        test.game.setStoredValue("nekrolatestAssignHits", "assaultcannoncombat");
+        String color = test.nekro.getColor();
+        AiPrompt loss = prompt(
+                "loss",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "FFCC_nekro_assignHits_" + position + "_1_cv_" + color,
+                "FFCC_nekro_assignHits_" + position + "_AllShips",
+                "deleteButtons");
+        AiPrompt edited = prompt(
+                "loss",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "FFCC_nekro_assignHits_" + position + "_AllShips",
+                "FFCC_nekro_assignHits_" + position + "_All",
+                "deleteButtons");
+
+        assertThat(pressedId(CombatRules.next(test.context(loss)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_assignHits_" + position + "_1_cv_" + color);
+        assertThat(pressedId(CombatRules.next(test.context(edited)).orElseThrow()))
+                .isEqualTo("deleteButtons");
+    }
+
     // Magen Defense Grid gives a free hit at the start of a ground combat on a planet with its structures. It uses it,
     // and an infantry is a better target than an undamaged mech, which would only sustain.
     @Test

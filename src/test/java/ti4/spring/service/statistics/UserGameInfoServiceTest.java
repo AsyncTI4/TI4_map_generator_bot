@@ -51,7 +51,7 @@ class UserGameInfoServiceTest {
         game.setEndedEpochMilliseconds(Duration.ofDays(daysToComplete).toMillis());
 
         PlayerEntity player = new PlayerEntity();
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setGame(game);
         return player;
     }

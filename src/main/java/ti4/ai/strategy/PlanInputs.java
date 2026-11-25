@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.Threats;
 import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.TacticalPlan;
@@ -50,7 +51,8 @@ record PlanInputs(
     }
 
     static PlanInputs of(Game game, Player seat, PlanMoment moment) {
-        String key = game.getName() + "|" + seat.getUserID() + "|" + moment + viewerKey(game, seat);
+        String key = game.getName() + "|" + seat.getUserID() + "|" + moment + viewerKey(game, seat)
+                + ImaginedTurn.cacheMark(seat);
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();

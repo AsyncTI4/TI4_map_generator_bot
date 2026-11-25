@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
@@ -67,6 +67,6 @@ class RearAdmiralFarranRulesTest extends BaseTi4Test {
 
     @Test
     void theBrainAnswersTheOfferInThePublicChannel() {
-        assertThat(new NekroBrain().publicWindowHandlerPrefixes()).contains(RearAdmiralFarranRules.GAIN);
+        assertThat(new StandardBrain().publicWindowHandlerPrefixes()).contains(RearAdmiralFarranRules.GAIN);
     }
 }

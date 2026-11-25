@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "matchmaking_queue_member", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
-public class MatchmakingQueueMember {
+class MatchmakingQueueMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

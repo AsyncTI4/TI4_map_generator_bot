@@ -47,4 +47,18 @@ class ImaginedTurnTest extends BaseTi4Test {
         assertThat(seen).isPositive();
         assertThat(imagined).isZero();
     }
+
+    // Per-save caches keyed on a seat (PlanInputs, SpendOutlook, DiplomacyUse) add this mark, so an answer worked out
+    // with the seat's hand hidden is never handed to the seat itself, nor the other way round.
+    @Test
+    void marksCacheKeysOnlyForTheImaginedSeat() {
+        assertThat(ImaginedTurn.cacheMark(rival)).isEmpty();
+        ImaginedTurn.of(rival, () -> {
+            assertThat(ImaginedTurn.cacheMark(rival)).isNotEmpty();
+            assertThat(ImaginedTurn.cacheMark(test.nekro)).isEmpty();
+            assertThat(ImaginedTurn.seatFaction()).isEqualTo("sardakk");
+            return null;
+        });
+        assertThat(ImaginedTurn.seatFaction()).isEmpty();
+    }
 }

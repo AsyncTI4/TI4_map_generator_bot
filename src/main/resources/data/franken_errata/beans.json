@@ -201,6 +201,12 @@
         "source": "beans"
     },
     {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "netrunners",
+        "alternateText": "Choose 1 non-faction technology owned by 1 other player.",
+        "source": "beans"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "cataclysm",
         "optionalSwaps": [
@@ -236,6 +242,115 @@
         "itemCategory": "MECH",
         "itemId": "natau_mech",
         "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "migo",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "migo",
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "pseudomorphism",
+        "optionalSwaps": [
+            "HOMESYSTEM:migo"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "origin_unknown",
+        "optionalSwaps": [
+            "HERO:deephero"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "deep",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "strain_dispersal",
+        "optionalSwaps": [
+            "FLAGSHIP:bloom_flagship"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "bloom_flagship",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "deaths_refrain",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "morbid_harmony",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "choircommander",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bechoirylament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bechoirrlament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "choir_mechlament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "choir_flagship",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain"
+        ],
         "source": "beans"
     }
 ]

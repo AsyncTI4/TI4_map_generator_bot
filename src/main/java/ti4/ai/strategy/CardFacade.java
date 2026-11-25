@@ -15,7 +15,7 @@ public class CardFacade {
         List<TacticalPlan> ranked = in.ranked();
         int index = Math.max(0, seat.getTacticalCC());
         double plan = index < ranked.size() ? ranked.get(index).score() * CardValueScale.TOKEN_ACTION_SHARE : 0;
-        return Math.max(CardValueScale.TOKEN_FLOOR, plan);
+        return Math.max(CardValueScale.HELD_TOKEN, plan);
     }
 
     public static Optional<Double> stalledLeadershipValue(Game game, Player seat) {

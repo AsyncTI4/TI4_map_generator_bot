@@ -15,7 +15,6 @@ class PutEventTop extends GameStateSubcommand {
     public PutEventTop() {
         super(Constants.PUT_TOP, "Put event on top of the deck", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
-                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

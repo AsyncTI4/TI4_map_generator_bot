@@ -18,6 +18,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
@@ -41,6 +42,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -53,6 +55,7 @@ public class TeHelperActionCards {
     private static final String EXTREME_DURESS = "ExtremeDuress";
     private static final String CRISIS_TARGET = "Crisis Target";
     private static final String STASIS_TARGET = "Stasis Target";
+    public static final String LIE_IN_WAIT_SUFFIX = "_lieinwait";
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
@@ -94,11 +97,12 @@ public class TeHelperActionCards {
         return false;
     }
 
-    private static List<Button> getOverruleButtons(Game game, Player player, boolean blueReverie) {
+    public static List<Button> getOverrulePrimaryButtons(Game game, Player player, boolean blueReverie) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
-                    || (game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))) continue;
+                    || (game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))
+                    || !MegagameGroupService.allowsCard(game, player, sc)) continue;
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -164,6 +168,7 @@ public class TeHelperActionCards {
             return;
         }
         game.removeStoredValue(EXTREME_DURESS);
+        ActionCardTargets.record(game, "Extreme Duress", player, target);
         sendExtremeDuressResolutionButtons(target, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -188,6 +193,7 @@ public class TeHelperActionCards {
         }
         game.removeStoredValue(CRISIS_TARGET);
         ActionCardHelper.playAC(event, game, crisisPlayer, "crisis", game.getMainGameChannel());
+        ActionCardTargets.record(game, "Crisis", crisisPlayer, player);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
         buttons.add(Buttons.green("crisisSabotaged_" + player.getColor(), "Delete These (If Crisis Was Sabo'd)"));
@@ -255,6 +261,7 @@ public class TeHelperActionCards {
         } finally {
             game.removeStoredValue(EXTREME_DURESS_AUTO_RESOLVING);
         }
+        ActionCardTargets.record(game, "Extreme Duress", duressPlayer, target);
         sendExtremeDuressResolutionButtons(target, duressPlayer);
     }
 
@@ -299,12 +306,12 @@ public class TeHelperActionCards {
     @ButtonHandler("lieInWait")
     private static void lieInWait(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             if (p2 == player || p2.getAcCount() == 0) {
                 continue;
             }
             buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), "gray", p2));
+                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction() + LIE_IN_WAIT_SUFFIX, "gray", p2));
         }
         String message = player.getRepresentationUnfogged()
                 + ", please tell the bot which two of your neighbors did the transaction.";
@@ -371,6 +378,7 @@ public class TeHelperActionCards {
     private static void exchangeProgramPart2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
 
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        ActionCardTargets.record(game, "Exchange Program", player, p2);
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
             buttons = PlanetTargetService.targetButtons(
@@ -455,7 +463,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleStart")
     private static void resolveOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game, player, false);
+        List<Button> buttons = getOverrulePrimaryButtons(game, player, false);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -463,7 +471,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleBrStart")
     private static void resolveBlueReverieOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game, player, true);
+        List<Button> buttons = getOverrulePrimaryButtons(game, player, true);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -472,37 +480,42 @@ public class TeHelperActionCards {
     public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
 
-        if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
+        if (isReadiedForStrategize(game, player, 1)) {
             buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens", CardEmojis.SC1));
         }
-        if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
+        if (isReadiedForStrategize(game, player, 2)) {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
-        if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
+        if (isReadiedForStrategize(game, player, 3)) {
             buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
-        if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
+        if (isReadiedForStrategize(game, player, 4)) {
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
-        if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
-            buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+        if (isReadiedForStrategize(game, player, 5)) {
+            buttons.add(Buttons.green("non_sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
-        if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
+        if (isReadiedForStrategize(game, player, 6)) {
             buttons.add(Buttons.green("warfareBuild", "Build At Home", CardEmojis.SC6));
         }
-        if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
+        if (isReadiedForStrategize(game, player, 7)) {
             if (player.hasAbility("propagation")) {
                 buttons.add(Buttons.green("leadershipGenerateCCButtons_", "Gain 3 Command Tokens (for Nekro)"));
             } else {
                 buttons.add(Buttons.GET_A_TECH.withEmoji(CardEmojis.SC7.asEmoji()));
             }
         }
-        if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
+        if (isReadiedForStrategize(game, player, 8)) {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
 
         return buttons;
+    }
+
+    private static boolean isReadiedForStrategize(Game game, Player player, int cardNumber) {
+        int sc = MegagameGroupService.groupCardFor(game, player, cardNumber);
+        return game.getScPlayed().get(sc) == null || !game.getScPlayed().get(sc);
     }
 
     @ButtonHandler("strategize")
@@ -568,6 +581,9 @@ public class TeHelperActionCards {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             Tile tile = game.getTileFromPlanet(planet);
+            game.getRealPlayers().stream()
+                    .filter(owner -> owner.hasPlanet(planet))
+                    .forEach(owner -> ActionCardTargets.record(game, "Mercenary Contract", player, owner));
             resolvePiratesGeneric(event, game, player, tile, "2 inf " + planet);
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
@@ -782,6 +798,7 @@ public class TeHelperActionCards {
         String regex = "resolveBrillianceUnlock_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
+            ActionCardTargets.record(game, "Brilliance", player, p2);
             BreakthroughCommandHelper.unlockAllBreakthroughs(game, p2);
             ButtonHelper.deleteMessage(event);
         });

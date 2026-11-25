@@ -161,11 +161,10 @@ public class PlayerFactionSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "teFactions" -> prioritizeTEFactions();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "teFactions" -> prioritizeTEFactions();
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

@@ -13,6 +13,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -36,16 +37,24 @@ public class CrystellumTechHandler {
         }
     }
 
+    public static void offerResonanceDrive(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        addResonanceDriveButton(buttons, player);
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Resonance Drive_.",
+                    buttons);
+        }
+    }
+
     public static void addAtomizationButton(List<Button> buttons, Game game, Player player) {
         if (!player.hasTechReady(ATOMIZATION)) return;
         for (Tile tile : game.getTileMap().values())
             for (UnitHolder holder : tile.getUnitHolders().values())
                 for (UnitKey key : holder.getUnitKeysForPlayer(player)) {
                     UnitModel unit = player.getPriorityUnitByAsyncID(key.asyncID(), holder);
-                    if (unit != null
-                            && unit.getIsShip()
-                            && key.unitType() != ti4.helpers.Units.UnitType.Fighter
-                            && unit.getCost() <= 3) {
+                    if (unit != null && unit.getIsShip() && key.unitType() != UnitType.Fighter && unit.getCost() <= 4) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + USE_ATOMIZATION,
                                 "Use Atomization",

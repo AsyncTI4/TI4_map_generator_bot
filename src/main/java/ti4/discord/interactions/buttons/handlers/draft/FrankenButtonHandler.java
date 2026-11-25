@@ -21,6 +21,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.BagDraft;
+import ti4.draft.BagDraftEventRecorder;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
@@ -312,17 +313,19 @@ public class FrankenButtonHandler {
     private static void refreshContainers(ButtonInteractionEvent event, Player player) {
         MessageV2Editor editor = new MessageV2Editor();
         List<Color> accents = FrankenDraftBagService.getAccents();
+        int limit = 4;
         for (DraftCategory cat : FrankenDraftBagService.componentCategories) {
-            Container c2 = FrankenDraftBagService.postDraftCategoryContainer(player, cat);
-            if (c2 == null) continue;
-            c2 = c2.withAccentColor(accents.getFirst());
-            editor.replace(replaceContainer(c2), c2);
+            List<Container> containers = FrankenDraftBagService.postDraftCategoryContainers(player, cat);
+            limit += containers.size() * 2;
+            for (Container container : containers) {
+                Container updatedContainer = container.withAccentColor(accents.getFirst());
+                editor.replace(replaceContainer(updatedContainer), updatedContainer);
+            }
         }
 
         Container summary = FrankenDraftBagService.getFrankenPlayerSummaryContainer(player);
         editor.replace(replaceContainer(summary), summary);
 
-        int limit = FrankenDraftBagService.componentCategories.size() * 2 + 4;
         editor.applyAroundMessage(event.getMessage(), limit, null);
     }
 
@@ -348,6 +351,7 @@ public class FrankenButtonHandler {
                     return;
                 }
                 case "confirm_draft" -> {
+                    BagDraftEventRecorder.recordPicks(game, player, player.getDraftQueue().Contents, "CONFIRM");
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);

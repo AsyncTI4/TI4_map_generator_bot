@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 
@@ -48,6 +49,7 @@ public class WhisperService {
             }
             msg = msg.replace(player2.getPing(), player2.getUserName());
         }
+        msg = MentionGuard.withoutAnyMentions(msg);
 
         if (anonY.compareToIgnoreCase("y") == 0) {
             message = "Attention " + realIdentity + "! [REDACTED] says: " + msg;

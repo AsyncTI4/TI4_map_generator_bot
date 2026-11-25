@@ -2,6 +2,7 @@ package ti4.spring.service.deploy;
 
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ public class ActiveLeaseTransactionService {
 
     private final ActiveLeaseRepository activeLeaseRepository;
     private final LeaseProperties leaseProperties;
+    private final JdbcTemplate jdbcTemplate;
 
     @Transactional
     public boolean tryAcquireLease(String instanceId) {
@@ -36,6 +38,10 @@ public class ActiveLeaseTransactionService {
     @Transactional
     public void releaseLease(String instanceId) {
         Instant now = Instant.now();
-        activeLeaseRepository.updateLeaseIfOwned(leaseProperties.getLeaseKey(), instanceId, now.minusSeconds(1), now);
+        String leaseKey = leaseProperties.getLeaseKey();
+        int released = activeLeaseRepository.updateLeaseIfOwned(leaseKey, instanceId, now.minusSeconds(1), now);
+        if (released == 1) {
+            jdbcTemplate.queryForList("select pg_notify(?, ?)", LeaseReleaseListener.CHANNEL, leaseKey);
+        }
     }
 }

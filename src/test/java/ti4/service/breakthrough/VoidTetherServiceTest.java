@@ -25,4 +25,17 @@ class VoidTetherServiceTest extends BaseTi4Test {
                     .hasSize(2);
         }
     }
+
+    // The cards-info "Void Tether Access" button only shows while a tether actually blocks something.
+    @Test
+    void accessButtonOnlyWhileATetherIsEnforced() {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
+            Game game = harness.load();
+            game.setOneWayAdjacency(false);
+            assertThat(VoidTetherService.hasEnforcedTether(game)).isEqualTo(game.isFowMode());
+
+            game.setOneWayAdjacency(true);
+            assertThat(VoidTetherService.hasEnforcedTether(game)).isTrue();
+        }
+    }
 }

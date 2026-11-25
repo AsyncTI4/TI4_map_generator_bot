@@ -4,7 +4,7 @@
         "name": "Armed Forces Standardization",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player place command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",
+        "text1": "The elected player places command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",
         "text2": "",
         "source": "pok"
     },
@@ -45,7 +45,7 @@
         "alias": "covert",
         "name": "Covert Legislation",
         "type": "Directive",
-        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.). The other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.); the other players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
         "text1": "",
         "text2": "",
         "notes": "If keleres uses executive order to draw this from the bottom, the hidden agenda will also be from the bottom.",
@@ -56,7 +56,7 @@
         "name": "Galactic Crisis Pact",
         "type": "Directive",
         "target": "Elect Strategy Card",
-        "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token - command tokens placed by the ability are placed from a player's reinforcements instead.",
+        "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements instead.",
         "text2": "",
         "source": "pok"
     },
@@ -105,11 +105,11 @@
         "name": "Representative Government",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
+        "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
         "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
         "forEmoji": "🗳️",
         "againstEmoji": "ExhaustedPlanet",
-        "mapText": "Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
+        "mapText": "Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
         "source": "pok"
     },
     {

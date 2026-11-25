@@ -23,6 +23,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private final BooleanSetting monuments;
     private final BooleanSetting echoesOfYggdrasil;
     private final BooleanSetting wftv;
+    private final BooleanSetting refracture;
 
     FrankenHomebrewSettings(Game game, JsonNode json, SettingsMenu parent) {
         super(
@@ -40,6 +41,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
         echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
         wftv = new BooleanSetting("Wftv", "WFTV", false);
+        refracture = new BooleanSetting("Refracture", "Refracture", game.isRefractureMode());
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
@@ -54,6 +56,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         monuments.setExtraInfo("Adds Monuments+ cards and enables Monument drafting.");
         echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
         wftv.setExtraInfo("Adds WFTV factions.");
+        refracture.setExtraInfo("Enables Refracture layouts and Neutral Reference II.");
 
         if (json != null && json.has("homebrewSettings")) json = json.get("homebrewSettings");
         if (json != null
@@ -68,6 +71,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
             monuments.initialize(json.get("monuments"));
             echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
             wftv.initialize(json.get("wftv"));
+            refracture.initialize(json.get("refracture"));
         }
     }
 
@@ -90,7 +94,8 @@ class FrankenHomebrewSettings extends SettingsMenu {
                 lostLegacies,
                 monuments,
                 echoesOfYggdrasil,
-                wftv));
+                wftv,
+                refracture));
     }
 
     @Override

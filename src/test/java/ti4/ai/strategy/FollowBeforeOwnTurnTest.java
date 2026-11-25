@@ -7,7 +7,7 @@ import static ti4.ai.AiTestGame.prompt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
@@ -20,7 +20,7 @@ class FollowBeforeOwnTurnTest extends BaseTi4Test {
     private static final int IMPERIAL = 8;
 
     private AiTestGame test;
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
 
     @BeforeEach
     void setUp() {

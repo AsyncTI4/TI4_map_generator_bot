@@ -24,7 +24,9 @@ class ManagedGameSeatTest extends BaseTi4Test {
         Game game = newGame();
         String realUser = seat(game, 0).getUserID();
         Player eliminated = seat(game, 1);
+        // Elimination turns the seat into a dummy as well, as ButtonHelper does.
         eliminated.setEliminated(true);
+        eliminated.setDummy(true);
         Player npc = seat(game, 2);
         npc.setNpc(true);
         Player dummy = seat(game, 3);
@@ -44,10 +46,10 @@ class ManagedGameSeatTest extends BaseTi4Test {
         assertThat(managedGame.isRealOrEliminatedPlayer(dummy.getUserID())).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(spectator)).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(uniqueName("stranger"))).isFalse();
-        // An eliminated seat keeps its faction and color, so it still counts as real; only the NPC drops out.
+        // While the game runs, only seats still playing for themselves are real players.
         assertThat(managedGame.getRealPlayers())
                 .extracting(ManagedPlayer::getId)
-                .containsExactlyInAnyOrder(realUser, eliminated.getUserID());
+                .containsExactly(realUser);
     }
 
     @Test
@@ -74,7 +76,40 @@ class ManagedGameSeatTest extends BaseTi4Test {
             assertThat(UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer))
                     .isEqualTo(1);
             gameLoadService.verify(() -> GameLoadService.load(anyString()), never());
+            gameLoadService.verify(() -> GameLoadService.load(anyString()), never());
         }
+    }
+
+    @Test
+    void eliminatedSeatInARunningGameDoesNotCountTowardTheJoinLimit() {
+        String userId = uniqueName("eliminated-user");
+        Game ongoing = gameWithUserAndTwoOthers(userId);
+        // Elimination turns the seat into a dummy as well, as ButtonHelper does.
+        ongoing.getPlayer(userId).setEliminated(true);
+        ongoing.getPlayer(userId).setDummy(true);
+        Game completed = gameWithUserAndTwoOthers(userId);
+        completed.getPlayer(userId).setEliminated(true);
+        completed.getPlayer(userId).setDummy(true);
+        completed.setHasEnded(true);
+        completed.recordWinner(completed.getPlayers().values().stream()
+                .filter(player -> !player.getUserID().equals(userId))
+                .findFirst()
+                .orElseThrow());
+
+        ManagedGame managedOngoing = new ManagedGame(ongoing);
+        ManagedPlayer managedPlayer = new ManagedGame(completed).getPlayer(userId);
+
+        assertThat(managedOngoing.isRealPlayer(userId)).isFalse();
+        // The table still counts as a 3+ player game for the other seats.
+        assertThat(managedOngoing.countRealAndEliminatedPlayers()).isEqualTo(3);
+        assertThat(UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer))
+                .isZero();
+        // The LFG spam guard still treats a knocked-out player as someone who has played.
+        assertThat(UserGameInfoService.hasSeatInAnUnabandonedGame(new ManagedGame(ongoing).getPlayer(userId)))
+                .isTrue();
+        // Being knocked out of a game that finished still counts as completing it.
+        assertThat(UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer))
+                .isEqualTo(1);
     }
 
     private static Game gameWithUserAndTwoOthers(String userId) {

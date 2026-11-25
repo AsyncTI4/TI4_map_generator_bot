@@ -16,16 +16,16 @@ public class DecidingSeat {
         return Objects.equals(DECIDING.get(), seat.getUserID()) && !ImaginedTurn.imagines(seat);
     }
 
+    @Nullable
+    public static String currentUserId() {
+        return DECIDING.get();
+    }
+
     public static Player orSelf(Game game, Player seat) {
         @Nullable String deciding = DECIDING.get();
         if (deciding == null) return seat;
         @Nullable Player decider = game.getPlayer(deciding);
         return decider == null ? seat : decider;
-    }
-
-    public static String id() {
-        @Nullable String deciding = DECIDING.get();
-        return deciding == null ? "" : deciding;
     }
 
     public static <T> T of(Player seat, Supplier<T> decision) {

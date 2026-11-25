@@ -18,14 +18,22 @@ class EndGameButtonHandler {
 
     @ButtonHandler("gameEnd")
     public static void gameEnd(ButtonInteractionEvent event, Game game) {
+        if (refusedBecauseAlreadyEnded(event, game)) return;
         EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(EndGameService.MOST_POINTS_END_GAME_BUTTON_ID)
     public static void gameEndWithMostPointsWinner(ButtonInteractionEvent event, Game game) {
+        if (refusedBecauseAlreadyEnded(event, game)) return;
         EndGameService.recordMostPointsWinner(game, event.getMessageChannel());
         gameEnd(event, game);
+    }
+
+    private static boolean refusedBecauseAlreadyEnded(ButtonInteractionEvent event, Game game) {
+        if (!game.isHasEnded()) return false;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game has already ended.");
+        return true;
     }
 
     @ButtonHandler("gameEndConfirmation")

@@ -85,6 +85,26 @@ class AiConfusionServiceTest extends BaseTi4Test {
                 .contains("FFCC_nekro_passForRound");
     }
 
+    // A seat with pass abilities gets "Pass (+1 ability)" instead of the plain pass. In self-play (seed 9508) the
+    // fallback pressed it with a tactic token left, because only the plain pass was guarded.
+    @Test
+    void neverPassesWithAbilitiesWhileItCanStillAct() {
+        AiTestGame test = new AiTestGame();
+        Player seat = test.nekro;
+        seat.setTacticalCC(1);
+        AiPrompt turn = prompt("FFCC_nekro_tacticalAction", "FFCC_nekro_passingAbilities");
+
+        assertThat(AiConfusionService.safeDefault(test.game, seat, turn)).isEmpty();
+        assertThat(AiConfusionService.selfPlayChoice(test.game, seat, turn))
+                .map(PromptButton::customId)
+                .contains("FFCC_nekro_tacticalAction");
+
+        seat.setTacticalCC(0);
+        assertThat(AiConfusionService.safeDefault(test.game, seat, turn))
+                .map(PromptButton::customId)
+                .contains("FFCC_nekro_passingAbilities");
+    }
+
     // End Turn only appears once the turn's action is done, so tokens left over are no reason to hold it back. The
     // end-of-turn abilities prompt puts End Turn first: the self-play fallback must end the turn, not fire an ability.
     @Test

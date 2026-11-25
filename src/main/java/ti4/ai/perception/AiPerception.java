@@ -30,6 +30,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.GameClock;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -66,7 +67,8 @@ public class AiPerception {
             }
             for (AiPrompt prompt : main) {
                 if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, publicWindowPrefixes)
-                        || prompt.isTableTalk()) {
+                        || prompt.isTableTalk()
+                        || isLeadershipRiderPayout(prompt)) {
                     prompts.add(prompt);
                 }
             }
@@ -124,8 +126,8 @@ public class AiPerception {
         return snapshot;
     }
 
-    private static List<ThreadChannel> recentStrategyThreads(Game game) {
-        long cutoff = System.currentTimeMillis() - STRATEGY_THREAD_WINDOW_MILLIS;
+    static List<ThreadChannel> recentStrategyThreads(Game game) {
+        long cutoff = GameClock.currentTimeMillis() - STRATEGY_THREAD_WINDOW_MILLIS;
         try {
             return game.getPlayedSCs().stream()
                     .map(initiative -> ButtonHelper.getRightStratThread(game, ButtonHelper.getStratName(initiative)))
@@ -162,6 +164,13 @@ public class AiPerception {
 
     static boolean isRelevantInPrivateThread(AiPrompt prompt, String faction, Set<String> prefixes) {
         return isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, prefixes) || isRejectionNotice(prompt);
+    }
+
+    public static boolean isLeadershipRiderPayout(AiPrompt prompt) {
+        return prompt.source() == PromptSource.PUBLIC
+                && prompt.buttons().isEmpty()
+                && prompt.content() != null
+                && prompt.content().contains(LEADERSHIP_RIDER_PAYOUT);
     }
 
     public static boolean isRejectionNotice(AiPrompt prompt) {

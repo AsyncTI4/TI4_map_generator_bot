@@ -22,6 +22,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.strategy.CardFacade;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.Stall;
@@ -150,14 +151,14 @@ class ResearchCardTest extends BaseTi4Test {
         return ActionCardRules.playBeforePassing(table.test.context(hand));
     }
 
-    // 3 x tempo - 4 trade goods + 1.5 = 1.7, which clears the 1.33 the card is worth in hand.
+    // follow threshold x tempo - 4 trade goods + 1.5 clears the 1.33 the card is worth in hand.
     @Test
     void focusedResearchIsPlayedForATechnologyWorthFollowingForWhileOthersStillAct() {
         table.nekro.setTg(4);
         bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
 
         assertThat(plan("f_researched").orElseThrow().value())
-                .isCloseTo(ResearchPolicy.TECH_TEMPO * 3 - 4 + 1.5, within(EXACT));
+                .isCloseTo(ResearchPolicy.TECH_TEMPO * ResearchPolicy.WORTH_FOLLOWING_FOR - 4 + 1.5, within(EXACT));
         assertThat(AiTestGame.pressedId(triesToPlayFocusedResearch().orElseThrow()))
                 .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
@@ -176,7 +177,7 @@ class ResearchCardTest extends BaseTi4Test {
     @Test
     void noStallCountsOnceEveryOtherPlayerHasPassed() {
         table.nekro.setTg(4);
-        bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
+        bestTechIsWorth(3.0);
         table.sol.setPassed(true);
 
         assertThat(Stall.actionValue(table.game, table.nekro)).isZero();
@@ -195,11 +196,11 @@ class ResearchCardTest extends BaseTi4Test {
         assertThat(plan("f_researched").orElseThrow().value()).isPositive();
     }
 
-    // The tempo is what the Technology follow pays (4 resources at 0.8 and a strategy token) for a technology worth 3.
+    // The follow threshold is the technology worth what the Technology follow pays: 4 resources at 0.8 and a token.
     @Test
     void techTempoAgreesWithWhatTheTechnologyFollowPays() {
         assertThat(ResearchPolicy.TECH_TEMPO * ResearchPolicy.WORTH_FOLLOWING_FOR)
-                .isCloseTo(0.8 * 4 + 1.0, within(EXACT));
+                .isCloseTo(0.8 * 4 + CardFacade.strategyToken(), within(EXACT));
     }
 
     // ---- Divert Funding ----------------------------------------------------------------------

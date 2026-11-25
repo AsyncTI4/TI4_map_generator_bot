@@ -3,7 +3,7 @@
         "id": "mitosis",
         "name": "Mitosis",
         "faction": "arborec",
-        "permanentEffect": "Your space docks cannot produce infantry",
+        "permanentEffect": "Your space docks cannot produce infantry.",
         "window": "At the start of the status phase",
         "windowEffect": "Place 1 infantry from your reinforcements on any planet you control.",
         "source": "base"
@@ -95,7 +95,7 @@
         "id": "armada",
         "name": "Armada",
         "faction": "letnev",
-        "permanentEffect": "The maximum number of non-fighter ships you can have in each system is equal to 2 more than the number of tokens in your fleet pool",
+        "permanentEffect": "The maximum number of non-fighter ships you can have in each system is equal to 2 more than the number of tokens in your fleet pool.",
         "source": "base"
     },
     {
@@ -126,7 +126,7 @@
         "id": "gashlai_physiology",
         "name": "Gashlai Physiology",
         "faction": "muaat",
-        "permanentEffect": "Your ships can move through supernovas",
+        "permanentEffect": "Your ships can move through supernovas.",
         "source": "base"
     },
     {
@@ -296,7 +296,7 @@
         "name": "Stall Tactics",
         "faction": "yssaril",
         "window": "ACTION",
-        "windowEffect": "Discard 1 action card from your hand",
+        "windowEffect": "Discard 1 action card from your hand.",
         "source": "base"
     }
 ]

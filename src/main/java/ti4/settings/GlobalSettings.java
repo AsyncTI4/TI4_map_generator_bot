@@ -1,16 +1,13 @@
 package ti4.settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import ti4.helpers.Storage;
-import ti4.json.JsonMapperManager;
+import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.ObjectWriter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
 
 public final class GlobalSettings {
 
@@ -30,8 +27,6 @@ public final class GlobalSettings {
         ALLOW_GAME_CREATION,
         SQLITE_PERSISTENCE_DISABLED, // Temporarily no-op auxiliary SQLite/JDBC reads and writes during migration
         READY_TO_RECEIVE_COMMANDS, // Whether the bot is ready to receive commands
-        @Deprecated(forRemoval = true, since = "2026-10")
-        GAME_MESSAGES_IMPORTED_TO_DATABASE,
         BOT_LOG_WEBHOOK_URL, // Webhook URL to send rogue bot log messages to
         TESTBED_ENABLED,
         AI_PLAYERS_ENABLED;
@@ -54,6 +49,8 @@ public final class GlobalSettings {
         }
     }
 
+    private static final String SETTINGS_FILE_NAME = "global_settings.json";
+
     private static Map<String, Object> settings = new HashMap<>();
 
     public static <T> T getSetting(String attr, Class<T> clazz, T defaultValue) {
@@ -75,9 +72,8 @@ public final class GlobalSettings {
     }
 
     private static void saveSettings() {
-        ObjectWriter writer = JsonMapperManager.basic().writerWithDefaultPrettyPrinter();
         try {
-            writer.writeValue(getFile(), settings);
+            PersistenceManager.writeObjectToJsonFile(Storage.getStoragePath(), SETTINGS_FILE_NAME, settings);
         } catch (Exception e) {
             BotLogger.error("Error saving Global Settings", e);
         }
@@ -85,14 +81,11 @@ public final class GlobalSettings {
 
     public static void loadSettings() {
         try {
-            JavaType settingsType = JsonMapperManager.basic()
-                    .getTypeFactory()
-                    .constructMapType(HashMap.class, String.class, Object.class);
-            settings = JsonMapperManager.basic()
-                    .readValue(Files.readString(getFile().toPath()), settingsType);
-        } catch (IOException e) {
-            // THis _probably_ means there's no file, which isn't critical.
-            // So this is intended to silently fail.
+            Map<String, Object> loaded = PersistenceManager.readObjectFromJsonFile(
+                    Storage.getStoragePath(), SETTINGS_FILE_NAME, new TypeReference<HashMap<String, Object>>() {});
+            if (loaded != null) settings = loaded;
+        } catch (JacksonException e) {
+            BotLogger.error("Global Settings file is unreadable, using defaults", e);
         }
     }
 
@@ -104,9 +97,5 @@ public final class GlobalSettings {
         }
         sb.append("```");
         return sb.toString();
-    }
-
-    private static File getFile() {
-        return new File(Storage.getStoragePath() + "/global_settings.json");
     }
 }

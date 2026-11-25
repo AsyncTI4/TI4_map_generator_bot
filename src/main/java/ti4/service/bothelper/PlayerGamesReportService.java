@@ -269,7 +269,7 @@ public class PlayerGamesReportService {
     static String endedGameLine(Game game, Player player, String targetId) {
         long daysPlayed = Duration.ofMillis(game.getEndedDate() - game.getCreationDateTime())
                 .toDays();
-        String outcome = game.hasWinner() ? "completed" : "aborted";
+        String outcome = game.hasWinner() ? "completed" : "abandoned";
         String duration = daysPlayed + (daysPlayed == 1 ? " day" : " days");
         if (isFogGame(game)) {
             return fogGameTitle(game) + " · " + duration + " · " + outcome;

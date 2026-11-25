@@ -54,6 +54,7 @@ public class ArcanumPrimordialTechHandler {
     private static final String PLACE_INFANTRY = "miraclePlaceInfantry_";
     private static final String FINISH_INFANTRY = "miracleFinishInfantry_";
     private static final String INFANTRY_PLACED = "miracleInfantryPlaced_";
+    private static final String PLACE_THREE_INFANTRY = "miraclePlaceThreeInfantry_";
     // Fabricate
     private static final String FABRICATE_STATION = "fabricatestation";
     private static final String FABRICATE_TECH = "tharcanumpmy";
@@ -73,20 +74,17 @@ public class ArcanumPrimordialTechHandler {
     private static final String PLANE_SHIFT_SYSTEM = "planeShiftSystem";
 
     // Forbidden Knowledge
-    public static boolean hasFourTechsMatchingPrimordial(Player player) {
-        return player != null
-                && PRIMORDIAL_TECHS.stream()
-                        .filter(player::hasTech)
-                        .anyMatch(primordialTech -> hasFourTechsMatchingPrimordial(player, primordialTech));
+    public static boolean isPrimordialTechnology(String tech) {
+        return tech != null && PRIMORDIAL_TECHS.contains(AliasHandler.resolveTech(tech));
     }
 
-    public static boolean hasFourTechsMatchingPrimordial(Player player, String primordialTech) {
+    public static boolean canGainPrimordialTechnology(Player player, String primordialTech) {
         if (player == null || primordialTech == null) {
             return false;
         }
 
         String resolvedPrimordialTech = AliasHandler.resolveTech(primordialTech);
-        if (!PRIMORDIAL_TECHS.contains(resolvedPrimordialTech) || !player.hasTech(resolvedPrimordialTech)) {
+        if (!PRIMORDIAL_TECHS.contains(resolvedPrimordialTech)) {
             return false;
         }
 
@@ -98,7 +96,6 @@ public class ArcanumPrimordialTechHandler {
 
         return player.getTechs().stream()
                         .map(AliasHandler::resolveTech)
-                        // Primordial technologies never contribute to Forbidden Knowledge, including other colors.
                         .filter(tech -> !PRIMORDIAL_TECHS.contains(tech))
                         .map(Mapper::getTech)
                         .filter(tech -> tech != null && tech.getTypes().contains(primordialType))
@@ -111,25 +108,68 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
 
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + DISCARD_AC,
-                "Discard 1 Action Card and Draw 2",
-                CardEmojis.getACEmoji(game)));
-        buttons.add(Buttons.green(player.factionButtonChecker() + GAIN_CC, "Gain 1 Command Token"));
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + PLACE_INF, "Place Up to 4 Infantry", UnitEmojis.infantry));
-
+        player.setTacticalCC(player.getTacticalCC() + 1);
+        ActionCardHelper.drawActionCards(player, 1);
+        List<Button> buttons = getPowerWordMiraclePlanetButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " gained 1 command token in their tactic pool and drew 1 action card with _Power Word: Miracle_, but has no eligible controlled planet for the infantry.");
+            return;
+        }
+        String message = player.getRepresentation()
+                + " gained 1 command token in their tactic pool and drew 1 action card with _Power Word: Miracle_. Choose 1 controlled planet to place 3 infantry.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose an effect for _Power Word: Miracle_.",
-                buttons);
+                message,
+                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + PLACE_THREE_INFANTRY, 0));
+    }
+
+    private static List<Button> getPowerWordMiraclePlanetButtons(Game game, Player player) {
+        return player.getPlanets().stream()
+                .map(game::getUnitHolderFromPlanet)
+                .filter(planet -> planet != null && !planet.isSpaceStation(game))
+                .map(Planet::getName)
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + PLACE_THREE_INFANTRY + planet,
+                        "Place 3 Infantry on " + Helper.getPlanetRepresentation(planet, game),
+                        UnitEmojis.infantry))
+                .toList();
+    }
+
+    @ButtonHandler(PLACE_THREE_INFANTRY)
+    public static void placeThreeMiracleInfantry(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String message = player.getRepresentation()
+                + " gained 1 command token in their tactic pool and drew 1 action card with _Power Word: Miracle_. Choose 1 controlled planet to place 3 infantry.";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                getPowerWordMiraclePlanetButtons(game, player),
+                message,
+                player.factionButtonChecker() + PLACE_THREE_INFANTRY,
+                buttonID)) {
+            return;
+        }
+        String planetName = buttonID.substring(PLACE_THREE_INFANTRY.length());
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if (planet == null || !player.getPlanets().contains(planetName) || planet.isSpaceStation(game)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planetName), game, player.getColor(), "3 gf " + planetName);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " placed 3 infantry on "
+                        + Helper.getPlanetRepresentation(planetName, game) + " with _Power Word: Miracle_.");
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(DISCARD_AC)
@@ -137,8 +177,7 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -164,8 +203,7 @@ public class ArcanumPrimordialTechHandler {
         if (player == null
                 || game == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
 
@@ -193,8 +231,7 @@ public class ArcanumPrimordialTechHandler {
         if (player == null
                 || game == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -210,8 +247,7 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
 
@@ -364,7 +400,6 @@ public class ArcanumPrimordialTechHandler {
                 && player != null
                 && player == game.getActivePlayer()
                 && player.hasTechReady(PLANE_SHIFT)
-                && hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)
                 && game.getTileMap().values().stream().anyMatch(ArcanumPrimordialTechHandler::isPlaneShiftSystem);
     }
 
@@ -373,8 +408,7 @@ public class ArcanumPrimordialTechHandler {
                 || player == null
                 || player != game.getActivePlayer()
                 || !player.hasTech(PLANE_SHIFT)
-                || !player.getExhaustedTechs().contains(PLANE_SHIFT)
-                || !hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)) {
+                || !player.getExhaustedTechs().contains(PLANE_SHIFT)) {
             return;
         }
 
@@ -404,8 +438,7 @@ public class ArcanumPrimordialTechHandler {
                 || player != game.getActivePlayer()
                 || !player.hasTech(PLANE_SHIFT)
                 || !player.getExhaustedTechs().contains(PLANE_SHIFT)
-                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(PLANE_SHIFT_PENDING))
-                || !hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)) {
+                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(PLANE_SHIFT_PENDING))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -487,8 +520,7 @@ public class ArcanumPrimordialTechHandler {
                 || opponent == null
                 || tile == null
                 || combatHolder == null
-                || !player.hasTech(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+                || !player.hasTech(DISINTEGRATE)) {
             return List.of();
         }
 
@@ -508,7 +540,7 @@ public class ArcanumPrimordialTechHandler {
     @ButtonHandler(DISINTEGRATE_HIT)
     public static void produceDisintegrateHit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DisintegrateCombat combat = getDisintegrateCombat(game, player, buttonID, DISINTEGRATE_HIT);
-        if (combat == null || !player.hasTech(DISINTEGRATE) || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+        if (combat == null || !player.hasTech(DISINTEGRATE)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -552,9 +584,7 @@ public class ArcanumPrimordialTechHandler {
     public static void exhaustDisintegrateToDestroyUnit(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DisintegrateCombat combat = getDisintegrateCombat(game, player, buttonID, DISINTEGRATE_DESTROY);
-        if (combat == null
-                || !player.hasTechReady(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+        if (combat == null || !player.hasTechReady(DISINTEGRATE)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -615,7 +645,6 @@ public class ArcanumPrimordialTechHandler {
                 || holder == null
                 || techOwner == null
                 || !techOwner.hasTech(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(techOwner, DISINTEGRATE)
                 || unitType == null
                 || state == null
                 || !isDisintegrateCombat(game, techOwner, player, tile, holder)) {

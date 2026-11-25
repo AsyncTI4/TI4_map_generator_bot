@@ -1,0 +1,25 @@
+{
+  "id": "before-20261116-strength-bundle",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Does the over-pessimistic win threat with token pricing and stall timing make the AI stronger?",
+  "date": "before 2026-11-16",
+  "code": {
+    "commit": "unknown",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "baseSeed": null,
+    "experimentsUnderTest": null
+  },
+  "estimate": {
+    "completePairs": 24,
+    "pointDifference": null,
+    "treatmentWinShare": "0.35"
+  },
+  "batch": null,
+  "verdict": "Reverted: threat and denial now come from feasible point paths; the stall, token and tech-tempo terms were dropped.",
+  "notes": "Only the win share (35% against 65%) was noted."
+}

@@ -34,14 +34,14 @@ public class DeckConfigImportService {
      * exclusion is reported and skipped rather than aborting the whole import. The caller's command
      * carries {@code saveGame = true}, so the mutated game is persisted after this returns.
      */
-    public static void importDeckConfig(GenericInteractionCreateEvent event, Game game, String json) {
+    public static boolean importDeckConfig(GenericInteractionCreateEvent event, Game game, String json) {
         DeckConfigIO config;
         try {
             config = JsonMapperManager.basic().readValue(json, DeckConfigIO.class);
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Failed to parse deck config JSON: " + e.getMessage());
-            return;
+            return false;
         }
 
         StringBuilder applied = new StringBuilder();
@@ -63,7 +63,7 @@ public class DeckConfigImportService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Failed to import deck config: " + e.getMessage() + "\n-# Solax has been pinged");
-            return;
+            return false;
         }
 
         StringBuilder summary = new StringBuilder("Deck config imported.\n");
@@ -72,6 +72,7 @@ public class DeckConfigImportService {
             summary.append("\nWarnings / skipped:\n").append(problems);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), summary.toString());
+        return true;
     }
 
     private static void applySlots(

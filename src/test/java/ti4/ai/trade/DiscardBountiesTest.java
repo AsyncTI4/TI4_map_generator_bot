@@ -123,7 +123,7 @@ class DiscardBountiesTest extends BaseTi4Test {
         AiPrompt whens = AiTestGame.prompt(
                 "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
 
-        AiDecision decision = new ti4.ai.nekro.NekroBrain().decide(context(sol, whens, table()));
+        AiDecision decision = new ti4.ai.brain.StandardBrain().decide(context(sol, whens, table()));
 
         assertThat(decision).isInstanceOf(AiDecision.Post.class);
         Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
@@ -389,5 +389,30 @@ class DiscardBountiesTest extends BaseTi4Test {
         Bounty old = DiscardBounties.all(test.game).getFirst();
         assertThat(old.veto()).isEqualTo(3);
         assertThat(old.deadlyPlot()).isZero();
+    }
+
+    // A Deadly Plot holder, in the window after voting, waits a little before declining while an AI seat that loses
+    // to the winning outcome may still post a bounty, and stops waiting once it has.
+    @Test
+    void aDeadlyPlotHolderWaitsForAPayerInPain() {
+        sol.setTg(14);
+        test.game.setCurrentAgendaVote("for", "red_6");
+        test.game.setPhaseOfGame("agendaEnd");
+        nekro.setActionCard("deadly_plot", 30);
+        AiTurnContext holder = context(nekro);
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(holder)).containsInstanceOf(AiDecision.Wait.class);
+
+        DiscardBountyDeals.offerDeadlyPlot(context(sol, table())).orElseThrow();
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(holder)).isEmpty();
+        assertThat(DiscardBounties.deadlyPlotBounty(test.game, nekro)).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+    }
+
+    // Outside the Deadly Plot window there is nothing to wait for.
+    @Test
+    void noDeadlyPlotWaitBeforeTheVotesAreIn() {
+        sol.setTg(14);
+        nekro.setActionCard("deadly_plot", 30);
+        test.game.setPhaseOfGame("agendaVoting");
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(context(nekro))).isEmpty();
     }
 }

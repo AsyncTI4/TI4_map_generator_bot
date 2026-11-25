@@ -283,10 +283,11 @@
         "source": "theodisi"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "trovantous",
-        "optionalSwaps": [
-            "MECH:stoneborn_mech"
+        "itemCategory": "MECH",
+        "itemId": "stoneborn_mechdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
         ],
         "source": "theodisi"
     },
@@ -345,5 +346,35 @@
         "itemId": "celestial_envoys",
 		"undraftable": true,
         "source": "theodisi"
-    } 
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "hydromorphic",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thmorphag",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnmorpha",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fluid_transfer",
+        "undraftable": true,
+        "source": "theodisi"
+    }
 ]

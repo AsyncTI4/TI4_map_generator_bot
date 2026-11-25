@@ -36,17 +36,21 @@ public final class CrystellumAgent extends AgentModule<CrystellumAgent.Placement
         super(ID, "Shardwright Veyla, the Crystellum");
     }
 
-    public static void addEndTurnButton(List<Button> buttons, Game game, Player player) {
+    public static void offerAfterMovement(Game game, Player player) {
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         if (!player.hasUnexhaustedLeader(ID)
                 || activeSystem == null
                 || ButtonHelper.checkNumberNonFighterShips(player, activeSystem, false) < 1) {
             return;
         }
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + USE_ON_SELF + player.getFaction(),
-                useLabel(player, ID, "Crystellum Agent"),
-                FactionEmojis.crystellum));
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may use Shardwright Veyla, the Crystellum agent after moving ships into the active system.",
+                Buttons.green(
+                        player.factionButtonChecker() + USE_ON_SELF + player.getFaction(),
+                        useLabel(player, ID, "Crystellum Agent"),
+                        FactionEmojis.crystellum));
     }
 
     public static void addCardsInfoButton(List<Button> buttons, Player player) {

@@ -35,7 +35,7 @@
         "name": "Pieces of a Whole",
         "faction": "crystellum",
         "window": "At the start of space combat",
-        "windowEffect": "You may return up to 2 captured fighters from your faction sheet to place that many fighters from your reinforcements in the active system.",
+        "windowEffect": "You may return up to 2 captured fighters from your faction sheet and place them in the active system.",
         "source": "beans"
     },
     {
@@ -63,19 +63,19 @@
         "source": "beans"
     },
     {
-        "id": "trade_secrets",
-        "name": "Trade Secrets",
-        "faction": "iron",
-        "window": "During setup",
-        "windowEffect": "Take the salvage cards and place them in your reinforcements. When a player negotiates a transaction, they may exchange salvage cards in their play area as part of that transaction.",
-        "source": "beans"
-    },
-    {
         "id": "modifications",
         "name": "Modifications",
         "faction": "iron",
-        "window": "While a salvage card is in a player's play area",
-        "windowEffect": "Those units gain the abilities and values on that card, if they do not already have them.",
+        "window": "During setup",
+        "windowEffect": "Take the 6 salvage cards and place them in your reinforcements. While a salvage card is in your play area, the corresponding unit gains the abilities and values on that card, if they do not already have them.",
+        "source": "beans"
+    },
+    {
+        "id": "trade_secrets",
+        "name": "Trade Secrets",
+        "faction": "iron",
+        "window": "When you research a unit upgrade technology",
+        "windowEffect": "You may discard 1 salvage card of that unit's type to ignore all of that technology's prerequisites.",
         "source": "beans"
     },
     {
@@ -145,7 +145,7 @@
         "name": "Reave",
         "faction": "valhavn",
         "window": "Once per turn, when you would win a ground combat on a planet you do not control",
-        "windowEffect": "You may destroy each of your units on that planet to gain trade goods equal to that planet's resource value; that combat ends in a draw and you do not gain control of that planet.",
+        "windowEffect": "You may destroy each of your units on that planet to gain trade goods equal to that planet's resource value; that combat ends in a draw.",
         "source": "beans"
     },
     {
@@ -154,6 +154,167 @@
         "faction": "valhavn",
         "window": "Once per action, after you commit ground forces to a planet during a tactical action",
         "windowEffect": "If there are no units on that planet, you may resolve ground combat.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest",
+        "name": "Harvest",
+        "faction": "migo",
+        "window": "After you gain control of a planet that has a technology specialty",
+        "windowEffect": "Gain the corresponding harvest card and place it in your play area. Any time you control no planets that have a technology specialty that matches a harvest card in your play area, return that harvest card to your reinforcements.",
+        "source": "beans"
+    },
+    {
+        "id": "pseudomorphism",
+        "name": "Pseudomorphism",
+        "faction": "migo",
+        "window": "When you spend resources to research a technology",
+        "windowEffect": "If you exhaust a planet to use its technology specialty to ignore any prerequisites, you may reduce the spent resources by that planet’s influence value.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_blue",
+        "name": "Kinetic Morphology",
+        "shortName": "Kinetic\nMorphology",
+        "faction": "migo",
+        "window": "After you activate a system",
+        "windowEffect": "You may exhaust this card to apply +1 to the MOVE value of 1 of your ships during this tactical action.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_green",
+        "name": "Synaptic Grafting",
+        "shortName": "Synaptic\nGrafting",
+        "faction": "migo",
+        "window": "After you exhaust a planet that has a technology specialty",
+        "windowEffect": "You may exhaust this card to draw 1 action card.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_red",
+        "name": "Tachyonic Reversion",
+        "shortName": "Tachyonic\nReversion",
+        "faction": "migo",
+        "window": "After you roll 1 or more dice during a round of combat",
+        "windowEffect": "You may exhaust this card to reroll up to 2 of those dice.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_yellow",
+        "name": "Biomechanical Splicing",
+        "shortName": "Biomechanical\nSplicing",
+        "faction": "migo",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "windowEffect": "You may exhaust this card to apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "source": "beans"
+    },
+    {
+        "id": "origin_unknown",
+        "name": "Origin Unknown",
+        "faction": "deep",
+        "window": "When you create the game board",
+        "windowEffect": "Place the Deep Space tile where your home system would normally be placed; Deep Space is not a home system. During setup, gain and ready The Deep planet card and its unit card; you cannot lose these cards.",
+        "source": "beans"
+    },
+    {
+        "id": "dark_matter_link",
+        "name": "Dark Matter Link",
+        "faction": "deep",
+        "window": "After you explore a frontier token",
+        "windowEffect": "You may place a frontier token in a different system that contains no planets, if able.",
+        "source": "beans"
+    },
+    {
+        "id": "energy_siphon",
+        "name": "Energy Siphon",
+        "faction": "deep",
+        "window": "When you purge an exploration card for its effect",
+        "windowEffect": "Gain 1 command token.",
+        "source": "beans"
+    },
+    {
+        "id": "sporefall",
+        "name": "Sporefall",
+        "faction": "bloom",
+        "window": "Once per turn, after another player resolves the secondary ability of a strategy card",
+        "windowEffect": "You may place 1 infantry from your reinforcements into coexistence on a non-home planet they control adjacent to a system that contains 1 of your ground forces.",
+        "source": "beans"
+    },
+    {
+        "id": "strain_dispersal",
+        "name": "Strain Dispersal",
+        "faction": "bloom",
+        "window": "During setup",
+        "windowEffect": "Gain your 3 strain cards and place them in your reinforcements. While your units are coexisting on a planet with a trait, place the corresponding card in your play area dormant side up. While you are coexisting on 2 or more planets with the same trait, flip the corresponding card to its active side.",
+        "source": "beans"
+    },
+    {
+        "id": "neurotropic_dormant",
+        "name": "Neurotropic Dormant",
+        "shortName": "Neuro\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 1.",
+        "source": "beans"
+    },
+    {
+        "id": "neurotropic_active",
+        "name": "Neurotropic Active",
+        "shortName": "Neuro\nActive",
+        "faction": "bloom",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 2.",
+        "window": "Once per action, when a player whose planet you are coexisting on draws 1 or more aciton cards",
+        "windowEffect": "You may draw 1 aciton card.",
+        "source": "beans"
+    },
+    {
+        "id": "rhizomatic_dormant",
+        "name": "Rhizomatic Dormant",
+        "shortName": "Rhiz\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "Your commodity value is increased by 1.",
+        "source": "beans"
+    },
+    {
+        "id": "rhizomatic_active",
+        "name": "Rhizomatic Active",
+        "shortName": "Rhiz\nActive",
+        "faction": "bloom",
+        "permanentEffect": "Your commodity value is increased by 2.",
+        "window": "When a player whose planet you are coexisting on replenishes their commodities",
+        "windowEffect": "Gain 1 commodity, or convert 1 commodity to a trade good.",
+        "source": "beans"
+    },
+    {
+        "id": "carnivorous_dormant",
+        "name": "Carnivorous Dormant",
+        "shortName": "Carnivore\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "Apply +1 to the combat rolls of your infantry while you are the defender.",
+        "source": "beans"
+    },
+    {
+        "id": "carnivorous_active",
+        "name": "Carnivorous Active",
+        "shortName": "Carnivore\nActive",
+        "faction": "bloom",
+        "permanentEffect": "Apply +1 to your infantry's combat rolls while you are the defender.",
+        "window": "Once per ground combat, after 1 or more of your opponents infantry are destroyed",
+        "windowEffect": "You may place 1 infantry from your reinforcements on that planet.",
+        "source": "beans"
+    },
+    {
+        "id": "deaths_refrain",
+        "name": "Death's Refrain",
+        "faction": "choir",
+        "window": "During the \"Repair Units\" step of the status phase",
+        "windowEffect": "You may choose up to 2 of your damaged units on the game board; those units are not repaired.",
+        "source": "beans"
+    },
+    {
+        "id": "morbid_harmony",
+        "name": "Morbid Harmony",
+        "faction": "choir",
+        "permanentEffect": "At the end of your turn, if you have more damaged units with SUSTAIN DAMAGE on the board than not damaged, flip your faction technologies and mech to their requiem side, otherwise, flip them to their lament side; the other side has no effect.",
         "source": "beans"
     }
 ]

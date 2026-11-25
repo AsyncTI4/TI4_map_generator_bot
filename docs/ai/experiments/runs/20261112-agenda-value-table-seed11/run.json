@@ -1,0 +1,27 @@
+{
+  "id": "20261112-agenda-value-table-seed11",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Repeat of the seed 7 run on a second seed.",
+  "date": "2026-11-12",
+  "code": {
+    "commit": "unknown (before the agenda trace fixes)",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "RoundTwoSelfPlayTest#playTwoRounds (playagenda, 3 rounds)",
+    "games": 24,
+    "baseSeed": 11,
+    "experimentsUnderTest": [
+      "AGENDA_VALUE_TABLE"
+    ]
+  },
+  "estimate": {
+    "completePairs": 12,
+    "pointDifference": "+0.06",
+    "treatmentWinShare": null
+  },
+  "batch": null,
+  "verdict": "Inconclusive: agenda utility +0.098 ± 0.112 TG.",
+  "notes": "Same grading caveat as seed 7."
+}

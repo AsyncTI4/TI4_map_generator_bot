@@ -500,7 +500,7 @@ public final class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveTranspose")
     public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(false)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             buttons.add(
                     Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
@@ -770,7 +770,7 @@ public final class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveGenophage")
     public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(false)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             buttons.add(
                     Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }

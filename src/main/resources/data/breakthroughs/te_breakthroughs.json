@@ -35,7 +35,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "When you activate a system that contains or is adjacent to a unit or planet you control, you may place or move 1 of your Void Tether tokens onto a border that system shares with another system; other players do not treat those systems as adjacent to each other unless you allow it.",
+        "text": "When you activate a system that contains or is adjacent to a unit or planet you control, you may place or move 1 of your void tether tokens onto a border that system shares with another system; other players do not treat those systems as adjacent to each other unless you allow it.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/empyreanbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -62,14 +62,14 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "When you gain this card, place the Avernus planet token into a non-home system that is adjacent to a planet you control; gain the Avernus planet card and ready it.\nAfter you move one of your war suns out of or through Avernus's system and into a non-home system, you may move the Avernus token with it.",
+        "text": "When you gain this card, place the Avernus planet token into a non-home system that is adjacent to a planet you control; gain control and ready it.\nAfter you move 1 of your war suns out of or through Avernus's system and into a non-home system, you may move the Avernus token with it.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/muaatbt.png?raw=true",
         "source": "thunders_edge"
     },
     {
         "alias": "cabalbt",
-        "name": "Al'Raith Ix Ianovar",
-        "shortName": "Al'Raith\nIx Ianovar",
+        "name": "Al'raith Ix Ianovar",
+        "shortName": "Al'raith\nIx Ianovar",
         "faction": "cabal",
         "synergy": [
             "BIOTIC",
@@ -193,7 +193,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of cruiser II.\nCorsair [Cost 2, Combat 6, Move 3, Capacity 2] If the active system contains another player's non-fighter ships, this unit can move through systems that contain other players' ships.",
+        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of Cruiser II.\nCorsair [Cost 2, Combat 6, Move 3, Capacity 2] If the active system contains another player's non-fighter ships, this unit can move through systems that contain other players' ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mentakbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -253,15 +253,15 @@
     },
     {
         "alias": "jolnarbt",
-        "name": "Specialist Compounds",
-        "shortName": "Specialist\nCompounds",
+        "name": "Specialized Compounds",
+        "shortName": "Specialized\nCompounds",
         "faction": "jolnar",
         "synergy": [
             "BIOTIC",
             "CYBERNETIC"
         ],
         "notes": "This ability is affected by Jol Nar's synergy. Greens count as yellow and vice versa.",
-        "text": "When you research technology using the 'Technology' strategy card, you may exhaust a planet that has a technology specialty instead of spending resources; if you do, you must research a technology of that color.",
+        "text": "When you research technology using the \"Technology\" strategy card, you may exhaust a planet that has a technology specialty instead of spending resources; if you do, you must research a technology of that color.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/jolnarbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -301,7 +301,7 @@
             "WARFARE"
         ],
         "notes": "If you run out of breaches in your reinforcements, you can pull inactive breaches from the board to use instead. You cannot pull active breaches.",
-        "text": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains an active breach.\nACTION: Exhaust this card to flip any breach or to place an active breach in a non-home system that contains your units.",
+        "text": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains an active breach.\nACTION: Exhaust this card to flip any breach or place an active breach in a non-home system that contains your units.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/crimsonbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -328,7 +328,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you gain this card and at the start of the status phase, you may place up to 3 of your trade goods on this card.\nFlip this card if you become The Obsidian faction.",
+        "text": "When you gain this card and at the start of the status phase, you may place up to 3 of your trade goods on this card.\nFlip this card if you become the Obsidian faction.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/firmamentbt.png?raw=true",
         "source": "thunders_edge"
     },

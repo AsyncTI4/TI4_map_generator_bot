@@ -13,7 +13,6 @@ class MakeCopiesOfACs extends GameStateSubcommand {
     MakeCopiesOfACs() {
         super(Constants.MAKE_AC_COPIES, "Make Copies of action cards", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many copies to make, 2 or 3")
-                .setRequiredRange(2, 3)
                 .setRequired(true));
     }
 

@@ -12,6 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.ValueScale;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -32,7 +35,6 @@ class DiplomacyUse {
 
     static final int PLANETS_TO_READY = 2;
     private static final int PAIR_CANDIDATES = 8;
-    private static final int MIN_DIPLOMACY_USE = 3;
     private static final int TOKENS_TO_FOLLOW = 1;
     private static final int MAX_CACHED = 64;
     private static final Map<String, Cached> CACHE = new ConcurrentHashMap<>();
@@ -53,15 +55,35 @@ class DiplomacyUse {
     }
 
     static boolean claimsWorthFollowing(Game game, Player seat) {
-        return PeaceAccords.bestValue(game, seat) > CardValueScale.STRATEGY_TOKEN;
+        return PeaceAccords.bestValue(game, seat) > tokenPrice(game, seat);
+    }
+
+    static double readyingValue(Game game, Player seat, Choice choice) {
+        return readyingValue(game, seat, choice, new HashMap<>());
+    }
+
+    private static double readyingValue(Game game, Player seat, Choice choice, Map<String, Double> skips) {
+        double spend = choice.unlocksScore()
+                ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
+                : choice.use() * ValueScale.RESOURCE;
+        double skip = choice.planets().stream()
+                .mapToDouble(planet ->
+                        skips.computeIfAbsent(planet, ignored -> ReadyingValue.techSkipValue(game, seat, planet)))
+                .max()
+                .orElse(0);
+        return spend + skip + ExpeditionUnlock.gainFromReadying(game, seat, choice.planets());
+    }
+
+    private static double tokenPrice(Game game, Player seat) {
+        return StrategyTokenCost.toSpend(game, seat).orElse(StrategyTokenCost.UNSPARED);
     }
 
     static boolean readyingWorthFollowing(Game game, Player seat) {
-        String key = game.getName() + "|" + seat.getUserID();
+        String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
         Cached cached = CACHE.get(key);
         if (cached != null && cached.isFor(game)) return cached.worth();
         boolean worth = bestToFollow(game, seat)
-                .filter(choice -> choice.unlocksScore() || choice.use() >= MIN_DIPLOMACY_USE)
+                .filter(choice -> choice.unlocksScore() || readyingValue(game, seat, choice) >= tokenPrice(game, seat))
                 .isPresent();
         if (CACHE.size() > MAX_CACHED) CACHE.clear();
         CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), worth));
@@ -118,8 +140,9 @@ class DiplomacyUse {
         int size = Math.min(Math.min(count, PLANETS_TO_READY), ranked.size());
         if (size < 1) return Optional.empty();
         Demand demand = new Demand(game, seat, diplomacyTokens);
+        Map<String, Double> skips = new HashMap<>();
         Comparator<Choice> ranking = Comparator.comparing(Choice::unlocksScore)
-                .thenComparingInt(Choice::use)
+                .thenComparingDouble(choice -> readyingValue(game, seat, choice, skips))
                 .thenComparingInt(choice -> totalValue(game, choice.planets()));
         return combinations(ranked, size).stream()
                 .map(planets -> new Choice(planets, demand.use(planets), SpendUnlock.unlocks(game, seat, planets, 0)))

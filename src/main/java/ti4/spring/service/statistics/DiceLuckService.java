@@ -56,7 +56,7 @@ public class DiceLuckService {
         for (PlayerEntity player : players) {
             if (player.getExpectedHits() == 0) continue;
             usersToDiceLuckAccumulators
-                    .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
+                    .computeIfAbsent(player.getStatsUser(), user -> new DiceLuckAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getActualHits());
         }
         return usersToDiceLuckAccumulators;

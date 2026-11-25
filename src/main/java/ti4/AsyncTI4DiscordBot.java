@@ -1,14 +1,17 @@
 package ti4;
 
+import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ti4.cron.CronManager;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.discord.interactions.listeners.ModalListener;
@@ -33,32 +36,43 @@ public class AsyncTI4DiscordBot {
     private static volatile boolean shuttingDown;
 
     static void main(String[] args) {
+        StartupTimeline startup = new StartupTimeline();
+        startup.mark("STARTING THE JVM");
         GlobalSettings.loadSettings();
         BotLogger.info("\n# __BOT IS STARTING UP__");
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AsyncTI4DiscordBot.class, args);
         applicationContext.getBean(JdaLifecycleService.class);
         ActiveLeaseService activeLeaseService = applicationContext.getBean(ActiveLeaseService.class);
+        GameManager.preloadManagedGames();
+        startup.mark("STARTING SPRING");
 
         String[] resolvedArgs = resolveSourceArgs(args);
         JdaService.startJdaAndRegisterListeners(resolvedArgs);
-        if (!JdaService.waitForJdaReadyAndInitializeGuilds(resolvedArgs)) {
+        startup.mark("BUILDING JDA");
+        boolean jdaReady = JdaService.awaitJdaReady();
+        startup.mark("CONNECTING TO DISCORD");
+        if (!jdaReady || !JdaService.initializeGuilds(resolvedArgs)) {
             applicationContext.close();
             throw new IllegalStateException("Failed to initialize JDA and guilds");
         }
+        startup.mark("SETTING UP SERVERS");
+        GameManager.buildPreloadedManagedGames();
         JdaService.loadStaticDataAndResources();
-        BotLogger.info("WARMING INTERACTION HANDLERS");
+        startup.mark("LOADING DATA");
         ButtonProcessor.checkButtonHandlersSetup();
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
         ModalListener.checkModalHandlersSetup();
-        BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
+        startup.mark("WARMING INTERACTION HANDLERS");
         activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
+        startup.mark("JOINING THE LEASE AND REGISTERING CRONS");
         JdaService.markProcessReady();
+        BotLogger.info(startup.summary(JdaService.describeServers()));
     }
 
     private static void runLeaseOwnedStartupWork() {
-        BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
+        CronManager.runLeaseStartJobs();
         GameManager.warmup();
         DataMigrationManager.runMigrations();
     }
@@ -98,5 +112,25 @@ public class AsyncTI4DiscordBot {
 
     private static boolean isWithinStartupDuration() {
         return System.currentTimeMillis() - START_TIME_MILLISECONDS <= WARMUP_DURATION.toMillis();
+    }
+
+    private static final class StartupTimeline {
+
+        private final long startedAtMillis =
+                ManagementFactory.getRuntimeMXBean().getStartTime();
+        private final List<String> stages = new ArrayList<>();
+        private long lastMarkMillis = startedAtMillis;
+
+        private void mark(String stage) {
+            long now = System.currentTimeMillis();
+            stages.add(String.format("%,d MS %s", now - lastMarkMillis, stage));
+            lastMarkMillis = now;
+        }
+
+        private String summary(String servers) {
+            return String.format(
+                    "STARTED UP ON %s IN %,d MS AFTER THE JVM STARTED: %s",
+                    servers, lastMarkMillis - startedAtMillis, String.join(", ", stages));
+        }
     }
 }

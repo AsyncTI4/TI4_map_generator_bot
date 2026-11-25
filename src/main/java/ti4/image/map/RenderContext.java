@@ -2,6 +2,7 @@ package ti4.image.map;
 
 import javax.annotation.Nullable;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.playerarea.NeighbourMap;
@@ -20,6 +21,7 @@ final class RenderContext {
     private final int scoreTokenSpacing;
     private final BoardLayout board;
     private final MapCanvasLayout canvas;
+    private final MapFocus focus;
 
     private RenderContext(
             Game game,
@@ -31,7 +33,8 @@ final class RenderContext {
             MapSideStatLayout statLayout,
             int scoreTokenSpacing,
             BoardLayout board,
-            MapCanvasLayout canvas) {
+            MapCanvasLayout canvas,
+            MapFocus focus) {
         this.game = game;
         this.displayType = displayType;
         this.basicType = basicType;
@@ -42,6 +45,7 @@ final class RenderContext {
         this.scoreTokenSpacing = scoreTokenSpacing;
         this.board = board;
         this.canvas = canvas;
+        this.focus = focus;
     }
 
     static RenderContext build(MapRenderRequest request, FogViewer viewer) {
@@ -65,7 +69,8 @@ final class RenderContext {
                 statLayout,
                 scoreTokenSpacing,
                 board,
-                canvas);
+                canvas,
+                request.focus());
     }
 
     private static DisplayType effectiveDisplayType(Game game, @Nullable DisplayType requested) {
@@ -143,5 +148,15 @@ final class RenderContext {
 
     MapCanvasLayout canvas() {
         return canvas;
+    }
+
+    @Nullable
+    MapFocus focus() {
+        return focus;
+    }
+
+    @Nullable
+    Player focusPlayer() {
+        return focus == null ? null : game.getPlayerFromColorOrFaction(focus.faction());
     }
 }

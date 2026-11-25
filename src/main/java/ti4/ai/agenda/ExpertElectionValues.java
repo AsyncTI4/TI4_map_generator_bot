@@ -18,6 +18,7 @@ import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.actioncards.ExpertTiers;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretPhase;
 import ti4.ai.secrets.SecretValue;
@@ -131,11 +132,17 @@ class ExpertElectionValues {
         Player elected = electedPlayer(view.game(), outcome);
         if (elected == null) return 0;
         if (winsWithPoint(view.game(), elected)) return pointsTo(view.game(), view.voter(), elected, POINT);
-        return elected(view, outcome, worthToHolder);
+        double shared = elected(view, outcome, worthToHolder);
+        if (elected == view.voter() || !contendsWithPoint(view.game(), elected)) return shared;
+        return Math.min(shared, pointsTo(view.game(), view.voter(), elected, POINT));
     }
 
     private static boolean winsWithPoint(Game game, Player player) {
         return player.getTotalVictoryPoints() + POINT >= GameHorizon.goal(game);
+    }
+
+    private static boolean contendsWithPoint(Game game, Player player) {
+        return player.getTotalVictoryPoints() + POINT >= GameHorizon.goal(game) - ScoringStakes.CONTENDER_FROM_GOAL;
     }
 
     private static boolean isFaction(Player player, String faction) {

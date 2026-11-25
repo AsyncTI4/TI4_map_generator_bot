@@ -25,15 +25,15 @@ releasable versions; this document describes what exists today.
 | --- | --- |
 | `/ai add` | Adds an AI seat and sets it up at the given home position. |
 | `/ai status` | Shows whether each AI seat is running, paused, or disabled on the bot. Never shows aggression. |
-| `/ai pause` / `/ai resume` | While paused, an AI acts only through the table: blocking choices are posted for any player to make. |
+| `/ai pause` / `/ai resume` | While paused, an AI makes no choices and hands nothing to the table on its own; `/ai delegate` posts its blocking choice for the game owner or a developer to make. |
 | `/ai fallbacks` | Lists the last 10 times an AI seat was unsure, made no progress or timed out, with what it did about it. Players, the owner and developers only; the prompt, button and decision details are left out for private prompts and in Fog of War games unless you are a developer. |
 | `/ai delegate` | If an AI is holding up the game and doesn't know what to do, post its options for the table now. Without `faction_or_color` it only applies to seats that are waiting on something. |
-| `/ai watch` | Developers only: creates a new game with its channels in this channel's category, sets up the standard map, seats an AI in every chair (3 to 6, default 6, random supported factions) and starts it, so you can watch it play itself. Options: `seats`, `game_name` (default `aiwatch<N>`) and `pace` (`fast` by default: shorter pauses while no human plays). You are added to each AI's private thread. |
-| `/ai play` | Developers only: like `watch`, but you take one seat and the AIs fill the rest. Options: `opponents` (2 to 5, default 5), `faction` (yours; default a random Base, PoK or Thunder's Edge faction), `color` and `game_name` (default `aiplay<N>`). The seats, the speaker and your home position are random, the AIs' factions come from the six fully implemented ones, and you are not added to their private threads. Press **Deal 2 Secret Objectives** to begin; the referee only runs when every seat is an AI, so you move the phases on yourself. |
-| `/ai remove` | Removes an AI seat before the game starts and restores what adding it changed (map tile; speaker and game flags once the last AI seat leaves). Afterwards, use `/game replace` to hand a seat to a human. |
+| `/ai watch` | Developers only: creates a new game with its channels in this channel's category, sets up the self-play map (Thunder Dreaming, from the Thunder's Edge rulebook), seats an AI in every chair (3 to 6, default 6, random factions from the six fully implemented ones) and starts it, so you can watch it play itself. Options: `seats`, `game_name` (default `aiwatch<N>`) and `pace` (`fast` by default: shorter pauses while no human plays). You are added to each AI's private thread. |
+| `/ai play` | Developers only: like `watch`, but you take one seat and the AIs fill the rest. Options: `opponents` (2 to 5, default 5), `faction` (yours; any Base, PoK, Codex or Thunder's Edge faction by name, default a random one of the factions AI seats support, work in progress ones included), `color` and `game_name` (default `aiplay<N>`). The seats, the speaker and your home position are random, the AIs' factions come from the six fully implemented ones, and you are not added to their private threads. Press **Deal 2 Secret Objectives** to begin; the referee only runs when every seat is an AI, so you move the phases on yourself. |
+| `/ai remove` | Removes an AI seat before the game starts and restores what adding it changed: the map tile, the seat's units on every tile, the speaker when the seat holds it, and the game flags once the last AI seat leaves. Afterwards, use `/game replace` to hand a seat to a human. |
 
-Every command except `add` takes an optional `faction_or_color` to target one AI seat; without
-it, it applies to all of them (`remove` needs it when there are several).
+`status`, `pause`, `resume`, `fallbacks`, `delegate` and `remove` take an optional `faction_or_color` to target one
+AI seat; without it, they apply to all of them (`remove` needs it when there are several).
 
 **Factions.** Each AI seat plays a different faction: the bot cannot seat two players with the same
 faction (setup refuses it, and home planets, button ownership and many game values are keyed by
@@ -41,9 +41,10 @@ faction). AI seats can play the factions whose setup needs no choices and whose 
 shared rules handle: Nekro Virus, Sardakk N'orr, Emirates of Hacan, Barony of Letnev,
 L1Z1X Mindnet, Naalu Collective, Federation of Sol, Universities of Jol-Nar, Xxcha Kingdom,
 Yin Brotherhood and the Winnu (whose starting technology the seat picks itself at setup). Naalu, Winnu and Yin are
-work in progress (`AiSettings.WIP_FACTIONS`): their faction rules are written but not yet tested in play, so they are
-selectable by name only and never picked by default, `/ai watch` or `/ai play`. They all use the same rules; the Nekro-only rules (Technological Singularity,
-the tech-steal bonus when choosing attacks) switch on for Nekro only.
+work in progress: their faction rules are written but not yet tested in play, so they are left out of
+`AiSettings.DEFAULT_FACTIONS` and an AI seat gets one only by name, never by default, `/ai watch` or `/ai play` (the
+human of `/ai play` may still get one at random). They all use the same rules; the Technological Singularity rules
+(the copy, the tech-steal bonus when choosing attacks) switch on for any seat with that ability.
 
 **Federation of Sol.** The Sol rules key on the ability, leader, unit or breakthrough rather than the faction, so
 Nekro and Franken copies work too (`ti4.ai.sol`):
@@ -53,15 +54,17 @@ Nekro and Franken copies work too (`ti4.ai.sol`):
   finishing _Occupy the Fringe_ (80% of a point), plus a floor of 0.3 per infantry and a quarter of the rest. It
   costs a strategy token (2 trade goods, times 0.4 with 3 spare tokens, 0.6 with 2, 0.8 with 1, 1.0 with none, and 1.5
   more when it would cost a follow it plans) and the action. It is played when that, plus 1.5 for stalling while
-  anyone else is still in the round, beats the best tactical plan, and in place of passing. The mech deploy pays 3
+  anyone else is still in the round (more while it can outlast the table for _Prove Endurance_), nets at least 0.6 and
+  beats the best tactical plan, and in place of passing. The mech deploy pays 3
   resources when the mech's gain beats the premium over a mech's cost (a mech that turns a landing 2 infantry cannot,
   or advances _Mechanize the Military_).
 - Evelyn Delouis (`SolAgentRules`) is used at the start of a round of a ground combat the seat fights in, when the
-  extra die on its best ground force moves the win chance times the stake by at least 0.2; never for other
+  fight is not already won (below 95% without the die) and not hopeless (at least 5% with it); never for other
   players' combats. Claire Gibson (`SolCommanderRules`) places her free infantry before the seat's first roll.
-- Jace X, 4th Air Legion (`SolHeroRules`) is played from round 3 on when the seat has a tactical token and freeing
-  every command token on the board makes its best tactical plan worth at least three quarters of a point and at least
-  3 more than its two best plans now.
+- Jace X, 4th Air Legion (`SolHeroRules`) is played when the seat has a tactical token and freeing every command
+  token on the board brings at least a point its current plans do not (`FreedPlays`): an objective or secret, the
+  custodians or Imperial point on Mecatol Rex, Styx, or denying a rival close to winning (its home system, or Mecatol
+  from the Imperial holder).
 - _Bellum Gloriosum_ (`BellumGloriosumRules`): after its normal build is paid, the seat takes the free build for each
   ship with capacity it produced: defending infantry, spare infantry up to four, then fighters up to its room, paid
   from what the reserve leaves.
@@ -173,8 +176,11 @@ decided before the next die is rolled:
   demilitarized zones, Mallice, or planets with enemy structures and no enemy ground forces; Mecatol Rex under the
   custodians only when their 6 influence is payable, which it then pays), each planet worth its landing win chance
   without space cannon times its value, objective progress, denial of a rival's objective, the Mecatol hold value and
-  a point for the custodians. It plays the hero as a component action when that spread, less half a point for keeping
-  the hero (nothing in the last round), beats the best tactical plan, or instead of passing. It walks the hero's buttons
+  a point for the custodians; Styx's point and an unclaimed relic on a Fracture planet; and a point on Mecatol Rex
+  with Imperial or Overrule in hand (a quarter more with Fleet Logistics). Neutral defenders count, and on its point
+  landings it plans one Indoctrination conversion each (into a mech while one is in reinforcements) as far as its
+  influence allows. It plays the hero as a component action when that spread, less a quarter point for keeping the
+  hero (nothing in the last round or when a landing takes a point), beats the best tactical plan, or instead of passing. It walks the hero's buttons
   once per planet, starts each ground combat the bot asks about, and holds its turn (up to 15 minutes) until those
   combats end.
 - The Van Hauge (`VanHauge`, `CombatOdds.Force.detonating`): when the side holding it is wiped out the other side loses
@@ -191,9 +197,12 @@ decided before the next die is rolled:
 - Not handled: Milor for other players' losses (or selling him), and committing all of Dannel's infantry before any of
   the ground combats (the bot resolves each landing in turn).
 
-**When an AI is confused**, it posts the choice in the main game channel and **any player**
-may pick for it. Choices involving hidden information (its hand, its secret objectives) are
-never shown: the AI picks a safe option and says so. A safe option is one that declines or passes; it is never a
+**When an AI is confused**, it posts the choice in the main game channel and **the game owner or a bot developer**
+may pick for it (any player, for a seat with experiment `EXPLOIT_GUARDS` off). Choices involving hidden information
+(its hand, its secret objectives) are never shown: the AI picks a safe option and says so. A safe option is one that
+declines, passes or closes the prompt (a button whose id or label holds `decline`, `pass`, `no_`, `not follow`,
+`deletebuttons`, `done`, `skip` or `cancel`, in that order of preference); it never opens a form, never passes for the
+round while the seat still has a tactic token or an unplayed strategy card, and it is never a
 button that cancels a hit (`cancelSpaceHits_`, `cancelPdsOffenseHits_`, `cancelGroundHits_`, `cancelAFBHits_`), which
 would throw a hit away for free.
 
@@ -214,14 +223,17 @@ to build one by hand:
 2. Add the map, set `/game setup player_count_for_map` to the number of seats, then run `/ai add`
    once per seat (one of them with `speaker:True`).
 3. The AIs take it from there. On top of their own choices:
-   - **Referee.** After every seat has been idle for 20 seconds, the speaker AI presses the
-     buttons any player may press to move the game on: dealing the starting secret objectives
+   - **Referee.** Once 20 seconds have passed since the last AI action and the prompt is that old, an AI seat presses
+     the buttons any player may press to move the game on (the seat of the button's faction, else the speaker seat,
+     else the first seat): dealing the starting secret objectives
      (once every seat is filled), revealing objectives, starting the strategy phase, flipping and
      resolving agendas, breaking ties and moving on to the next round. It never ends the game. It confirms an agenda's
      winner (the "Resolve with Current Winner" button, never a manual resolution) only once the announcement is a
      minute old, so the AI seats have answered the shenanigans prompts first.
    - **No one to delegate to.** Instead of posting a choice for the table, an unsure AI picks a
-     declining option (or else the first option that doesn't open a form) and says so.
+     safe option (above), or else the first option that doesn't open a form, undo, cancel a hit or pass the round
+     early, and says so. This applies to private prompts too. When a stall times out or is handed over on a system
+     picker, it first takes a system holding only its own units.
    - **Game end.** Once a player reaches the victory point goal, or every objective has been revealed,
      the AIs stop and post a notice; finish the game with `/game end`. Ending it still reports the game like any other (staff
      channel, stats for the winner); deleting the channels by hand avoids that for a throwaway `/ai watch` game.
@@ -234,26 +246,32 @@ to build one by hand:
 - **Seat.** A normal player whose user id is synthetic: `7100000` followed by 9 digits, below any
   real Discord snowflake. Its name is "<faction> AI". The bot gives it a private cards-info thread,
   which is its inbox. Its hidden profile (brain, aggression base and mode, paused state, seed) lives
-  in player stored values, so `/game undo` rolls it back with the game.
+  in player stored values, so `/game undo` rolls it back with the game. No decision reads the aggression values yet.
 - **Change detection.** `AiRuntime` polls every 3 seconds from a `CronManager` task named
   `AiRuntime`. It compares each AI game's `ManagedGame.lastModifiedDate`, which every save,
   undo and reload refreshes, and queues a debounced tick on its own worker threads.
 - **One lane per game.** A tick reads the main channel, the AI seats' private threads and
   their ongoing combat threads once, then lets each AI seat decide in turn, starting after the
   seat that acted last. The first seat that wants to press gets the game's single press for that
-  tick, so presses never race for the game lock and every decision sees fresh state. Each seat
+  tick, so presses never race for the game lock. All seats of a tick decide on the same snapshot of the channels; a
+  seat's own bookkeeping (hostility, promises, deals and the like) may save the game during its decision, so a later
+  seat in the same tick can read a game that changed while its prompts did not. Each seat
   keeps its own memory, pressed buttons, attempt counts, stall timer and caps.
 - **Perception.** A seat sees buttons it owns (`FFCC_<faction>_…`), everything in its own
-  thread, every message in its combat threads, and the public windows its rules care about. It
-  never reads other players' private threads.
-- **Decision.** The rules return `Press`, `Unsure`, `Wait` or `Idle`. They handle:
+  thread, the 2 newest combat threads it fights in, the strategy card threads (its own buttons, while the newest
+  message is under 15 minutes old), and the public windows its rules care about, plus a few bot and AI texts without
+  buttons (AI table talk, the _Leadership Rider_ payout line). It reads the last 50 messages of a
+  channel (100 of a combat thread). It never reads other players' private threads.
+- **Decision.** The rules return `Press`, `Unsure`, `Wait` or `Idle`, or `Announce`, `Post` and `Propose` for the
+  AI's own messages and deal offers. They handle:
   - strategy card picks, valued by what the card is worth to the seat right now (below);
   - **tactical actions**: choosing a plan, activating the system, moving, landing, exploring, building, paying and ending the turn (below);
   - **combat**: rolling, anti-fighter barrage, space cannon offense (also its own PDS and PDS II on its own tactical
     action) and defense, Assault Cannon (it fires it with 3 or more non-fighter ships before the first roll, and
     when an opponent fires it, destroys its own cheapest non-fighter ship and closes the prompt), bombardment before
     landing, hit assignment with the bot's auto-assign buttons (which use Sustain Damage first), a single hit an
-    opponent's ability assigns to one of its units (it sustains if it can, otherwise takes the loss), Graviton
+    opponent's ability assigns to one of its units (it sustains if it can, otherwise presses the first loss the bot
+    offers), Graviton
     Laser System before its space cannon fires at ships screened by fighters, Magen Defense Grid's hit at the start
     of a ground combat (a damaged mech first, then infantry, then a mech that would only sustain), ground combat
     automation. Combat technologies (`CombatTechRules`): Dimensional Splicer at the start of a space combat;
@@ -286,9 +304,11 @@ to build one by hand:
     Warfare first (no command token), leaving the same ships free for the follow-up; each action keeps its own plan;
     Dark Energy Tap: a spare ship is worth sending to a system with a frontier token (1.5 for the card, 1.0 for the
     position, the stall and later edge-of-map objectives) and it widens retreats; Production Biomes' 4 trade goods
-    instead of passing while it has a strategy token to
-    spare (the other 2 to the player furthest behind); Nullification Field when the player activating a system
-    with its ships could bring in a bigger fleet; Neural Parasite against the leader, on a planet rather than in space
+    instead of passing, or instead of a tactical action when that is worth more than the best plan, while it has a
+    strategy token to spare (the other 2 to the least threatening player: never the points leader if another can
+    take them, then the lowest victory points plus the best public objective it can score now, then the fewest trade
+    goods and commodities); Nullification Field, with a strategy token to spare, when the activation puts a score at
+    stake or is worth at least twice the token (`NullificationOutlook`); Neural Parasite against the leader, on a planet rather than in space
     and on a planet's last infantry first; Salvage Operations' trade good after a decided space combat (it declines the paid
     rebuild); Self-Assembly Routines' free mech after producing (on the dock planet); Integrated Economy after
     taking a planet (`IntegratedEconomyRules`): units an objective wants (a mech for _Mechanize the Military_, ships
@@ -303,7 +323,10 @@ to build one by hand:
     reachable scar is worth 0.6 of a point divided by the faction technologies still missing. While it holds the secret
     with ships in or beside a scar it keeps one strategy token for the purchase (`ScarToken`), and while a reachable
     research route still needs work it takes a third strategy token at the status phase so it can follow Technology;
-  - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
+  - Transit Diodes (`TransitDiodesRules`, for the mech secrets, below), Quantum Datahub Node (`DatahubRules`, a
+    strategy card swap at the end of the strategy phase) and Instinct Training (`InstinctTraining`, a strategy token
+    to cancel an action card, weighed by the Sabotage policy);
+  - technologies it does not use: Chaos Mapping, Wormhole
     Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
     the least when it researches or copies a technology;
   - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat. A technology
@@ -332,6 +355,10 @@ to build one by hand:
       planet worth a victory point or more (an objective or secret it would score, a custodians/Mecatol hold, an
       enemy home planet, denying a rival's score), and not fighting is worth more than the fleet's replacement cost
       beyond the expected fight losses plus half a point for the card. It then lands everything on that planet.
+      Before each tactical action the planner also ranks every plan with the space combat skipped
+      (`SkippedSpaceCombat`: only the ground combat must be won and every ship in the system is lost); when that plan
+      is worth a point after the ships and beats the best plan without the hero by half a point, the seat takes it and
+      presses the hero in that system;
   - playing component action cards and _Forward Supply Base_, valued by what they score and by human play statistics,
     and answering cards that target it (below);
   - playing the promissory notes other players gave it, and respecting its own notes played against it (below);
@@ -339,11 +366,15 @@ to build one by hand:
 - **Scoring comes first.** Victory points drive most choices:
   - **Public objectives**, including "spend" objectives. The bot takes trade goods and tokens off by itself;
     for resources and influence it only posts exhaust buttons and trusts the player, so the AI plans the cheapest
-    payment (`Wallet`: planets before trade goods, each planet paying resources or influence, never both) and
-    exhausts exactly that. It prefers the objective worth more points, then one that costs nothing.
-  - **Reserve.** During the action phase it keeps back what the cheapest affordable spend objective needs at the
-    status phase (unexhausted planets, trade goods, tokens), unless it already qualifies for enough free
-    objectives. Production, research and following respect the reserve. Production pays with the planet that wastes
+    payment (`Wallet`: planets before trade goods, each planet paying resources or influence, never both, except that
+    with the Xxcha hero one planet pays both and with the Xxcha breakthrough each kind counts the larger value) and
+    exhausts exactly that. It prefers the objective worth more points, then the one costing the fewest trade goods
+    and tokens (exhausted planets are not counted), then, in the status phase, a spend objective.
+  - **Reserve.** During the action phase it keeps back what the affordable spend objective worth the most points
+    needs at the status phase (unexhausted planets, trade goods, tokens; the cheaper one on a tie), or else one it
+    expects to afford with the trade goods and Diplomacy readying still to come, unless it already qualifies for
+    enough free objectives. It reserves nothing when a rival is expected to win first, unless the reserve itself wins
+    the race (`WinRace`). Production, research and following respect the reserve. Production pays with the planet that wastes
     least: the resources it overpays plus its influence at 2 resources to 3 influence, so a 2/3 planet such as Lirta IV
     is kept for Leadership or the custodians when a resource planet covers the same bill. Production also leaves the custodians' 6
     influence while its ships can reach Mecatol Rex, and the influence-leaning planets a Leadership secondary (or its
@@ -379,11 +410,12 @@ to build one by hand:
       retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round, counted even when the
       fighters were all the opponent had, which ends the combat before another look; the seat waits for the barrage
       hits to be assigned before rolling the first round), _Turn
-      Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships), _Become a
-      Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
+      Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships). _Become a
+      Martyr_ is judged when it loses a home planet, and _Prove Endurance_ is queued for the status phase (below).
+      Earned secrets wait in a queue, so two combats in one turn can score two.
       _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
       before it lands; it builds ships with bombardment for it and keeps the secret while it has some.
-      When a combat meets two, the rarer one (by how often real players finished it) is scored.
+      When a combat meets two, the rarer one (by how often real players finished it, a fixed order) is scored.
     - **Prove Endurance** (`ti4.ai.endurance`). It is scored by passing last, so a seat holding it counts the actions each
       player still has (`StallCount`) and stalls only while it can outlast them. A count is the tactic tokens (its own
       less the ones a scoring reserve keeps), unplayed strategy cards, ready technologies with an ACTION (its own: Sling
@@ -410,28 +442,31 @@ to build one by hand:
       in that last round (its ordinary per-round rate, never counting on an enemy staying within reach, times 0.85 for
       each other combat secret in hand as they compete for the same combats) must be at least 0.4. So rare secrets
       are pursued at once. _Make an Example of Their World_ and _Destroy Their Greatest Ship_ are never saved: the
-      seat pursues them from round 1. `-Dai.secrets.hold=false` turns patience off.
+      seat pursues them from round 1. The tactical planner also always prices _Destroy Their Greatest Ship_,
+      _Darken the Skies_ and _Brave the Void_ at a whole point, and _Brave the Void_, _Unveil Flagship_, _Demonstrate
+      Your Power_ and _Fight with Precision_ at a whole point against a neutral opponent. `-Dai.secrets.hold=false`
+      turns patience off.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
     - **Seize an Icon** (`IconStake`). While it holds the secret and controls no legendary planet it chases one.
       The planner already credits a landing or an attack that takes a legendary planet with the secret's full point;
       on top of that it claims the legendary planet of a system first when the landing forces cannot cover every
-      planet, takes a rival's legendary planet through the structures on it (outside a home system structures
-      otherwise forbid the landing), stages for one a rival holds, and `marchPlans` moves a transport with up to two
+      planet, takes a rival's legendary planet through the structures on it, stages for one a rival holds, and `marchPlans` moves a transport with up to two
       ground forces one system closer to the nearest free legendary planet it cannot reach this action (worth 0.6 of a
       point times the share of the distance closed, less the counterstrike, the cost of leaving and the distance). A
       free legendary planet is also a round goal for the advance plans, in any territory zone. For a legendary Mecatol
       Rex (Thunder's Edge) the secret's point joins the custodians race prize, and the custodians are paid out of the
       scoring reserve, since the point of the custodians plus the icon outweighs a spend objective. A held legendary
       planet needs no extra rule to be kept until the status phase: losing it loses the secret, which already makes its
-      system guarded. The standard self-play map (tiles 18-48) has no legendary planet, so only a map with one (Primor,
-      Hope's End, Mallice, a Thunder's Edge Mecatol Rex) exercises this.
+      system guarded. A map with a legendary planet (Primor, Hope's End, Mallice, a Thunder's Edge Mecatol Rex)
+      exercises this.
     - **Keeping secrets.** When it holds too many it discards the one with the lowest keep value: the chance the
       secret gets scored times what a point from its phase is worth (action 1.2). The chance blends how often real
       players finished the secret (`SecretStatistics`) with the board: progress for a status secret, and for an action
       secret the chance per round of meeting its condition (`ActionSecretOdds`), higher with a ship placed for it and
-      0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, and a
-      status secret is halved when other scorable ones already fill the rounds left. It uses Imperial to replace the
+      0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, unless it
+      is a status secret and other scorable ones already fill the rounds left: then it is worth half its phase
+      value (0.5 after round 1). It uses Imperial to replace the
       rest. It pursues _Mechanize the Military_ and _Occupy the Fringe_ like the other board secrets: the tactical
       planner counts the planets holding one of its mechs and the most ground forces on a planet without its space dock,
       lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
@@ -455,8 +490,9 @@ to build one by hand:
       With an unscored _Destroy Heretical Works_ it never purges fragments for a relic unless 2 are left, and fragment
       trades value its first two fragments 2 trade goods higher (`FragmentValue`, `FragmentDeals`).
     - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
-      an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
-      every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
+      an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest. The
+      Imperial primary always draws while it does not hold Mecatol Rex and has secrets left to score; the Imperial
+      follow and _Strategize_ skip the draw when every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
       a good action secret); it never draws once all its secrets are scored. A full hand values the draw at what the new
       secret could add over the weakest one. When its secrets are weak it plays its outs: at the end of its turn it
       exhausts Mecatol Rex (Thunder's Edge) to trade the weakest for a new one, holding Mecatol Rex is worth that trade
@@ -465,25 +501,39 @@ to build one by hand:
 - **Command tokens** (`CommandTokenPolicy`). Every gain (status phase, Leadership, Propagation) goes to the first
   unmet level of one priority list, and status-phase redistribution moves a token out of any pool above its share
   (fleet first, then strategy, then tactic) and gains it back where the list needs it, so each move brings the pools
-  closer and it always settles:
+  closer and it always settles. The status-phase list:
   1. fleet up to its largest stack, so no ships are lost;
-  2. tactic up to 2 (tactics are what turn into actions);
-  3. fleet up to what a revealed _Raise a Fleet_ or _Command an Armada_ needs, once a stack can grow into it this
-     round;
-  4. fleet up to 3;
-  5. fleet up to the Styx fleet while a dock is within two moves of an ingress, one ingress is in the seat's own slice
-     and Styx is not the seat's, before the ships are built (`FractureCampaign.fleetShips`: at least the four ships
-     that take Styx from its guard, three dreadnoughts and a carrier, and as many as the strongest rival stack so the
-     fleet can hold Styx, with no fixed upper size; no fleet of three unupgraded ships that carries enough infantry
-     beats the guard, and production is capped by the pool). In the status phase the four ships that take Styx come
-     earlier, right after two tactic tokens and one strategy token and ahead of the other tactic and strategy levels,
-     so seven tokens cover them; only the growth past four waits here;
-  6. strategy up to 2;
-  7. fleet up to its largest stack plus one (at most 5), only when that stack has at least 3 ships and other ships
-     could join it;
-  8. tactic up to 5;
-  9. strategy up to 3, never more;
-  10. the rest to tactic.
+  2. tactic up to 1;
+  3. fleet up to the fleet its hero needs, and up to what a revealed _Raise a Fleet_ or _Command an Armada_ needs
+     when no other free public objective is in reach;
+  4. while a dock is within two moves of an ingress, one ingress is in the seat's own slice and Styx is not the
+     seat's: strategy up to 1, tactic up to 2 and fleet up to the four ships that take Styx from its guard (three
+     dreadnoughts and a carrier), so seven tokens cover them before the other tactic and strategy levels;
+  5. strategy up to 1, strategy up to 2, tactic up to 2 (tactics are what turn into actions); when a rival can
+     outlast it in stalls, tactic 2, strategy 1, tactic 4, strategy 2 instead;
+  6. fleet up to the gathering fleet while Styx is still to take: the non-fighter ships that can reach Styx within
+     two rounds of moves, at most 6 (`FractureCampaign.gatheringFleet`, `GATHER_FLEET_MAX`);
+  7. fleet up to 2;
+  8. fleet up to 3 from the status phase of round 2 on;
+  9. when it plans to build ships next round, tactic up to 3 and fleet up to what the build needs;
+  10. fleet up to what _Raise a Fleet_ or _Command an Armada_ needs, once a stack can grow into it this round;
+  11. strategy up to 2 (one more on a research route to _Adapt New Strategies_, one more while it holds a playable
+      _Strategize_);
+  12. fleet up to 4 from the status phase of round 2 on;
+  13. fleet up to the Styx fleet under the same conditions as level 4 (`FractureCampaign.fleetShips`: the four ships
+      that take Styx, or as many as the strongest rival stack so the fleet can hold Styx, with no fixed upper size;
+      no fleet of three unupgraded ships that carries enough infantry beats the guard, and production is capped by
+      the pool);
+  14. fleet up to its largest stack plus one (at most 3 for round 2, 5 later), only when that stack has at
+      least 3 ships and other ships could join it;
+  15. tactic up to 5;
+  16. strategy up to 3, never more;
+  17. the rest to tactic.
+
+  Gains in the action phase (Leadership, Propagation) use a shorter list whose strategy and tactic levels come from
+  the round's token plan (`TokenPlan`); its fleet levels are the largest stack, the build it keeps, the hero and
+  objective fleets, the Styx fleet and the gathering fleet before the plan's tokens, then fleet 2 (round 2) or 3
+  (later) and one more, then the stacking fleet.
 
   Every fleet level stays within _Fleet Regulations_' 4, and _Raise a Fleet_ is ignored under it. A normal round
   ends near 2 tactic, 2 strategy and 3 fleet. When it must lose a token (for example for a Nekro agent), it takes it
@@ -496,7 +546,7 @@ to build one by hand:
   score and no Mecatol Rex is worth only the secret it draws (no more than the strategy token a follow costs).
   | Card | Uses it plans for |
   | --- | --- |
-  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), acting first in a race for the custodians, and claiming a contested expedition slice before a rival (see below) |
+  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and claiming a contested expedition slice before a rival (see below) |
   | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), readying its best 2 planets (more with a spend objective revealed), and the planets an expedition exhausts or would need (see below). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
   | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), looking at the agenda deck once the custodians are taken, and the expedition the 2 cards make payable (the action card slice) |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
@@ -515,14 +565,17 @@ to build one by hand:
 
   A Trade, Politics or Diplomacy plan with an expedition use of at least 0.5 plays the card at once, so the end-of-turn claim happens with what the card gave before a rival's turn (Leadership needs no play: the claim is the seat's first turn's end whatever it does).
 
-  The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
-  players take that card in that round (`PickPrior`), and remembers the plan. During the action phase it re-plans
+  The pick adds the trade goods on a card, the custodians race gain of its initiative (`InitiativeRace`, which
+  favours low initiatives on every card), and a small nudge (at most an eighth of a point) from how often human
+  players of the faction take that card in that round (`PickPrior`: tables for Hacan, Xxcha, Sardakk, Letnev and Sol,
+  the Nekro table for every other faction), and remembers the plan. During the action phase it re-plans
   every held card from the live board each turn (`StrategyCardReplanner`), so a plan that other players spoil gives
   way to the card's next best use. A card is played before tactical actions when its plan says now (`CardTiming`):
   Leadership or Propagation with no tactic token left, Diplomacy to lock a threatened system or once planets are
   worth readying, Construction to produce or to place PDS under threat or a dock in the first 3 rounds, PoK Warfare
-  once taking back a token unlocks a much better action, Thunder's Edge Warfare to reactivate a system or with no
-  tactic token, and Imperial while it can score two objectives or before an enemy fleet takes Mecatol Rex, except that
+  once taking back a token unlocks a much better action, Thunder's Edge Warfare in round 1, with no tactic token, to
+  reactivate a system for a plan worth 2 or more, or for any other target worth 1 or more (it holds the card only while its main use is a
+  second build at home or building and then moving out, and home is unlocked), and Imperial while it can score two objectives or before an enemy fleet takes Mecatol Rex, except that
   Imperial waits while the best tactical action takes Mecatol Rex (the point is then scored with the card; unless
   playing it now wins the game) and while the seat's own _Overrule_ is due first. Otherwise
   it plays the card once no tactical action is left. While it holds Warfare for a second build or to build and then
@@ -531,11 +584,11 @@ to build one by hand:
   | Card | Primary | Follows when |
   | --- | --- | --- |
   | Imperial | scores the best public objective it qualifies for, then the Imperial point (Mecatol Rex) or a secret | it has a spare strategy token, and room in hand for a secret or a weakest secret worth replacing (see Drawing and trading secrets) |
-  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives it can still finish in the rounds left, about 1.5 researches a round until the leader is 2 points a round from winning, and Space Dock II for _Produce en Masse_; minus 0.7 per resource or influence lost exhausting a technology specialty planet for a prerequisite, which it then exhausts when paying, free with Psychoarchaeology, or AI Development Algorithm when that costs less); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
-  | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
-  | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards, and once the custodians are taken looks at the top 2 agendas, burying _Public Execution_ while it leads on points, agendas that punish the planet owner while it holds the most planets, and elections it would lose on influence (a work in progress that needs a redesign: votes are unknown in the action phase) | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
-  | Construction | the Thunder's Edge card produces at the dock its plan chose (no token placed) and then places one structure; otherwise two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); while Styx is open, a planet in an ingress system of its own slice is a dock site whatever it is worth and comes first (the human Ral Nel docked on its ingress in round 1); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
-  | Diplomacy | first locks the threatened system its plan chose (PoK card only), then readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | with _Peace Accords_, a planet worth more than the strategy token can be claimed (the ready button is pressed even with nothing exhausted, and `PeaceAccordsRules` then claims the best planet the prompt offers, or declines); otherwise its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
+  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: a hand-set generic value, nudged for Sardakk, Hacan, Xxcha, Letnev and Sol by the technologies human players of those factions research (`ResearchPrior`), plus progress on tech objectives it can still finish in the rounds left, about 1.5 researches a round until the leader is 2 points a round from winning, and Space Dock II for _Produce en Masse_; minus 0.56 (0.7 of a resource) per resource or influence lost exhausting a technology specialty planet for a prerequisite, which it then exhausts when paying, free with Psychoarchaeology, or AI Development Algorithm when that costs less); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest), or at least 1.8 when idle trade goods cover the 4 resources, is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
+  | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token; 4 while it holds a playable _Strategize_ and has no strategy token) |
+  | Politics | makes itself speaker; when it already is, names the rival that is not a contender after which it picks earliest (`SpeakerSale`; it may first offer to sell the token), or the player furthest behind in full priority-track mode; draws 2 action cards, and once the custodians are taken looks at the top 2 agendas, burying _Public Execution_ while it leads on points, agendas that punish the planet owner while it holds the most planets, and elections it would lose on influence (a work in progress that needs a redesign: votes are unknown in the action phase) | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with room for 2 cards and a strategy token left after every other follow it wants; never with no strategy token, a full hand or _Hold No Action Cards_ |
+  | Construction | the Thunder's Edge card produces at the dock its plan chose (no token placed) and then places one structure; otherwise two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); while Styx is open, a planet in an ingress system of its own slice is a dock site whatever it is worth and comes first (the human Ral Nel docked on its ingress in round 1); any planet for _Fuel the War Machine_ | it has a spare strategy token and its best structure (`StructurePolicy`: an early dock is worth 4 in rounds 1-3 on its own, more with a structure objective in reach) is worth at least 0.5 more than the token |
+  | Diplomacy | first locks the threatened system its plan chose, or with no threat the system most exposed to a lock (PoK card only), then readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | with _Peace Accords_, a planet worth more than the strategy token can be claimed (the ready button is pressed even with nothing exhausted, and `PeaceAccordsRules` then claims the best planet the prompt offers, or declines); otherwise its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
   | Warfare | Thunder's Edge: a tactical action without a command token, which may reactivate a system that already holds its token (for example a second production at home), at the target its plan chose while that is still close to the best; PoK: takes back the token whose removal unlocks the best tactical action | producing at home is worth as much as a tactical action's production would need to be (carriers, infantry for free planets, ships for objectives, or enough filler) |
   | Trade | the bot resolves the primary; an AI holder then announces X−k terms per player (k = 2 for 4 or more commodities or a player ahead of it, otherwise 1; none for a player close to winning, the leader, a bad payer or one the commodities would let score) and sends each follower the deal: their commodities for that many minus k trade goods (k debt when they are not neighbours, k trade goods after Replenish and Wash), an even wash for Hacan and for players who spent a strategy token | for free when an AI holder's terms are worth it (it holds its own _Trade Agreement_, gains commodities, and the deal or the debt is worth more than what it gives up), always as Hacan, and with a strategy token for a human holder only for 4 or more new commodities and somewhere to wash them |
 
@@ -565,18 +618,22 @@ to build one by hand:
     give a point or a benefit (and any election while it holds _Drive the Debate_), the leader for _Public
     Execution_, its own planets for beneficial planet agendas and others' for harmful ones, the _Seed of an Empire_
     side that scores for itself, "For" on _Mutiny_ when it would carry. Planet agendas that need a trait (_Holy
-    Planet of Ixth_, the _Research Teams_, _Core Mining_, ...) only go on planets with that trait. It votes
-    everything when a point is at stake, half otherwise, and abstains on agendas it has no stake in. It only
-    answers the outcome prompts its own vote opened.
-  - **A rival's _Imperial Rider_.** When another seat's _Imperial Rider_ sits on an outcome of the agenda, the seat
-    votes all of its votes for the outcome that leaves it best off in the forecast with those votes counted (the rider
-    costs the seat what a point is worth to the rival, in full when it wins them the game), whatever it thought of the
-    agenda, and as speaker breaking a tie it picks the tied outcome that does the same. _Mutiny_ keeps its own rule,
-    and agendas without such a rider are voted as above.
+    Planet of Ixth_, the _Research Teams_, _Core Mining_, ...) only go on planets with that trait. With a forecast
+    (below) it picks the number of votes by valuing every total its planets can make (a 0.5 trade good floor, a
+    price on the votes it keeps, and the fewest votes close to the best). Without one it votes everything when a point
+    is at stake (a preference of 8 trade goods or more), half otherwise, and abstains on agendas it has no stake in. It
+    only answers the outcome prompts its own vote opened.
+  - **A rival's _Imperial Rider_.** When another seat's _Imperial Rider_ sits on an outcome of the agenda, the
+    forecast charges that outcome what a point is worth to the rival (in full when it wins them the game), so the
+    seat votes for the outcome that leaves it best off with the rider counted, whatever it thought of the agenda, and
+    as speaker breaking a tie it picks the tied outcome that does the same. The number of votes follows the ballot
+    planner as for any agenda. _Mutiny_ is valued by its own rule (`DirectiveValues.mutiny`: its own vote and the
+    forecast's shift of the other voters).
   - **Nekro** cannot vote (Galactic Threat): it never plans a ballot unless the Xxcha commander lets it. Once per
     agenda phase it queues Galactic Threat as an "after" when
-    another player has a technology it could gain, predicts the outcome most likely to win (the election of the
-    player with the most votes), and on a correct prediction takes the best technology (`CopiedTechPolicy`, which
+    another player has a technology it could gain and the agenda suits a prediction (`suitsThisAgenda`), predicts the
+    outcome most likely to win by the votes of the other players, on the forecast that includes its prediction (the
+    votes at the reveal without a forecast), and on a correct prediction takes the best technology (`CopiedTechPolicy`, which
     also caps copied faction technologies at its two Valefar Assimilators). It never researches: every research is
     replaced by Propagation's command tokens, all of them, within its reinforcements.
   - **Xxcha commander (Elder Qanoj)**: the bot's vote count adds one vote per planet, so the AI's ballot, the planets it
@@ -586,25 +643,32 @@ to build one by hand:
     outcome winning, from public information only: the votes each seat had at the reveal less the votes already cast,
     which players have voted (those before the active voter), and the riders placed (a rider's owner casts nothing
     without the Xxcha commander alliance, nor does a seat in the _Assassinate Representative_ list, nor Nekro). Every
-    seat that still has votes casts them all for one outcome drawn from a softmax over what the outcome is worth to it
-    (temperature 4 trade goods): a point election is worth the point to the elected seat and minus a quarter of a point
-    to everybody else (the whole game when it wins the elected player the game), any other agenda is its policy score
-    clamped to two units of 4 trade goods (never reading Drive the Debate for another seat), a seat's own placed rider
-    adds its payoff and a rival's _Imperial Rider_ takes away the rival's point (`RiderPayoff`). A seat that sees
-    nothing between the outcomes (within one trade good) abstains three times in ten and otherwise chooses at random.
+    seat that still has votes votes for one outcome drawn from a softmax over what the outcome is worth to it
+    (temperature 3 trade goods); on an agenda that is not the last one it casts only the votes the outcome needs
+    (`AGENDA_HELD_BALLOTS`), and the last voter may best-respond or abstain (`AGENDA_ABSTAIN_CHOICE`). A point
+    election is worth the point to the elected seat and minus 0.75 of it to every rival (0.25 for a rival far
+    behind; the whole game when it wins the elected player the game). Every official agenda has a value in
+    `AgendaValues` (the expert table, or the legacy one), for example Shard of the Throne 6 trade goods, Crown of
+    Emphidia 1 and Censure 3 or 5 to the holder, scaled by threat; an agenda without an entry falls back on its
+    policy score clamped to two units of 4 trade goods (never reading Drive the Debate for another seat). A seat's own
+    placed rider adds its payoff and a rival's _Imperial Rider_ takes away the rival's point (`RiderPayoff`). A seat
+    that sees nothing between the outcomes (within one trade good) abstains (without `AGENDA_VALUE_TABLE`, it
+    abstains three times in ten and otherwise chooses at random).
     256 draws, one per seat and sample that every hypothetical (`withRider`, `withVotes`, `without`) shares, decide
     the winner by the most votes, a tie going to the speaker's own choice. The draws are seeded by the game, agenda and
     viewer, so the same table gives the same numbers. It is empty in fog of war, Hidden Agenda and Omega modes, outside
     the agenda phase and for agendas it cannot list the outcomes of, and the readers below then use the votes at the
-    reveal as before. Galactic Threat predicts the outcome with the best chance; the Political Secret, Political Favor
+    reveal as before. Galactic Threat predicts the outcome with the best chance by the other players' votes; the Political Secret, Political Favor
     and "elected to a point" tests take expectations over it, which makes them a little less sure than the single
     expected winner they used to assume: a 9 vote leader now wins about three times in four, so the leader has to be
     7 points ahead, not 6, before Political Favor is worth discarding the agenda.
   - **Shenanigans courtesy** (`ShenanigansRules`). When the winner is announced the bot asks every player to confirm they
     play no _Deadly Plot_, _Bribery_, _Confounding Legal Text_ or _Confusing Legal Text_ (generic buttons that add a
-    reaction). Each AI seat presses each of those buttons once, 5 to 25 seconds after the message, a delay seeded by the
+    reaction). Each AI seat presses each of those buttons once, 5 to 24 seconds after the message, a delay seeded by the
     message and never by the hand: the bot pre-reacts for seats holding no action cards, so whether a seat has to answer
-    is public. It never plays those cards (the bot has no automation for them), so confirming is its true answer.
+    is public. With experiment `AGENDA_SABOTAGE` (on by default) it plays _Deadly Plot_ (through the bot's manual
+    resolution, resolving with no effect) and _Confounding Legal Text_ (electing itself) instead when that is worth it
+    (`ShenaniganCards`); it never plays _Bribery_ or _Confusing Legal Text_, so for those confirming is its true answer.
   - **Queued entries.** A seat whose "when" or "after" slot holds an entry (a Political Secret or Political Favor
     note, Galactic Threat) never presses the "Pass On" button the bot posts for it, which would unqueue it, and never
     holds its turn while the entry waits (`AgendaQueue`). It used to wait quietly, which meant it never answered the
@@ -620,9 +684,10 @@ to build one by hand:
     arrived yet it waits for it rather than closing the prompt unpaid.
   - **Hero (UNIT.DSGN.FLAYESH).** Once the hero is unlocked (3 scored objectives) it plays it as a component action,
     which costs no tactic token, when a planet with a technology specialty in a system holding its units is worth it:
-    half a point per trade good (the planet's resources and influence), the best technology of that colour it does
-    not own (`CopiedTechPolicy`), and the other players' units the hero destroys there. It walks the component
-    action menu, the planet and the technology, then ends its turn. The hero is purged as soon as it is played, so
+    0.5 trade goods per resource and influence of the planet, the best technology of that colour it does
+    not own (`CopiedTechPolicy`), and the other players' units the hero destroys there, at least 3 trade goods in all.
+    It walks the component action menu, the planet and the technology; its turn then ends as after any component
+    action. The hero is purged as soon as it is played, so
     it never starts it without a worthwhile planet.
 - **Action cards** (`ti4.ai.actioncards`).
   - **Scoring decides.** Victory points are the first reason to play, keep or cancel a card, valued on one scale
@@ -661,10 +726,11 @@ to build one by hand:
     Score misjudges some cards (_Impersonation_ and _Leadership Rider_ rate lower than the experts put them, _Morale
     Boost_ higher), so each tier is a range of strengths, spread evenly from its best card to its worst: S 2.2 to 1.8,
     A 1.7 to 1.4, B 1.35 to 1.05, C 1.0 to 0.8, D 0.75 to 0.45. A ranked card's strength is the mean of the two
-    sources; a card the experts have not reached keeps the statistics alone. Cancel appetite stays with the human
+    sources, kept between 0.5 and 2 (so S-tier cards above 2 are cut); a card the experts have not reached keeps the statistics alone. Cancel appetite stays with the human
     statistics.
   - **Keeping and discarding** (`AiActionCards`). A card is *usable* when a rule of the AI plays it: the economy
-    cards, _Summit_, _Sabotage_ and the cards in the table below. A card no rule plays is worth 0 and goes first;
+    cards, _Summit_, _Sabotage_ and the cards in the table below. A card no rule plays is worth 0 and goes first, and so
+    do _Confounding Legal Text_ and _Deadly Plot_, which the agenda rules play but which have no keep value;
     between such cards the lower keep prior goes first. A usable card is worth the larger of its keep prior and what
     playing it is worth now (at most 3); a second _Sabotage_ in the hand is worth 0.6 of the first. Discards (hand
     limit, _Form a Spy Network_, Nekro's agent) follow this order. Nekro's agent only spends a card worth less than
@@ -707,13 +773,13 @@ to build one by hand:
     | Impersonation | the value of a fresh secret less the 3 influence, paid with the planets it can best spare | none: the secret is drawn at once |
     | Counterstroke (2 copies) | the tactic token it gets back (at least 0.75) plus what its ships in that system could do once the token no longer holds them; played after another player activates a system holding its token | none: it takes the token back in the system |
     | Overrule | on Imperial, the points its primary scores beyond what the status phase would (one more public objective than the seat has scoring chances for, 2 for a stage II objective, and 1 for Mecatol Rex), valued as points, or 30 when they reach the goal, plus a fresh secret when it holds no Mecatol Rex; on Technology, what the strategy card plan values the primary at; plus a little for how often human players overrule that card (Imperial 0.5, Technology 0.16). It is held for a *points play* (Imperial with at least a point to score) or a use worth the reserve, see below | an unplayed Imperial or Technology, among the uses the reserve lets through; the card stays unplayed for its holder |
-    | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
+    | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources); Leadership only as a stall before passing or to start a Leadership secondary |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
     | Flank Speed (4 copies), Lost Star Chart, Nav Suite | played only when the remembered plan cannot be moved without the card (one more move; alpha and beta wormhole systems adjacent; anomalies ignored: through nebulae and out of them at full move, into and through asteroid fields and supernovas, across rifts with no roll and no +1), worth that plan less 1.5 for the card. The effects cover only this activation's movement: later legs and rounds (`MoveEnablers.laterActivation`) still feel anomalies and keep normal adjacency. Each card has its own play memory, so Flank Speed and the chart can both be played in one action | none: played right after it activates the system, before it moves |
-    | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
+    | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), plus, when positive, the combat secret it could score against the neutral destroyer (`NeutralSetups`, in turn) and a _Turn Their Fleets to Dust_ target for its space cannon (`DustTarget`), else a pure stall | a legal system that is not next to its own planets or units |
     | Pirate Fleet | 2 × a contender's standing for blocking its approach, less the 3 resources, paid honestly | a legal system next to a contender and away from its own ships |
-    | Mercenary Contract | the points a contender loses with the planet (and a third of the planet's value) less the 2 trade goods | an empty non-home planet a contender controls, among the first 22 the bot lists |
-    | Signal Jamming | what the player would have wanted from the system: a third of the planets it could still take, a point for Mecatol Rex, times its standing | the player and the system next to or with its ships; a pure stall elsewhere |
+    | Mercenary Contract | the points a contender loses with the planet (and 0.3 of the planet's value) less the 2 trade goods | an empty non-home planet a contender controls, among the first 22 the bot lists |
+    | Signal Jamming | what the player would have wanted from the system: 0.3 of the planets it could still take, a point for Mecatol Rex, times its standing | the player and the system next to or with its ships; a pure stall elsewhere |
     | Cripple Defenses | a PDS (1) per PDS on the planet times the owner's standing | a rival planet without its own PDS on it; a pure stall when there is no PDS |
     | Plague | half the infantry on the planet × 0.5 × the owner's standing | the rival planet with the most infantry, never one it has ground forces on |
     | Unstable Planet | half the planet's value if readied, plus up to 3 infantry (0.5 each), times the owner's standing | a rival's hazardous planet, never one it has ground forces on |
@@ -725,12 +791,15 @@ to build one by hand:
     | Repeal Law | the harm of a law that hurts it (an election that punishes the elected, one that punishes its planet) or the point a rival gets from a point law | a law that hurts the seat; never one that helps it |
     | Brilliance | the readying value of a spent planet with a technology specialty, else 2 for its own breakthrough | the best ready, else a breakthrough for the weakest player who is not a contender |
 
-    Every row of this table, and the economy cards, also adds the stall. The *tech tempo* converts a technology's value to
+    Every row of this table played on its own turn, and the economy cards, also adds the stall; _Forward Supply Base_
+    and _Counterstroke_, played on another player's activation, do not, and _Flank Speed_ is valued by its plan alone.
+    The *tech tempo* converts a technology's value to
     trade goods: technology comes from few sources, so the Technology follow pays 4 resources and a strategy token
     for a technology worth 3 (`ResearchPolicy.WORTH_FOLLOWING_FOR`), and the research cards value a technology at
-    (4 + 1) / 3 = 1.67 trade goods per point (`ResearchPolicy.TECH_TEMPO`) so the two rules agree. A technology worth 3
-    makes _Focused Research_ worth 3 × 1.67 − 4 + 1.5 = 2.5 and it is played; one worth 2 makes it worth 0.83 and it is
-    held; once every other player has passed the stall is gone and a technology worth 3 gives 1.
+    (4 × 0.8 + 1) / 3 = 1.4 trade goods per point (`ResearchPolicy.TECH_TEMPO`, a resource being 0.8) so the two rules
+    agree. A technology worth 3 makes _Focused Research_ worth 3 × 1.4 − 4 + 1.5 = 1.7, against its keep prior; one
+    worth 2 makes it worth 0.3 and it is held; once every other player has passed the stall is gone and a technology
+    worth 3 gives 0.2.
 
     _Standing_ is 3 for a contender, 1.3 for a player alone in the lead and ahead of the seat, 0.6 for a player two
     points or more behind the seat, otherwise 1. Nekro cannot research, so it never plays _Focused Research_ or
@@ -763,8 +832,9 @@ to build one by hand:
     the hand, above the rest of it (above a Sabotage kept against a contender) at the hand limit, until a points play
     appears. A points play is not compared with a tactical action, since Imperial may be played by its holder first.
     The reserve is lifted in the final round (someone within 2 points of the goal) for a seat that cannot win with the
-    card (not a contender, and its points, those in reach and the card's own point fall short of the goal), and for any seat that is
-    about to pass, which then plays the card on its best use rather than pass with it. Two waits come before a play:
+    card (not a contender, and its points, those in reach and the card's own point fall short of the goal), and, while
+    some player is a contender, for any seat that is about to pass, which then plays the card on its best use rather
+    than pass with it. Two waits come before a play:
     while the seat does not hold Mecatol Rex and its best tactical action takes it, the card waits for that action
     (unless the play wins the game), and a seat with its own unplayed Imperial and a points play for Overrule on it (a
     third public objective, or Mecatol Rex) overrules Imperial first and plays Imperial afterwards, two primaries in a
@@ -780,7 +850,8 @@ to build one by hand:
   - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
     5 cards while it holds _Form a Spy Network_.
   - **Sabotage** (`SabotagePolicy`, `SabotageRules`). Every AI seat answers each window after the same seeded delay
-    (5 to 14 seconds when only AIs play, 10 to 39 minutes otherwise), whichever button it presses, including windows
+    (5 to 14 seconds when only AIs play or once every human other than the card's player has answered, 10 to 39
+    minutes otherwise), whichever button it presses, including windows
     that have scrolled out of the messages it reads (it remembers each window's Sabotage button when it first sees
     it). It presses "Cancel Action Card With Sabotage" instead of "No Sabotage" when it holds a Sabotage and may play
     action cards (not censured, not over the limit, not passed against Transparasteel), the card is not its own, can
@@ -840,8 +911,9 @@ to build one by hand:
     (`RiderPayouts`).
   - **Veto**: a "when" card, worth its keep prior in the hand. It is queued (`queueAWhen`, `queueWhen_ac_veto`) when the
     seat's "when" slot is empty (a Political Secret or Political Favor note takes priority and keeps the card) and the
-    agenda's expected election costs the seat 5 units or more, the rule Political Favor uses
-    (`AgendaPolicy.worthDiscarding`, the forecast-weighted policy score). When the queue plays it the bot halts the
+    agenda is very bad for the seat (`AgendaPolicy.veryBadFor`: an expected loss over the forecast, with its own
+    ballot, of 3 trade goods or more, 3.5 on the legacy values; without a forecast the Political Favor rule,
+    `AgendaPolicy.worthDiscarding`), or when a pooled discard bounty makes it worth it. When the queue plays it the bot halts the
     queue and posts the card's buttons; the seat recovers the play in the agenda phase like it recovers an unfinished
     action phase play, waits out the Sabotage window, and presses "Reveal next Agenda" (`resolveVeto`) once it is at
     least 7 seconds after the previous reveal (the bot refuses within 6 and has already counted the Veto by then). While
@@ -849,15 +921,18 @@ to build one by hand:
     pass does, so every seat that had a Veto queued plays it in turn; with one Veto in the deck that is only a test
     artefact of dealing everyone one). It does not wait: it keeps answering Sabotage windows, since seats that each
     played a Veto would otherwise wait on one another, and the stall detector does not call it stuck. It gives up after
-    five minutes if the bot never posted the buttons. A cancelled Veto resumes the queue through the bot (see
-    Segregation).
+    five minutes if the bot never posted the buttons. A cancelled Veto resumes the queue through the bot.
   - **Quash** (Xxcha, `QuashRules`): queued (`queueAWhen`, `queueWhen_ability_quash`) after the Veto check when the seat
-    has a strategy token and the revealed agenda is expected to cost it more than that token is worth
+    has a strategy token and the revealed agenda is expected to cost it more than that token is worth plus 1.0
     (`AgendaPolicy.expectedLoss` over the forecast with the seat's own planned ballot, against
-    `CardFacade.strategyToken()`); the next agenda is judged afresh. Without a forecast (fog) it uses the Political
+    `CardFacade.strategyToken()`; no margin without `AGENDA_VALUE_TABLE`), or a discard bounty lifts the loss over
+    that line (`QuashRules.paidEnough`); the next agenda is judged afresh. Without a forecast (fog) it uses the Political
     Favor rule.
-  - **Combat cards** (`CombatCardRules`, `CombatCards`): _Morale Boost_ (every copy), _Fighter Prototype_ and
-    _Emergency Repairs_. The bot has no card window in a combat: the start of a round is the gap before someone presses
+  - **Combat cards** (`CombatCardRules`, `CombatCards`): _Morale Boost_ (every copy), _Fighter Prototype_,
+    _Emergency Repairs_ and _Skilled Retreat_ (`SkilledRetreatCard`: the fleet it saves and the secret it denies) at
+    the start of a round; _Shields Holding_ and _Maneuvering Jets_ (`HitCancelCards`) on the hit prompts they can
+    cancel (Shields Holding on space combat hits, Maneuvering Jets on space cannon hits against its ships or ground
+    forces); _Direct Hit_ (below). The bot has no card window in a combat: the start of a round is the gap before someone presses
     the unowned combat roll, and a one-round modifier is moved in by the seat's next roll of any kind (anti-fighter
     barrage, space cannon and bombardment included) and dropped by it. So the card is played at the one moment the
     seat would roll its combat round, through a hook `CombatRules` calls just before it presses that roll, after its
@@ -865,7 +940,9 @@ to build one by hand:
     when both sides have rolled the same number of rounds (once the opponent has rolled, its dice are known), no hits
     are pending, the combat is in the active system and, for a ground combat, no one has asked to automate it (see
     below). The seat is idle at that moment whatever it holds, so the timing says nothing about its hand, and no other
-    player's hand is read. A card is played when its swing reaches its keep prior:
+    player's hand is read. A card is played when its swing reaches its keep prior (the first _Morale Boost_ is also
+    played whenever the chance to lose is between 0.2 and 0.8, and a _Skilled Retreat_ that denies a secret is
+    played too):
     ```
     swing = (chance to win with the card - chance to win without it) x stake
     stake = unit cost of both sides + score value of the objective points riding on the system
@@ -898,10 +975,11 @@ to build one by hand:
     AI seat in the combat makes one round-start decision after a seeded pause (3 to 10 seconds against AI seats only,
     15 to 45 otherwise; the seed is the game, combat, round, seat and the seat's profile, never its hand): it plays a
     combat card if one is worth it, and when that card has resolved (or at once if none is) it presses
-    `announceReadyForDice_`, once per round (`ready|<position>@<holder>#<round>`). The pause, and the press when
-    nothing is played, are the same whatever the seat holds. The seat then rolls first only once the opponent has said
-    it is ready (a ready message naming the seat that is newer than the round's start, which is the newest bot message
-    in the thread that is not a declaration) or has rolled. Against a human who never presses it the usual 120 seconds
+    `announceReadyForDice_`, once per round (`ready|<channelId>|<position>@<holder>#<round>`; the automation
+    confirmation uses `automation|<channelId>|…`). The pause, and the press when nothing is played, are the same
+    whatever the seat holds. The seat then rolls first only once the opponent has said it is ready (a ready message
+    naming the seat that is newer than the thread's newest "Start of Combat Round #" message) or has rolled. The
+    seeded pause counts from the newest bot message in the thread that is not a declaration. Against a human who never presses it the usual 120 seconds
     after the thread's newest message still apply; against an AI seat that never declares the seat gives up after 3
     minutes. A non-active AI defender now makes its decision before the attacker rolls (it used to wait for the
     attacker's roll, so it never had a start-of-round window); it still does not roll first. Without the button (fog
@@ -936,11 +1014,11 @@ to build one by hand:
       Letnev seat holds two fewer fleet tokens for the same stack (also under _Fleet Regulations_, where the cap is 4
       tokens plus the bonus).
     - _Round start_ (`LetnevCombatRules`, called through the same hook as the combat cards, cards first). Viscount
-      Unlenn: when the extra die for the ship with the best hit chance gains at least 1.5 (in the units of a trade good)
-      in a fight the seat has at least a 10% chance in, it presses "Use Letnev Agent", then the button that names its
+      Unlenn: in every space combat round it fights where the ready agent's button is shown (the agent readies every
+      round, so there is nothing to save it for), it presses "Use Letnev Agent", then the button that names its
       own faction, waiting up to 30 seconds for the buttons so that it never rolls with the agent half-resolved. It
       never uses the agent for another player's combat. Munitions Reserves: 2 trade goods when the first-round reroll is
-      worth at least 2.5 (the 2 trade goods and a quarter on top), with the same 10% floor, plus a victory point when
+      worth at least 2.5 (the 2 trade goods and a quarter on top) in a fight the seat has at least a 10% chance in, plus a victory point when
       the 2 trade goods are reserved for a spend objective. A fight already won loses little to a miss and a hopeless
       one is not worth the trade goods. The swing is `(win chance with - win chance without) x stake + the drop in
       expected losses` (`CombatForecast.rerollGain`, `extraDieGain`). Dunlain Reaper: in a ground combat, 2 resources
@@ -950,11 +1028,18 @@ to build one by hand:
       for its best plan with the fleet limit lifted. It plays the hero (component action, then the hero button) when
       that plan is an attack that stacks more non-fighter ships than the real limit and beats the best real plan by 4 or
       more. The hero is not played because it is unlocked, and the lifted limit then lets the next tactical action
-      field the stack.
+      field the stack. It is also played for a whole-fleet assault on Mecatol Rex, and before passing as a stall
+      while a rival can still win this round; never in Fog of War.
     - _Rear Admiral Farran_ (`RearAdmiralFarranRules`): the commander's trade good prompt is taken when it names the
       seat. _L4 Disruptors_ (`L4Disruptors`): the planets' space cannon is left out of the landing in invasion planning
       (`StrikeEvaluator`) and of the invasion threat against the seat's own planets (`DefenseOutlook`); the cannon still
       fires at the arriving ships.
+    - _Xxekir Grom_ (Xxcha, Thunder's Edge, `XxekirGromRules`): treated like Diplomacy: it readies planets to spend, so it
+      is played as a component action when the four exhausted planets it readies pay for a public objective (also just
+      before passing), or mid-round while spending is still ahead and those planets are worth 4 TG or more. Each of the four
+      placements is a mech while one is in reinforcements (a PDS first when a structure objective is near) on the
+      exhausted planet worth most to ready (`ReadyingValue`) and to defend (`GroundDrops`); PDS go where
+      `StructurePolicy` puts them.
     - Not handled: _War Funding_ (the bot only prints the holder's rerolled dice and leaves the rerolled hits and the
       opponent's reroll to its players, so there is nothing an AI can press safely), the movement half of Gravleash
       Maneuvers, and playing the hero for a production overflow.
@@ -965,7 +1050,10 @@ to build one by hand:
     opponent asks the AI to confirm, the AI first makes its round-0 decision (cards, after the same seeded pause) and
     confirms afterwards, whatever it played. Once the confirmation is on the table no ground card is played, and the
     AI never starts an automation itself.
-  - Not yet: the other combat cards (see the known limitations), _War Machine_, _Rally_, _Parley_,
+  - _War Machine_ (`ProductionCards`): when it holds one and a build plan with the card's extra production beats the
+    plan without it (`ProductionPlanner.warMachinePlan`), it plays the card once it reaches the build, and builds the
+    plan without it if the card is cancelled.
+  - Not yet: the other combat cards (see the known limitations), _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
     unusable while it could stall; a test over the deck keeps it that way.
@@ -980,8 +1068,8 @@ to build one by hand:
     technologies, _Tekklar Legion_ in a ground combat it does not already dominate, and _Greyfire Mutagen_ against 2 or
     more non-Yin ground forces.
   - _Ceasefire_ when its owner activates a system holding the AI's units and has ships that could move in.
-  - Never _War Funding_ (the extra hits need manual assignment), and it never plays _Trade Convoys_; _Support for the
-    Throne_ and _Alliance_ need no play. When a note's play button has scrolled out of its thread, it presses one it
+  - _Trade Convoys_ (`ConvoysRules`) as a component action, instead of a tactical action or before passing.
+  - Never _War Funding_ (the extra hits need manual assignment); _Support for the Throne_ and _Alliance_ need no play. When a note's play button has scrolled out of its thread, it presses one it
     remembers or asks the bot to post its cards again.
   - Planning charges a victory point for handing back _Support for the Throne_ (and a little for other notes that go
     back when it activates their owner's units), and _Betray a Friend_ counts the notes held when its action began.
@@ -1001,24 +1089,28 @@ to build one by hand:
       wins) × the chance of keeping it for the rounds left (a small loss per round, more beside its owner and per
       system the two share), less the systems it fences off for every round left (beside the owner, each shared system,
       Mecatol Rex while the owner sits on it), so an early swap with a neighbour rarely pays. Its own given away: the
-      option of a better deal once the threats are clearer (1/8 of a point per round left, at most 3/4), less the
-      peace it buys on a border (the receiver now loses the point for
+      option of a better deal once the threats are clearer (1/8 of a point per round left, at most 3/4), less a fit
+      term for the receiver (1.5 for a neighbour, or by its fleet size for an aggressive faction), 6 trade goods more
+      while it is too early to sell (`ThroneTiming.open`), less the peace it buys on a border (the receiver now loses the point for
       activating its units; more against a stronger, more aggressive neighbour). The point handed over is charged by
       the stinginess term like any other gain of the partner's, so it swaps with a peer and never feeds a leader or a
       player one point from winning. It is never the "least harmful" note a TBD request takes.
-    - _Alliance_ (`AllianceValue`): its owner's commander, rated per faction (Keleres 3, Jol-Nar 2.5, Hacan, Xxcha, Sol
-      and Nekro 2, others 0.5 to 1.5), half while locked; nothing for Mahact. Its own costs 0.3, so it sells one for 1
-      or 2 trade goods and swaps them freely.
+    - _Alliance_ (`AllianceValue`): its owner's commander, rated per faction for rounds 1-3 and from round 4 (for
+      example Muaat 4 then 1, Nomad 4, Yin 3 then 2, Nekro 2 then 1, Hacan and Xxcha 1 then 0, most others 1 or 0.5),
+      less a per-faction penalty (usually 1) while the commander is locked, plus bonuses for buyers the commander
+      suits (Nekro buying the Xxcha's, Jol-Nar and Argent each other's, and the like, some read from the buyer's own
+      hand); at least 0.25, and nothing for Mahact. Its own costs 0.6 of what the best other buyer would pay, less 0.2
+      for a neighbour, at least 0.25.
     - _Trade Agreement_: its owner's commodity value less 1.
-    - _Political Secret_: 1 per agenda phase still to come, through round 5's (the current round counts once the
-      custodians are taken).
-    - _Political Favor_ given by its owner (the Xxcha): a quarter of a strategy token per agenda phase still to come,
-      since a holder who plays it costs a token but the card comes back.
+    - _Political Secret_ (`NotesForTrade.politicalSecretValue`): 3, or 8 in the agenda phase when the agenda matters
+      to its owner; 0.25 from a Galactic Threat owner and 1 from the Xxcha (2 to such an owner itself while it holds a rider).
+    - _Political Favor_ given by its owner (the Xxcha): 5 plus a strategy token (1) per agenda phase still to come,
+      through round 5's (the current round counts once the custodians are taken); one received is worth 0.5.
     - _Ceasefire_ (`CeasefireValue`): traded under duress. A seat is under duress from another whose fleet could take
       its home system or the Mecatol Rex it holds (ships worth at least 8 resources can reach it, and at least 1.5 times
       what defends it): it values that seat's
       Ceasefire at 3/4 of the stake (a point's worth + 2 for home, half a point for Mecatol) and its own at 0.5 to them.
-      Otherwise its own costs 2.5 (or half of what it could take from the receiver), and one received is worth 0.5 from
+      Otherwise its own costs 6 (or half of what it could take from the receiver, if more), and one received is worth 0.5 from
       a neighbour, 0.2 from afar.
     - Anything the engine cannot enforce (votes, attacks, territory) is not part of a deal and is worth nothing: every
       deal it values is delivered in full when it is accepted.
@@ -1074,7 +1166,8 @@ to build one by hand:
     - Transactions: posting or accepting an offer uses the pair's transaction window (LRR 94.1 on a turn, 94.6 per
       agenda); a partner with an open offer gets no other deal drafted, and the buttons refuse payment between seats
       that cannot transact.
-      At most 2 offers a round (territorial) and 2 an agenda (votes), one per partner, never with a contender. A seat
+      At most 2 offers a round (territorial) and 4 an agenda (votes, with `CONDITIONAL_VOTE_DEALS`; 2 without), one
+      per partner, never with a contender. A seat
       the Extortion code is already threatening is not also sold peace.
     - Keeping: tactical plans into a protected system are dropped (also while its own offer stands); a seat that
       promised its votes casts them all for that outcome, rebuilds a ballot it planned before the promise, plays no
@@ -1092,12 +1185,15 @@ to build one by hand:
     (tactical, component or strategic action, or the turn it passes) while its strategy pool is empty. A buyer wants it
     when the 2 infantry are worth more than the price: a ground need (an invasion, holding a threatened planet, staging,
     Occupy the Fringe) or a shortfall in the 4 spare infantry production keeps at home, each filling infantry worth 1.
-    Sol never sells it to a player with a public path to win, and charges a buyer half a trade good more per point it
-    leads the table by (so a clear leader is refused), preferring buyers who trail.
+    Sol never sells it to a player with a public path to win. The price is always 1 trade good, but Sol's own cost of
+    giving it rises by half a trade good per point of scoring tempo the buyer leads by, so a sale to a clear leader
+    fails the proposal margin; it prefers buyers who trail.
   - **Trust.** Human players start at 0.8 and AI seats are always 1: +0.1 for accepting its offer or paying debt, −0.3
-    for not paying for a free Trade follow, −0.2 for not paying a debt it collects. It lives in the AI's memory and
+    for not paying for a free Trade follow, −0.3 for following for free without paying when its terms excluded the player, −0.2 for not
+    paying a debt it collects, and −0.3 per broken promise (with `PROMISE_DEALS`). It lives in the AI's memory and
     resets on undo or restart.
-  - **What it starts.** On its own turn, before its action (at most 2 offers a turn): paying its own debt, buying the
+  - **What it starts.** On its own turn, before its action (at most 2 offers a turn, not counting debt payments and
+    Hacan's facilitation): paying its own debt, buying the
     trade goods it is short for a spend objective (the cheapest package of commodities, debt or a note the lender would
     accept, at most twice a round), a 1:1 commodity wash, a promissory note deal, a relic fragment deal, selling commodities when nobody has
     any to wash, and collecting debt from human players. A **note deal** (`NoteDeals`) is the best of: one of its own
@@ -1108,8 +1204,8 @@ to build one by hand:
     (`FragmentDeals`) is the best of: one fragment sold for 1 to 4 trade goods, one bought for 1 to 4, or a one-for-one
     swap of two different kinds with or without a trade good, again within the usual margins for both sides (at most 2
     a round, one per partner). A fragment that completes a set is worth 1 more in a trade (the relic comes sooner), so
-    the last fragment of a set sells for 3 trade goods (the seller's lone fragment costs 2, the buyer gets 3 + 1), a
-    lone fragment that completes nothing is not worth 2 to anyone else, and the swap of two lone fragments that each
+    the last fragment of a set sells easily (the seller's lone fragment costs it 0.7, the buyer gets 1.925 + 1), a
+    lone fragment that completes nothing is worth little to anyone else, and the swap of two lone fragments that each
     complete the other side's set clears best. The builder picks fragments by kind and amount (`Frags_<kind><n>`). In the agenda phase: paying debt (with the "Send" buttons of the bot's debt
     reminder, never "Erase"), collecting debt and washing (with another AI only when its faction sorts first). At
     most 12 new offers an hour, 3 waiting for an answer, and one unsolicited offer per human player per round.
@@ -1143,10 +1239,7 @@ to build one by hand:
     only boat floated; every 2 TG lowers relations by 1, for the rest of the game. It counts every attack and planet taken, undefended ones included: ship cost lost (in TG)
     and planet value, x3 in the victim's home system and x1.5 in its slice. Each round, ships parked in the victim's
     slice cost 1 TG, over its home 3 TG, and over its undefended space dock 2 TG; a system costs the largest that
-    applies, not the sum. Each mean "choose a player" card resolved on the victim costs 2 TG (Spy, Seize Artifact,
-    Uprising, Signal Jamming, Reactor Meltdown, Plague, Cripple Defenses, Unstable Planet, Insubordination,
-    Assassinate Representative), read from `GameStats.actionCardTargets`, which those cards'
-    resolve steps fill. Sabotage of the victim's card costs 1 TG; combat cards don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
+    applies, not the sum. Each mean "choose a player" card resolved on the victim (read from `GameStats.actionCardTargets`) counts by impact: a mean card costs what it actually took from its target, not a flat price: when an entry appears the AI notes the target's assets (trade goods, commodities, promissory notes, command tokens at 2.4 TG, relic fragments, the spendable value of its readied planets and the cost of its units on the board, with each space dock or PDS worth 1 TG + 3 influence (`PlayerAssets.worth`, also used by the attack ledger), from the previous observation), and charges the first drop of 0.1 TG or more before the window closes (the next action card play, a turn change or a new round). Assassinate Representative costs what the agenda's result cost the silenced player next to the best its own votes could have bought, judged once the votes are in (`AssassinationCost`); under 1 TG, or a gain, it was not mean and costs nothing. Units lost in a system where the card player also has units are left out, since the attack ledger already charges them. Spy and Lie in Wait cost the keep value of the cards that left the victim's hand (Overrule costs more than Diplomatic Pressure). Extreme Duress costs the trade goods handed over plus the keep value of the discarded hand, or 1 TG if the victim takes the strategic action. Signal Jamming costs half the cost of the victim's units in the system it locks down. Thunder's Edge Mercenary Contract costs the planet it returns to the deck, valued like a planet taken (x3 home, x1.5 slice). Cards whose harm is outside the assets carry set costs: Public Disgrace 2 TG, Coup d'Etat and Crisis 1 TG, Ancient Burial Sites 0.5 TG. Reparations costs half the spendable value of the planet it exhausts. A Tactical Bombardment played as a blank stall costs nothing (`Hostility.Pending`, stored value `aiHostilityPending`). Sabotage of the victim's card costs 1 TG; combat cards and cards that help their target don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
     exclusion other than a win) and a fee for flipping this seat's commodities. A fresh betrayal (broken promise or speaker sale) and trust under 0.8
     (a human with unpaid bills or broken promises) lower the level by 1 each. Shifts are stored on the seat
     (`aiRelations`), at most one up and one down per partner per round, never lifting the level above 2:
@@ -1170,13 +1263,15 @@ to build one by hand:
     0.2 per card in a rival's (unseen), and 0.2 per card in its own hand too when it is not the seat deciding (a simulated rival plan never reads the hidden hand). The anger cost of attacking a rival or voting against it is multiplied by
     (rival strength + 1) / (own strength + 1), kept within 0.25 to 2: a strong rival or a weak seat avoids anger, a
     weak rival or a strong seat cares less.
-    - **Open:** modify the ratings by what can actually reach the other player, according to the defensive planner
-      (`IncomingForces`): units that cannot reach the rival (or the seat) should count less toward the strength
-      that weighs anger between them.
+    - **Done (2026-11-21): reach.** In the anger weight, each side's units count only as far as they can reach the
+      other player's systems (home and planets), per the defense planner (`IncomingForces`: fleet and ground cost
+      arriving next move, plus half of what arrives the move after); cards, technology and the faction bonus count in
+      full. `TacticalStrength.seenBy` / `own` still give the whole-board rating.
     - **Open:** widen what defines tactical strength (for example flagships and war suns by ability, mechs, leaders,
       faction technologies, promissory notes held, how close the player is to winning, and known cards).
-    - **Open:** a tendency not to anger too many players at once: today each angered player is priced alone, so the
-      AI can anger several rivals in one round without any extra cost.
+    - **Done (2026-11-21): not angering too many players at once** (experiment `ANGER_SPREAD`). Hostility also keeps
+      this round's totals (`aiHostilityRound`). Angering a player costs 25% more for each other player the seat has
+      already cost 1 TG or more of value this round (`Hostility.spreadFactor`), in attacks and agenda votes.
   - **Friendly trade** (`FriendlyTrade`), with a player in good relations. It flips that player's commodities for free
     when only one side has commodities: it accepts their commodities for at most as many of its trade goods, and on
     its own turn, holding no commodities, offers that flip once a round. As Trade holder it charges such a follower X-1
@@ -1199,7 +1294,7 @@ to build one by hand:
 - **Tactical actions.** At the start of its turn, `TacticalPlanner` scores every system it can
   activate and remembers the best plan for the turn:
   - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last, except
-    that mechs go to hazardous planets first) to free planets, keeping at least one ground force (a mech when there is one) on each home planet, more when the defense model below asks for them, and one on Mecatol Rex, and avoiding systems
+    that mechs go to hazardous planets first) to free planets, keeping on each home planet the ground forces the defense model below asks for (none when leaving costs at most 0.5 more, for example with nobody in reach; a mech first when something is kept), and one on Mecatol Rex, and avoiding systems
     covered by enemy space cannon. In rounds 1-4 every planet taken is worth an extra 0.8, fading to nothing by round
     8, so small planets are worth a token early. It plans to take every free planet in the system: when one transport
     cannot carry a ground force for each planet (and a second for each hazardous one), more transports from the same
@@ -1215,7 +1310,7 @@ to build one by hand:
     rival is closer), its _slice_ (closer to its home than to any other), the _border_ (as close to a rival as to
     its home), a rival's area, and the rivals' homes and Mecatol Rex themselves. Every planet an expansion takes is worth
     1.5 more on a lane, 1.0 more in the slice and 0.3 more on the border, and costs 1.0 in a rival's area while the game
-    is young (fading to nothing after round 4). An attack that lands on a planet of the lane, slice or border gets the
+    is young (fading after round 4, to nothing by round 8). An attack that lands on a planet of the lane, slice or border gets the
     same bonus, but no penalty elsewhere: attacking into a rival's area is the offensive planner's job.
   - **Holding Mecatol Rex.** What holding Mecatol Rex is worth beyond its planet is the Imperial point of the rounds ahead
     (`MecatolStake`): a quarter of a victory point for each of at most two later rounds, nothing in the last one. It
@@ -1225,14 +1320,16 @@ to build one by hand:
   - **The race for the custodians** (`CustodiansRace`, public information only). For every seat it works out when a
     loaded transport (a ship with capacity and a ground force in its system) could land on Mecatol Rex. A transport hops
     once a round, as far as its move allows (Gravity Drive adds one; a seat with a propulsion technology is assumed to
-    research it), and not at all from a system holding its own command token or once the seat has passed. The arrival is
+    research it); from a system holding its own command token or once the seat has passed it cannot land this round,
+    only from the next. The arrival is
     pushed back a round when the seat could not pay the 6 influence, or, for a later arrival, when its planets, trade
-    goods and free planets in reach would not make 6, and is empty under another player's space cannon. A seat that arrives
+    goods and free planets in reach would not make 6. Under another player's space cannon the win chance is multiplied
+    by the landing's chance to survive the cannon (experiment `CANNON_COVER_RISK`; without it the arrival is empty). A seat that arrives
     in the same round as a rival wins it by the order of play (the Naalu 0 token first, otherwise the initiative when it is
     known, a coin flip when it is not), and a rival that arrives sooner usually wins. Mecatol Rex is worth the
     custodians' point, its hold value and its planet. This drives: **approach moves** (a loaded transport that cannot
     land this action moves one system closer, worth half of the race it wins, and an expansion that brings a spare
-    ground force gets the same bonus); Leadership (acting first in a same-round race); Politics (the speaker token, when
+    ground force gets the same bonus); the initiative of every strategy card pick (`InitiativeRace`); Politics (the speaker token, when
     the seat and a rival both arrive next round); the research of Gravity Drive; and the influence it keeps for the
     custodians while a loaded transport could land.
   - **Attack** (the model is described under **Offense** below): a strike moves ships, and the ground forces they carry,
@@ -1251,7 +1348,8 @@ to build one by hand:
     and takes whichever plan scores better; the ground odds use the infantry and mechs actually landed, and ground
     forces that rode in a destroyed ship never land. It always clears enemy ships out of its own home system.
   - **Produce** (`ProductionPlanner`): build at a space dock, scoring first. Activating a system to build is only
-    worth it for at least 4 units, unless the build scores or advances an objective. In order:
+    worth it for at least 4 units or 6 resources, unless the build scores or advances an objective, is a defense
+    build, or the plan also shifts ground forces. In order:
     1. **Scoring.** A flagship or war sun (the cheaper) while _Engineer a Marvel_ is unscored, one that could reach
        Mecatol Rex or another home from that dock for _Achieve Supremacy_, and the flagship itself for _Unveil
        Flagship_. Destroyers to stack five (or eight) ships for _Raise a Fleet_ (_Command an Armada_) unless a big
@@ -1260,24 +1358,31 @@ to build one by hand:
        first) for _Make an Example of Their World_ and ships with anti-fighter barrage (destroyers) for _Fight with
        Precision_: two anywhere on the board, but three at the dock itself when a destroyer trip from it reaches a system
        holding enemy fighters. A few destroyers to move around for presence objectives.
-    2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
-       _Mechanize the Military_).
-    3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier
+    2. **Core.** A carrier when it has none on the board, then more while it has fewer carriers than claimable
+       systems a carrier built there reaches within two rounds and more spare ground forces than carriers, and more
+       while the cargo exceeds the capacity; infantry up to 2 spare; two mechs (four while the _Mechanize the
+       Military_ campaign is on, plus one when the mech has deep space cannon and a rival is within two moves).
+    3. **Defense.** After the scoring units, the bundles that lower the defense cost (`planDefensiveUnits`, below).
+    4. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier
        and dreadnoughts up to the Styx fleet (three, the smallest fleet that beats the guard of Styx, or more to match
        the strongest rival stack), with infantry for its whole capacity (at least six), counted in that system,
        at 0.75 a resource. After the surplus ships, that dock also fills the free capacity with fighters at the same
        value.
-    4. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
+    5. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to four on the board and planned
+       (five with Fracture interest), upgraded cruisers
        and destroyers up to four, then plain cruisers up to two. Each only while the resources left could still fill
        the rest of the production with cheap units. Every flagship is worth building with money to spare, ahead of
        dreadnoughts, and its tier in `FlagshipRating` sets how much more it needs on top: nothing for S (Nekro,
        Ghosts, Nomad, L1Z1X, Deepwrought, Crimson Rebellion, Xxcha), 1.5 resources for A (Yin, Sol, Naalu, Yssaril,
        Empyrean, Keleres, Naaz-Rokha, Mahact), 3 for B (Jol-Nar, Winnu, Letnev, Mentak, Cabal), 4.5 for C (Muaat,
        Saar, Titans), 6 for D (Argent, Arborec, Ral Nel, Sardakk, Hacan), and 3.75 for a flagship not on the list.
-       Plain destroyers are only built for objectives.
-    5. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
-       capacity of its ships (each carrier keeps room for two infantry, so fighters never block an expansion), then
-       infantry.
+       With Gravleash Maneuvers it adds ship types for the bonus. Plain destroyers are built for objectives and
+       presence, as defense bundles, as Auto-Factories trigger ships and as a filler option.
+    6. **Spare infantry** up to 4, and the Auto-Factories trigger and top-up.
+    7. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
+       capacity of its ships, then infantry (infantry first in round 1). Each carrier keeps room for two infantry, up
+       to the ground forces that could board (at least those already in space), so fighters never block an
+       expansion.
 
     It stays within production, fleet supply, reinforcements and the reserve, using Sarween Tools when it has them,
     and pays keeping the same reserve. A build is scored by what it is for: carriers and the infantry the dock is
@@ -1341,14 +1446,14 @@ to build one by hand:
     relaxing as fear falls (`target = 0.5 + 0.5 (1 - fear)^2`); the _defense cost_ is the value it expects to lose above
     that target, over both windows. Only the seat's own cards are read; a neighbour contributes its public board,
     objectives and technologies. The cost then drives the plans: ships, ground forces and fighters leave a guarded
-    system only while the cost stays within half a point (`holdBack`, `groundToKeep`, with a second pass that keeps
+    system only while the cost stays within 0.5 trade goods, a sixteenth of a point (`holdBack`, `groundToKeep`, with a second pass that keeps
     more infantry once the ships that leave are known); expansions, attacks and moves are scored net of the cost of
     leaving; a _defend_ plan brings ships to an exposed system when that lowers the cost by more than the move costs
     (their spare ground forces land on the weakest planet, and the ships take along the ground forces their capacity
     holds from the system they leave; a hauler that defends with nothing aboard pays the empty-slot charge, but one that
     ferries ground forces which lower the cost by enough is sent on those alone); retaking a planet in its own home is worth the points
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
-    planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
+    planet) until the cost is gone or a unit no longer lowers it by 0.5 trade goods per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
     defending with ships from more than one system in one action, planets
     an enemy needs in systems the seat does not guard, and Prophecy of Kings Warfare with Fleet Logistics unlocking a
@@ -1381,8 +1486,8 @@ to build one by hand:
        and being captured by Vuil'raith; half a point for each origin beyond the first.
     5. **Gates.** Win chance and the final score of at least 4 after every cost. Another player's home system is landed on
        only when its owner is close to winning, or the block it causes is worth about half a point of the seat's own, or
-       the seat's own objective gains as much; otherwise it is a ship-only strike. Planets with enemy structures are
-       taken only in their owner's home system, on Mecatol Rex, with _Conquer the Weak_ or against a player close to winning.
+       the seat's own objective gains as much; otherwise it is a ship-only strike. Attacks may land on planets with enemy
+       structures; only landings that are not attacks (expansions) skip them.
     The strikes of a system are first ranked by a cheap score (the value and the exposure of the systems they leave), and
     the two best plus the best held-back and all-in departures get the full economics. Up to three origins join one
     strike while the combined score keeps improving and the fleet pool allows it. Fleets that cannot yet reach a
@@ -1407,13 +1512,13 @@ to build one by hand:
     next round, so a fleet of dreadnoughts marches one step a round, from beside the ingress onto it, then the egress,
     then the void beside Styx. Each step must bring every ship closer to the target, so a fleet never stages backward,
     and only while the fleet that would be there can win the fight (the same score of 4 as for any attack). A step is
-    worth 0.8 of that strike when one move is left and 0.85 times less per further move (0.68, then 0.58), against 0.35
-    for a player's system: the neutral units never move or reinforce, so the strike a step prepares is near certain.
-    Styx itself has no lead limit (`STYX_MARCH_HORIZON`, ten systems): a fleet stages toward it from any distance, as
-    long as the staging system is closer to Styx than where the fleet stands, and its share counts the moves left in
-    fractions of a tactical action (systems to Styx over the slowest ship's move), so every system gained is worth
-    more even when it does not save a whole action. A fleet built at a dock two moves from the ingress, six one-move
-    actions from Styx, starts its march from there.
+    worth all of that strike when one move is left and 0.85 times less per further move (0.85, then 0.72), times the
+    route share below, against 0.35 for a player's system: the neutral units never move or reinforce, so the strike a
+    step prepares is near certain. Styx itself has no lead limit (`STYX_MARCH_HORIZON`, ten systems): a fleet stages
+    toward it from any distance, as long as the staging system is closer to Styx than where the fleet stands, and its
+    share counts the moves left in fractions of a tactical action (systems to Styx over the slowest ship's move), so
+    every system gained is worth more even when it does not save a whole action. A fleet built at a dock two moves
+    from the ingress, six one-move actions from Styx, starts its march from there.
     A fleet on that route keeps what it has marched: any other plan that moves its ships out of an empty Fracture
     system, the remembered march system or the Styx dock without bringing them closer to Styx (an attack on Cocytus or
     on Mecatol Rex from the egress, a stage toward another planet) is charged the value of the step it stands on, in
@@ -1422,7 +1527,8 @@ to build one by hand:
     expansion from the dock onto the ingress).
     All of this is worth half as much (`FractureCampaign.routeShare`) for a seat with no ingress in its own home, lane or
     slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
-    give up and the fleet it builds for Styx at half, and does not take the third fleet ship for it.
+    give up and the fleet it builds for Styx at half, and skips the Styx-taking token levels and the Styx fleet level
+    (it still keeps fleet tokens for the gathering fleet, the ships already within two rounds of Styx).
     Three things cover two steps of the march in one round. A seat holding _Flank Speed_ also plans its moves into
     the Fracture with one more move for every ship (`MoveBoost`), keeps such a plan only when it needs the extra move,
     at 1.5 less for the card, and plays the card right after activating the system, before it moves
@@ -1436,17 +1542,18 @@ to build one by hand:
     it away without a step forgets it. A march fills its capacity with ground forces and then with
     the fighters at its origin, which count in the strike it prepares (Saar took Styx with nine fighters).
     A dock within two moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships
-    the same half as much again, and builds dreadnoughts up to five instead of three. The dock nearest an ingress
+    the same half as much again, and builds dreadnoughts up to five instead of four. The dock nearest an ingress
     (`FractureCampaign`, while Styx is not the seat's) also builds the Styx fleet, a carrier and dreadnoughts up to
     the larger of the fleet that beats the guard (three dreadnoughts and a carrier) and the strongest rival stack, with
-    infantry for its capacity, counted in that system, at 0.75 a resource, after the core units and before the surplus
-    ships, and the fleet pool grows to that size for it.
+    infantry for its capacity (at least six), counted in that system, at 0.75 a resource, after the core units and
+    before the surplus ships, and the fleet pool grows to that size for it.
     Not yet: locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
-    without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
+    without landing; Mentak Ambush and Titans' planetary PDS in the odds; retreats in
     the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
     Logistics for a double move; pre-emptive strikes against a fleet that threatens only the system the strike leaves
     from; staging for a single target (`forTarget`) or for Warfare; action cards, agenda points, alliances, systems with
-    units of two other players, memory of past attacks, and the seat's hidden aggression level.
+    units of two other players, and the seat's hidden aggression level. (Magen Defense Grid's infantry and
+    start-of-combat hit, L4 Disruptors and the memory of past attacks, `AttackLedger` under `ATTACK_MEMORY`, are in.)
   - **Objective value.** Every plan also scores its progress on the revealed public objectives and the seat's own
     secrets (`ObjectiveValue` over a before/after `Footprint` of systems, ships and planets): a point for
     completing one, a share of a point for each step towards it (larger the closer it gets, so it finishes what it
@@ -1462,17 +1569,18 @@ to build one by hand:
   system of the action, so when two systems' own best departures each spent it, the attack merge re-splits once: it
   allocates the boost and the fleet supply over both systems' departing ships (`MoveBudget.allocate`, valued like a
   strike), rebuilds each departure from its share (escort fighters and cargo trimmed to the remaining capacity,
-  Gravleash pace setter kept) and drops a system left with nothing (experiment `POOLED_BOOST_RESPLIT`; the deciding
-  seat's setting also governs its forecasts of enemy strikes). Ships leave a guarded system only as far as its
+  Gravleash pace setter kept) and drops a system left with nothing (experiment `POOLED_BOOST_RESPLIT`; the forecasting
+  seat imagines each rival's strikes under that rival's own setting). Ships leave a guarded system only as far as its
   defense model allows. `TacticalRules` then walks the bot's own buttons step by step,
   in distance or ring mode, looking for the planned system in every part of a system picker that was split over
   several messages; if it still cannot find it, it activates the best system the picker does offer. Once it has
-  taken an action, it only ends its turn. When its units
+  taken an action, it ends its turn, unless Fleet Logistics or an extra-action grant lets it take a second tactical
+  action for an urgent plan. When its units
   share a system with another player's but no combat starts, it hands the choice over.
-- **Exploration** (`ti4.ai.explore`). Everything an exploration gives is valued in resources: a trade good 1, a
+- **Exploration** (`ti4.ai.explore`). Everything an exploration gives is valued in trade goods: a trade good 1, a
   command token 2 (nothing once none is left in reinforcements), an action card 1 (nothing at the hand limit), its own
-  commodity a third (0.6 with someone to wash it with), a relic fragment 2 (3 for the one that completes a set of
-  three; while it holds an unscored Destroy Heretical Works, each of its first two fragments is worth 2 more).
+  commodity a third (0.6 with someone to wash it with), a relic fragment by what it adds to the fragments held
+  (below; while it holds an unscored Destroy Heretical Works, each of its first two fragments is worth 2 more).
   - **Decks.** The decks are public, so a deck is worth the average of the cards still in its draw pile: an attachment
     by the resources and influence it adds (a research facility 0.3, or 1.6 on a planet with a technology specialty),
     the Demilitarized Zone by -1.5 less the space docks (4) and PDS (3) it returns, Mercenary Outfit 0.75, Freelancers
@@ -1487,7 +1595,7 @@ to build one by hand:
     best deck is worth more than nothing, otherwise ignored; the Crown of Emphidia is exhausted at the end of a
     tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
   - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no
-    one else). Removing an infantry costs 0.7 (production limits included). It costs half the value of
+    one else). Removing an infantry costs 0.7, plus what follows. It costs half the value of
     the claim it would leave unmet when it is needed for that. The seat plans its next activations (its tactic
     tokens, at most 3, and one per ship with capacity): each takes the best unclaimed system within that ship's move
     that holds none of its ground forces, needing an infantry or mech per free planet. The ground forces it can
@@ -1515,14 +1623,15 @@ to build one by hand:
     is worth at least 0.25 more than the payment and declines otherwise.
   - **Command tokens** from Volatile Fuel Source (or any exploration that asks for them) go to the pool the command
     token policy grows first.
-  - **Relic fragments.** A fragment is worth 2 trade goods, and 3 when it is the third of a kind, so a set of three is
-    worth 7 and a relic is bought or sold at about that. Unknown fragments stand in for any kind; the 3 goes to the
-    fragment that completes a set (`FragmentValue`), and while it holds an unscored _Destroy Heretical Works_ each of
-    its first two fragments is worth 2 more. Receiving a fragment is worth the rise in the value of what it holds,
-    giving one the fall (a fragment of a complete set costs 3, a spare one 2), so it never parts with a set it is about
-    to purge. With three of one kind (unknown fragments fill in last), it purges exactly three as a
-    component action and draws the relic: instead of a tactical action when no plan scores 2.5 (1 for having the relic
-    sooner, 1.5 for waiting to see what the others do), and before passing. It keeps two fragments back while it holds
+  - **Relic fragments.** The fragments held are worth 3.5 trade goods (`RelicValue.BASE`, an average relic) times
+    (complete sets + 0.45 × pairs + 0.2 × singles) (`FragmentValue`), so a single is 0.7, a pair 1.575 and a set of
+    three 3.5; the second fragment of a kind adds 0.875 and the third 1.925. Unknown fragments stand in for any kind,
+    and while it holds an unscored _Destroy Heretical Works_ each of its first two fragments is worth 2 more.
+    Receiving a fragment is worth the rise in the value of what it holds, giving one the fall, so it never parts with
+    a set it is about to purge. With three of one kind (unknown fragments fill in last), it purges exactly three as a
+    component action and draws the relic: instead of a tactical action when no plan scores 0.3 of an average relic
+    (having it sooner) plus the stall (1.5 for waiting to see what the others do, more for _Prove Endurance_), and
+    before passing. It keeps two fragments back while it holds
     an unscored _Destroy Heretical Works_, one relic a turn.
   - **Enigmatic Device.** When the best technology it can research is worth at least 4 (the bar for paying for a
     second technology) and it can pay 6 resources after the scoring reserve, it purges the device as a component
@@ -1540,14 +1649,14 @@ to build one by hand:
   | --- | --- |
   | Relic fragments, Enigmatic Device | above |
   | Dynamis Core | purges it for the trade goods of its commodity value, less what the extra 2 commodity value would be worth over the next 3 rounds (its own commodity 0.3, or 0.6 with an outlet) |
-  | Nano-Forge | attaches it to the safest non-home, non-legendary planet it holds: +2 resources, +2 influence (0.6 each) and a legendary planet (2), times 0.6 if an enemy can reach it |
+  | Nano-Forge | attaches it to a non-home, non-legendary planet it holds that no enemy can reach (the first such planet the bot offers), else an exposed one: +2 resources, +2 influence (0.8 each) and a legendary planet (2), 5.2 in all, times 0.6 if an enemy can reach it |
   | The Codex | retrieves up to 3 of the best discarded action cards by keep value; the net is the gain over the cards it would have to discard, and it stops when the next card is not worth more than its worst by 0.3 |
-  | JR-XS455-O | exhausted before passing to give itself a trade good (never the 3 resources for a structure) |
-  | Circlet of the Void | exhausted to explore a frontier token in a system without another player's ships (a frontier card, 1.5) |
-  | Book of Latvinia | researches the best two technologies without prerequisites when drawn (in the 2 minutes after the draw); purged for its point (8) only once it controls all four technology specialties, otherwise kept |
+  | JR-XS455-O | exhausted to give itself a trade good (never the 3 resources for a structure): before passing, or mid-turn when 1.0 plus the stall beats the best tactical plan |
+  | Circlet of the Void | exhausted to explore a frontier token in a system without another player's ships (a frontier card, 1.5, plus the _Derelict Vessel_ share times a secret draw) |
+  | Book of Latvinia | researches the best two technologies without prerequisites (in the 2 minutes after the AI first sees itself holding it); purged for its point (8) only once it controls all four technology specialties, otherwise kept |
   | Stellar Converter | destroys a rival's non-home, non-legendary planet next to its bombardment when the planet is worth at least 4 (its value, structures and ground forces, times 0.6, 0.9 for the leader); never a planet with its own units |
   | The Crown of Emphidia | purges it for its point as soon as the bot offers the button (control of the Tomb of Emphidia in the status phase); the exploration use is above |
-  | Maw of Worlds | purges it in the status phase for the best technology it could research when that is worth at least 2 more than the votes the exhausted planets would have cast (0.25 per influence) |
+  | Maw of Worlds | purges it in the status phase for the best technology it could research when that is worth at least 2 more than the votes its ready planets' influence would cast (0.25 per influence, or the agenda phase vote value when higher under `AGENDA_VALUE_TABLE`) |
   | The Prophet's Tears | replaces the cheapest planet it would exhaust to skip a prerequisite; when a research needs no skip it draws an action card (room in hand permitting) |
   | Scepter of Emelpar | decides a follow as if a strategy token were free, exhausts the Scepter first (the bot then counts the card as followed without charging a token) and makes the follow; a ready Scepter also counts as a spare token when it checks whether it can follow |
   | The Triad | counted as a planet when paying (3 resources and 3 influence, plus one per kind of fragment held) |
@@ -1564,8 +1673,8 @@ to build one by hand:
   strategy-card values to ask what the expedition would be worth after the card.
   - **Net value** (the planner's currency: a victory point 8, a trade good 1) = breakthrough + Fracture roll +
     Thunder's Edge race + kind nudge + race urgency - cost. A kind the scoring reserve cannot afford is unavailable.
-  - **Breakthrough** (only while the seat still has a locked one): `2.0 + 0.5 x lift`, at least 0.75, scaled down when
-    fewer than 4 rounds are left. 2.0 is what a free faction ability is worth (about a quarter of a point, like a
+  - **Breakthrough** (only while the seat still has a locked one): `2.0 + 0.5 x lift`, at least 0.75 (8 for Hacan and Letnev,
+    `PRIORITY_FLOORS`), scaled down when fewer than 4 rounds are left, and never less than _Yin Ascendant_'s value. 2.0 is what a free faction ability is worth (about a quarter of a point, like a
     cheap technology); the lift is the faction's win rate with a breakthrough minus without, in percentage points,
     from `expedition_stats.json` (human games), and 0.5 per point is 0.8 (a point is about 10 win-rate points) halved
     because most of the lift is who gets an expedition early, not what the breakthrough does. The "without" rate
@@ -1582,7 +1691,7 @@ to build one by hand:
     against 16-19%, but that is mostly correlation). The chance of holding is 1/players plus `0.6 / (slices left + 2)`
     per slice of lead, between 0.03 and 0.9, 0.95 when the lead cannot be caught, and exact for the last slice (it
     holds if it has the most slices or ties). A claim is worth 8 x (chance after - chance before), so the last slice is
-    rushed when it makes the seat the holder (about +6.9 when tied) and left alone when it gives the infantry to a
+    rushed when it makes the seat the holder (about +6.7 when tied at six players) and left alone when it gives the infantry to a
     rival (the chance lost plus 4, half of the point, since the seat still chooses where the planet goes).
   - **Kind nudge.** The faction's win rate after each kind against its average over kinds (shrunk by 100 pseudo-games),
     0.2 per point and at most 1.0 (an eighth of a point).
@@ -1599,7 +1708,7 @@ to build one by hand:
     A trade good is always 1. **Claim now or at the pass.** `claimNow` claims the best kind (without its race urgency)
     only when it is worth at least the best kind priced for the pass times the chance that kind is still open then
     (0.75 per rival that lacks a breakthrough and could pay for it); otherwise the seat waits and `beforePassing`
-    claims at the pass rates. A seat that has passed is not offered an expedition.
+    claims at the pass rates. Hacan, Letnev and the last slice skip that comparison and claim now. A seat that has passed is not offered an expedition.
     | Kind | Cost |
     | --- | --- |
     | 5 resources, 5 influence | the cheapest payment after the scoring reserve (`Wallet`), priced at the planets it exhausts (all of each planet's resources or influence, so two planets for 7 resources cost 7) |
@@ -1645,8 +1754,8 @@ to build one by hand:
     | Emelpar | end of turn | the readying value of the best exhausted planet (`ReadyingValue`: spending it this round, a spend objective it unlocks, a tech skip) | readies that planet |
     | Ordinian, Ordinian Rex | passing | an action card plus a command token | always, then gains the token as any token gain |
     | Faunus | passing | 0.7 of the best free planet's value (no units, no attachments, not home or legendary, no custodians token) plus 0.3 if it is taken from someone, plus the objective points the planet would complete (`ObjectiveValue`, so Seize an Icon too) | the best planet |
-    | Industrex | passing | the cost of the costliest upgraded ship with fleet room and a reinforcement, plus the objective points the ship's system would complete | that ship in the system with the best objective gain, then the most ships |
-    | Tempesta | movement | the planner counts +1 movement (`BoardView.moveValueWithBoosts`, next to Gravity Drive); when a planned move needs it, the AI exhausts the card once in the movement step | |
+    | Industrex | passing | the filler value of the costliest upgraded ship with fleet room and a reinforcement, plus the objective points the ship's system would complete | that ship in the system with the best value, systems visited costliest fleet first (the first wins a tie) |
+    | Tempesta | movement | the planner counts +1 movement (`MoveBudget`, next to Gravity Drive); when a planned move needs it, the AI exhausts the card once in the movement step | |
     | Avernus | before passing | a free destroyer (or 2 fighters) in the system of its war sun, as a component action | |
     | Mecatol Rex (Thunder's Edge) | end of turn | the secret redraw (see Drawing and trading secrets) | |
   - **Not played.** Garbozia (the stored action cards would need a play step), and Custodia Vigilia and Styx, which have no
@@ -1665,20 +1774,23 @@ to build one by hand:
   `ButtonProcessor`.
 - **Fallback.** `AiStallDetector` names what the game is waiting on from a seat: its turn,
   scoring, status homework, strategy-card follows, an ongoing combat, or a when/after decision.
-  If that lasts 3 minutes with nothing the seat understands, the newest prompt tied to that
-  reason is re-posted with `aiSeatPick_…` buttons that name the seat. The first player to press
-  one makes that seat press the original button on the original message.
-  - Private prompts are only ever declined, and only when a declining option exists.
-    Otherwise the AI says it is stuck.
+  If that lasts 3 minutes (1 at fast pace in self-play) with nothing the seat understands, the newest prompt tied to
+  that reason is re-posted with `aiSeatPick_…` buttons that name the seat. The first press by the game owner or a
+  developer (any player with `EXPLOIT_GUARDS` off) makes that seat press the original button on the original message.
+  A paused seat hands nothing over until `/ai delegate` asks for it.
+  - Private prompts get only a safe option (see When an AI is confused), and only when one exists; otherwise the AI
+    says it is stuck. In self-play the self-play choice applies to them too.
   - It never presses buttons that open a form.
   - A fallback that presses "Done Redistributing Command Tokens" first puts back any command tokens the seat is short of
     its starting allocation (the `originalCCsFor<faction>` stored value), in the pool each came
     from or else the tactic pool (`RedistributionGuard`), and does not press Done if it cannot.
   - Every fallback (unsure, no progress, a stall timeout, a player asking for the hand-over, the loop stop and every
     "stuck" notice) is recorded by `FallbackLog`: one `BotLogger.info` line starting `AI fallback game=… round=… phase=…
-    seat=faction/color kind=… reason=… prompt=… text=… buttons=[…] recent=[…] pending=… outcome=…`, and the last 10 in
-    the game stored values `aiFallbackLog|slot0` to `slot9` (base64) with `aiFallbackLog|next`, so they survive a
-    restart. `/ai fallbacks` lists them and the self-play report prints an "AI fallbacks" section.
+    seat=faction/color kind=… reason=… prompt=… text=… buttons=[…] recent=[…] pending=… outcome=…`, and the last 10
+    under keys `slot0` to `slot9` with `next` in a per-game file, `<storage>/ai_logs/<game>.properties`
+    (`AiLogStore`), so they survive a restart; they are not in the game save and do not roll back with `/game undo`.
+    A record that matches a stored one in round, faction, phase, kind, reason and prompt is logged but not stored
+    again. `/ai fallbacks` lists them and the self-play report prints an "AI fallbacks" section.
 - **Thinking visibility.** Each seat decision runs inside a `Thinking` context (`ti4.ai.trace`, one ThreadLocal per worker
   thread). Planner entry points open spans (`tactical.best`, `tactical.candidates`, `tactical.warfare`, `tactical.target`,
   `production.plan`, `explore.expectedValue`, `strategy.tokenPlan`, `strategy.planInputs`, `strategy.planAll`,
@@ -1686,22 +1798,27 @@ to build one by hand:
   `ai.actuate` are timed around the tick's Discord reads and presses. A span that would re-enter itself 8 deep, nest 60
   deep, run 200,000 times in one decision, or start after the 20 second budget (`AiSettings.DECIDE_TIMEOUT`, or
   `-Dai.thinking.budget.seconds=N`, 0 for none) throws `ThinkingAborted`; a `StackOverflowError` is treated the same way.
-  The seat then idles (the stall timeout asks the table to choose), one `AI thinking cut short game=… trail=[…]` warning
-  is logged, and a `THINKING_ABORTED` fallback is recorded (visible in `/ai fallbacks`). The same decision is not tried
+  The seat then goes straight to its idle handling in the same tick (the stall timeout still decides when the table is
+  asked to choose), one `AI thinking aborted game=… path=[…] calls=[…] keys=[…] inputs=[…]` warning is logged, and a
+  `THINKING_ABORTED` fallback is recorded (visible in `/ai fallbacks`). The same decision is not tried
   again until the game changes or 5 minutes pass. Decisions over 2 seconds log one `AI thinking was slow` warning a
   minute per game. `/ai profile` shows the per-game table (self and total time per span, the slowest decisions); it is
-  hidden in Fog of War games except for developers. Self-play turns the time budget off (virtual time) and prints a
-  "Thinking" section in its report.
+  hidden in Fog of War games except for developers. Self-play turns the time budget off (virtual time; the harness
+  stubs it to zero, so `-Dai.thinking.budget.seconds` has no effect there) and prints a "Thinking" section in its
+  report.
 - **Guards.**
   - At most 2 attempts per prompt and state (staged movement and unit positions count as progress).
-  - At least 1.5 s between actions in a game, and at most 150 actions an hour per seat.
+  - At least 1.5 s between actions in a game (none at fast pace in self-play), and at most 150 actions an hour per seat
+    (600 at fast pace).
   - Delegation caps per seat and per game each round.
-  - A loop guard: when a seat falls back on the same unsure choice 6 times in one turn without pressing anything
-    itself in between, it stops choosing on its own and posts one 🔁 notice (`/ai delegate` still hands the choice
+  - A loop guard: when a seat falls back for the same reason 6 times in one player's turn (unsure, no progress or a
+    stall timeout alike, whatever the prompt) without pressing anything itself in between, it stops choosing on its own and posts one 🔁 notice (`/ai delegate` still hands the choice
     over). In self-play the harness ends such a game as `LOOPED` instead of waiting for it to stall.
   - A pause in one game after 3 failed presses in 10 minutes, and in every game after 10; `/ai status` says when a seat is holding back.
   - After an undo, the AIs forget what they pressed and planned this turn, so they can redo it.
-  - It respects the circuit breaker, the kill switch and the lease, and its shutdown drains in-flight presses before the lease is released.
+  - It respects the circuit breaker and the lease, and its shutdown drains in-flight presses before the lease is
+    released. The kill switch stops the seats' own choices, the referee and new AI seats and games; the runtime keeps
+    polling, stall hand-overs are still posted and a delegated choice is still pressed.
 
 ## Segregation
 
@@ -1714,31 +1831,23 @@ list. Today the seams are:
 | `SlashCommandManager` registers `AiCommand` | the `/ai` command |
 | `TestBedService.findNonDeveloper` skips AI seats | test-bed games with an AI can still be reset and scripted |
 
-Seven small generic changes don't reference `ti4.ai`:
+The other engine changes this work needed (the stand-in event, the Sabotage, War Machine, Flank Speed and Veto
+cancel fixes, the Nekro hero report channel, bombardment auto-assign, `RandomHelper` seeding and the rest) are
+already on `master`. Besides the two seams, the branch still changes these files outside `ti4.ai`, none of which
+references it:
 - `GlobalSettings.ImplementedSettings.AI_PLAYERS_ENABLED`, the kill switch.
-- A public `TestBedPress.standInEvent` with a configurable repost header.
-- The Nekro hero's casualty and trade-good report goes to the player's game channel (`getCorrectChannel`) rather
-  than the channel the button was pressed in. Nothing changes for humans, but an AI seat presses that button in its
-  private thread, where the report's @mentions of the victims could add them to the thread.
-- The bombardment hit prompt offers every defender an "Auto-assign Hits" button (dummy players already had one), so
-  humans and AI seats alike can assign bombardment hits automatically.
-- The Sabotage button (`ActionCardButtonHandler`) refuses a second press on a window that a Sabotage already canceled
-  (the canceled windows' message ids are kept in the game's stored value `canceledActionCardWindows`): it spends no
-  Sabotage and marks no play as canceled. Before, that press spent another Sabotage and canceled an earlier play of the
-  same card. Any other press behaves as before.
-- A canceled _War Machine_ or _Flank Speed_ takes its effect back (the card player's spent `warmachine`, the
-  `flankspeedBoost` of the active tactical action) instead of leaving it for the player to undo by hand. It acts on the
-  card's player, not on the player who pressed the button.
-- A cancelled _Veto_ resumes the agenda's "when" queue, which halts at a Veto and which nothing started again (only
-  while the agenda is in the "when" window and the Veto's player was the last to play a "when"). The same button
-  erases a rider only when the Sabotage really cancels the card; before, a press by a player with no Sabotage erased it.
+- `GameClock`: game time read for game creation, save stamps (each save also moves the stamp forward by at least
+  1 ms), turn changes and agenda flips, so self-play can run them on its virtual clock.
+- `ActionCardHelper` records an action card's target when it is played (`ActionCardTargets.recordOnPlay`).
+- The shenanigans pre-pass draw and the secret objective deck shuffles go through `RandomHelper.current()`.
 
 ## Testing
 
 - Unit tests: `mvn -o test -Dtest='ti4.ai.**.*Test'`.
 - **Self-play integration test** (`AiSelfPlayTest`). Six AI seats play a real game in-process.
-  - The setup is the same as in production: `createNewGame`, the standard 6-player map, `/ai add` for each seat,
-    and the referee starting the game.
+  - The setup (`SelfPlaySetup`) creates the game with `createNewGame`, lays out the Thunder Dreaming map from the
+    Thunder's Edge rulebook, seats each AI through `AiSeatService.addSeat` (the code behind `/ai add`), and the
+    referee starts the game.
   - Every press runs the bot's real button handlers. Only Discord and a few services are replaced:
     - `FakeDiscord` (`src/test/java/ti4/testUtils/discord`) is an in-memory Discord. Messages, threads, edits and
       button ids work as on Discord, and every Discord request completes immediately on the test's thread.
@@ -1746,8 +1855,9 @@ Seven small generic changes don't reference `ti4.ai`:
       folder, and turns off map rendering, database sync and metadata files.
   - The AI runtime ticks on a virtual clock. The first round takes about 30 seconds of real time and a whole game
     about 2 minutes. A game keeps its thread busy only part of that time, so whole games run several at once (below).
-  - A run ends at the victory point goal, when the objectives run out, or when nothing changes for two virtual
-    hours (a stall). The outcome's report shows the game state, the AI's recent decisions and presses, what the bot
+  - A run ends at the victory point goal, when the objectives run out, when nothing changes for two virtual
+    hours (a stall), when a seat's loop guard stops it (`LOOPED`), at the time or tick budget (`LIMIT`), or when the
+    game can no longer be found (`LOST_GAME`). The outcome's report shows the game state, the AI's recent decisions and presses, what the bot
     logged, Discord calls the fake doesn't support, and the latest messages in the main channel, combat threads
     and private threads.
   - Each report also has a scoreboard (victory points after every round, each revealed objective and who scored
@@ -1774,7 +1884,8 @@ Seven small generic changes don't reference `ti4.ai`:
     (about 20 seconds per game, against about 2 minutes each one after another), and 16 take under 5. The test mocks
     are stub-only, so a game does not keep a record of every call it made; that is what lets many games fit in the heap.
     Under heavy load the bot's real-time "Slow Button Warning" can show up in the reports; it says nothing about the AI.
-  - `-Dai.selfplay.factions=sol,jolnar,...` seats other factions (default: the first six supported ones). Every seat
+  - `-Dai.selfplay.factions=sol,jolnar,...` seats other factions (default: `AiSettings.DEFAULT_FACTIONS`, Nekro,
+    Sardakk, Hacan, Letnev, Sol and Xxcha). Every seat
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
@@ -1783,7 +1894,8 @@ Seven small generic changes don't reference `ti4.ai`:
     seats with those experiments off (control) and half with everything on (treatment). Games run in pairs: both games
     of a pair share a seed and swap the two halves (`seedFor(slot) = seed + slot / 2`). The summary prints the
     treatment-minus-control points and win share over complete pairs, with standard errors. With one experiment
-    named this is a leave-one-out test. A/A noise is about ±0.26 points at 12 pairs. Leave-one-out results from
+    named this is a leave-one-out test. Every A/B run is recorded in the catalog under
+    [docs/ai/experiments](docs/ai/experiments/README.md) (`AbRecord`). A/A noise is about ±0.26 points at 12 pairs. Leave-one-out results from
     2026-11-10, 24 pairs each, seed 7000:
     | Experiment | Points, treatment minus control | Treatment win share |
     | --- | --- | --- |
@@ -1797,7 +1909,8 @@ Seven small generic changes don't reference `ti4.ai`:
     everything off (`ab=all`, 24 pairs, seed 9100) gave +0.29 ± 0.21 points and a 0.60 ± 0.07 treatment win share;
     all 48 games ended on points, average final round 5.6, leader 10.2 points, table total 42.5.
   - A stack overflow inside a decision is caught (`AiTickRunner`), and the abort log line names the repeating cycle
-    of AI frames (`keys=[cycle]`, cycle in `path`). Three such aborts in 10 minutes log an abort storm error. Pricing
+    of AI frames (`keys=[cycle]`, cycle in `path`). When every active AI seat has aborted 3 times in a row, an abort
+    storm error is logged once, until some seat decides normally again. Pricing
     paths that can call themselves again break the cycle with a per-thread guard: a hand's per-card keep values
     (`KindPricing.keepValues`, falls back to the prior) and a Mecatol take priced inside another take (`WinOdds`,
     counts as none).
@@ -1834,8 +1947,10 @@ Seven small generic changes don't reference `ti4.ai`:
     before deciding, the virtual time, the game's message reactions and open strategy card follows).
     `TrajectoryReplay` loads one and asks the brain again; `TrajectoryReplayTest` (`-Dai.selfplay.replay=true`) plays
     round 1 that way and checks every press replays to the same choice.
-  - Seeds: every random draw the game makes goes through `RandomHelper.current()`, which a self-play game thread seeds
-    (dice, deck shuffles, secret ids, AI seat ids and profile seeds). Each report header prints the game's seed.
+  - Seeds: the game's random draws go through `RandomHelper.current()`, which a self-play game thread seeds
+    (dice, deck shuffles, secret ids, AI seat ids and profile seeds). A few draws still do not
+    (`Math.random` and unseeded shuffles in `AuctionFrankenDraftService`, `TheodisiAgendaResolver`,
+    `IxthLegendaryButtonHandler` and `TileEmojis`). Each report header prints the game's seed.
     `-Dai.selfplay.seed=N` gives slot `i` seed `N + i` and also fixes the game names and the virtual clock start
     (message ids and names feed the AI), so the same command replays the batch. Cosmetic randomness (emoji, joke
     texts built when a class loads, map rendering) stays unseeded on purpose; the joke texts of an empty trade offer
@@ -1893,10 +2008,13 @@ Seven small generic changes don't reference `ti4.ai`:
     scored it and how far short the others were just before each status phase (taken once every seat has passed, as
     queued scores land when the status phase starts). It ends with every secret scored over the batch.
   - `LegendarySelfPlayTest` hands five seats a legendary planet each (Mallice, Hope's End, Primor, Ordinian, Emelpar) when
-    the first action phase begins and checks that the seats exhaust them through the bot's real buttons.
+    the first action phase begins and checks that the seats exhaust Mallice, Hope's End, Primor and Ordinian through
+    the bot's real buttons (Emelpar is handed out but not checked).
   - `RelicSelfPlayTest` hands six seats relics (Dynamis Core, JR-XS455-O, the Codex, Nano-Forge, the Circlet of the Void with a
     frontier token, the Crown of Emphidia with a Tomb, three cultural fragments, and the Book of Latvinia drawn through the
-    bot) when the first action phase begins and checks that the seats use them through the bot's real buttons. A batch
+    bot) when the first action phase begins and checks that the seats use them through the bot's real buttons; the
+    Letnev seat's relics (Maw of Worlds, Prophet's Tears, Emelpar, Silver Flame, Heart of Ixth) are handed out but not
+    checked. A batch
     prints, relic by relic, the games in which it was drawn, the average round, the times it was used, passed between
     seats and held unused at the end (`RelicTracker`), and the points of the seats that held one against the table.
   - `-Dai.secrets.hold=false` plays without patience with action secrets. The batch prints the secrets scored per seat
@@ -1911,10 +2029,10 @@ Seven small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, an agenda outcome forecast with riders, Veto and the shenanigans courtesy. Still to do: the rest of the combat action cards and the agenda ones, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, an agenda outcome forecast with riders, Veto and the shenanigans courtesy, the mech secrets (Mechanize the Military, Occupy the Fringe) and note buying for Strengthen Bonds. Still to do: the rest of the combat action cards and the agenda ones. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
-| V3 | Deeper deals: votes for trade goods, multi-party pacts. |
+| V3 | Deeper deals: multi-party pacts (votes for trade goods are done, as promise deals). |
 | V4 | Extortion and pacts. |
 | V5 | Action cards, leaders, more depth, then faction-specific rules beyond the shared set. |
 
@@ -1948,20 +2066,17 @@ Seven small generic changes don't reference `ti4.ai`:
   placement riders (Diplomacy, Construction, Warfare), _Sanction_ and the other agenda cards are not. There is no
   rider stacking logic: a seat does not consider that another seat's rider on the same agenda will be queued or placed
   first, so several seats can end up riding the same agenda and the late riders fall to the earlier ones' choices.
-  The softmax temperature of the forecast (4 trade goods) leaves a clear favourite about a quarter short of certain.
+  The softmax temperature of the forecast (3 trade goods) leaves a clear favourite short of certain.
 - **Agenda cards, deferred.**
   - _Confounding Legal Text_: a human's "Resolve with Current Winner" plus the AI's own resolution of the same agenda
     resolve it twice, because the bot only guards a second press of the same winner. The self-play referee picks the
-    newest resolution button. It needs a bot-side guard first.
+    newest resolution button. The AI plays the card (with `AGENDA_SABOTAGE`) all the same.
   - _Diplomatic Pressure_: the note it needs comes from a hidden hand, and there is no valuation of a note to aim it by.
-  - The poison pill: `AgendaPolicy` values nearly every For/Against agenda at 0, so "predict the outcome you do not
-    want" cannot emerge until For/Against agendas are valued.
-  - _Deadly Plot_ and _Bribery_ (the bot has no automation for them), the placement riders (Diplomacy, Construction,
+  - _Bribery_ and _Confusing Legal Text_ are never played, nor the placement riders (Diplomacy, Construction,
     Warfare), _Sanction_ and the D-tier agenda cards.
 - **Action cards, combat.**
-  - Played: _Morale Boost_, _Fighter Prototype_ and _Emergency Repairs_, at the start of a round. Not yet: _Shields
-    Holding_ and _Maneuvering Jets_ (they post nothing: the player presses "Cancel a Hit" on the hit message, and the
-    second cancel button is unowned, so the AI needs perception and a two-step play first), and _Fire Team_ (its extra
+  - Played: _Morale Boost_, _Fighter Prototype_, _Emergency Repairs_ and _Skilled Retreat_ at the start of a round,
+    _Shields Holding_ and _Maneuvering Jets_ on the hit prompts, and _Direct Hit_. Not yet: _Fire Team_ (its extra
     hits are posted as text only, with no hit-assignment buttons, so the AI could neither take them nor assign them).
   - No ground combat card is played once a player has asked to automate the combat (the confirmation is on the table).
     An unaccepted "Automate Combat" offer no longer blocks them.
@@ -1973,7 +2088,7 @@ Seven small generic changes don't reference `ti4.ai`:
     (an AI seat), so a combat against a human who plays cards slowly is no longer rolled before the human is done, but
     a human who never presses the button still delays the AI by two minutes a round.
   - _Wild Wild Galaxy_'s +2 _Morale Boost_ is valued as +1.
-  - Left to humans: _Direct Hit_ (the bot asks for the ship in chat), _Skilled Retreat_, _Rout_, _Intercept_,
+  - Left to humans: _Rout_, _Intercept_,
     _Parley_ and _Ghost Squad_ (retreat and invasion windows), _Courageous to the End_ (the AI cannot answer its
     `assignHits_` prompts), _Blitz_ and _Experimental Battlestation_ (they roll in the main channel),
     _Reflective Shielding_, _Scramble Frequency_, _Waylay_, _Solar Flare_, _In The Silence Of Space_, _Salvage_ and
@@ -1983,12 +2098,13 @@ Seven small generic changes don't reference `ti4.ai`:
     `CombatRollService`).
   - A combat card's Sabotage window can freeze its combat for as long as it stays open (see the combat cards above).
 - **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
-  resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
-  hand).
+  resources, so the AI could not pay honestly). Leadership only as a stall before passing or to start a Leadership
+  secondary.
 - **Action cards, Exchange Program.** Not played: its agreement needs a negotiation, and the other way costs both
   players a fleet token.
-- **Action cards, fog of war.** Cards aimed at a player, planet or system, and _Overrule_, are never played in
-  fog-of-war games.
+- **Action cards, fog of war.** AI seats are refused in fog-of-war games (`AiGameSupport.unsupportedModes`), so no
+  card is played there; several targeted cards (Spy, Insubordination, Forward Supply Base, Uprising, Ghost Ship,
+  Exploration Probe) have no fog check of their own.
 - **Action cards, Fleet Logistics.** Wiring _Master Plan_ exposed that the Fleet Logistics second action had never
   started. It now does, so every AI seat with Fleet Logistics takes second actions it did not take before; the effect
   on results is not yet measured.

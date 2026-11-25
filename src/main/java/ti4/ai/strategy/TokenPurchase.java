@@ -1,6 +1,5 @@
 package ti4.ai.strategy;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -77,36 +76,27 @@ public class TokenPurchase {
                 influenceLeaning(wallet), wallet.tradeGoods(), 0, 0, wallet.tradeGoodValue(), wallet.pooling());
         SpendCost keep = kept(game, seat, wallet);
         SpendCost claimNow = ScoringReserve.custodiansReserve(game, seat);
+        SpendCost followNow = technologyFollowToKeep(game, seat, wallet);
         for (int tokens = Math.min(maxTokens(game, seat), reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
                     .plan(SpendCost.influence(INFLUENCE_PER_TOKEN * tokens))
-                    .filter(plan -> afterPaying(game, seat, wallet, plan).canPay(keep))
-                    .filter(plan -> wallet.without(plan).canPay(claimNow));
+                    .filter(plan -> ExpectedReadying.afterPaying(game, seat, wallet, plan)
+                            .canPay(keep))
+                    .filter(plan -> wallet.without(plan).canPay(claimNow.plus(followNow)));
             if (payment.isPresent()) return Optional.of(new Purchase(tokens, payment.get()));
         }
         return Optional.empty();
     }
 
-    private static Wallet afterPaying(Game game, Player seat, Wallet wallet, Wallet.Payment payment) {
-        Wallet left = wallet.without(payment);
-        int readies =
-                ExpectedReadying.DIPLOMACY_READIES - seat.getExhaustedPlanets().size();
-        if (readies <= 0 || !holdsUnplayedDiplomacy(game, seat)) return left;
-        List<Wallet.PlanetValue> readied = wallet.planets().stream()
-                .filter(planet -> payment.forInfluence().contains(planet.name())
-                        || payment.forResources().contains(planet.name()))
-                .sorted(Comparator.comparingInt(
-                        (Wallet.PlanetValue planet) -> -(planet.resources() + planet.influence())))
-                .limit(readies)
-                .toList();
-        return left.withPlanetValues(
-                Stream.concat(left.planets().stream(), readied.stream()).toList());
-    }
-
-    private static boolean holdsUnplayedDiplomacy(Game game, Player seat) {
-        return seat.getSCs().stream()
-                .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.DIPLOMACY
-                        && !game.getPlayedSCs().contains(card));
+    private static SpendCost technologyFollowToKeep(Game game, Player seat, Wallet wallet) {
+        if (ESTIMATING_PLANS.get()) return SpendCost.NONE;
+        ESTIMATING_PLANS.set(true);
+        try {
+            SpendCost follow = TechnologyFollowReserve.of(game, seat);
+            return wallet.canPay(follow) ? follow : SpendCost.NONE;
+        } finally {
+            ESTIMATING_PLANS.set(false);
+        }
     }
 
     private static SpendCost kept(Game game, Player seat, Wallet wallet) {

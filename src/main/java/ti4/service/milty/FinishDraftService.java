@@ -44,6 +44,7 @@ class FinishDraftService {
     public boolean finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         boolean mapChanged = false;
+        MiltyDraftEventRecorder.recordEnded(game, manager);
         try {
             mapChanged = MiltyDraftHelper.buildPartialMap(game);
             boolean keleresExists = false;

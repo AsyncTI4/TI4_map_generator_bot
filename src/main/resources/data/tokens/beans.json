@@ -1,0 +1,14 @@
+[
+    {
+        "id": "libertalia",
+        "imagePath": "token_beans_libertalia.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "libertalia",
+            "wellspring"
+        ],
+        "tokenPlanetName": "libertalia",
+        "isPlanet": true,
+        "source": "beans"
+    }
+]

@@ -33,6 +33,11 @@ class StartFrankenDraft extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid draft mode.");
             return;
         }
+        if (draftMode == FrankenDraftMode.AUCTION) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Start Auction Draft from the Franken settings menu.");
+            return;
+        }
 
         String error = FrankenDraftStartService.startFrankenDraft(event, game, force, draftMode);
         if (error != null) {

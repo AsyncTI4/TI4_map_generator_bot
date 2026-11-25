@@ -30,8 +30,10 @@ class FogStandardServiceTest extends BaseTi4Test {
         FOWPlusService.FORCED_FOWPLUS_OPTIONS.forEach(forced -> assertThat(game.getFowOption(forced.getLeft()))
                 .as(forced.getLeft().name())
                 .isEqualTo(forced.getRight()));
-        FogStandardService.FOWPLUS_EXTRAS.forEach(option ->
-                assertThat(game.getFowOption(option)).as(option.name()).isTrue());
+        FogPreset.STANDARD
+                .getTurnedOn()
+                .forEach(option ->
+                        assertThat(game.getFowOption(option)).as(option.name()).isTrue());
         // Agenda comms used to be on for new fog games; FoW+ forces them off.
         assertThat(game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)).isFalse();
         assertThat(game.getExplorationDeckID()).isEqualTo(FOWPLUS_DECK);

@@ -119,8 +119,39 @@ public class CombatForecast {
         Optional<Player> defender = game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
                 .findFirst();
-        if (defender.isEmpty()) return 1;
-        Player opponent = defender.get();
+        return defender.map(opponent ->
+                        landingWin(game, seat, tile, planet, opponent, landing, facesSpaceCannon, Optional.empty()))
+                .orElse(1.0);
+    }
+
+    public static double landingWinWithConversion(
+            Game game,
+            Player seat,
+            String position,
+            String planetName,
+            Map<UnitType, Integer> landing,
+            boolean facesSpaceCannon,
+            Optional<UnitType> conversion) {
+        Tile tile = game.getTileByPosition(position);
+        UnitHolder planet = tile == null ? null : tile.getUnitHolders().get(planetName);
+        if (planet == null) return 0;
+        Optional<Player> defender = game.getRealPlayersNNeutral().stream()
+                .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
+                .findFirst();
+        return defender.map(opponent ->
+                        landingWin(game, seat, tile, planet, opponent, landing, facesSpaceCannon, conversion))
+                .orElse(1.0);
+    }
+
+    private static double landingWin(
+            Game game,
+            Player seat,
+            Tile tile,
+            UnitHolder planet,
+            Player opponent,
+            Map<UnitType, Integer> landing,
+            boolean facesSpaceCannon,
+            Optional<UnitType> conversion) {
         Map<UnitType, Integer> attackers = new EnumMap<>(UnitType.class);
         landing.forEach((type, count) -> attackers.merge(type, count, Integer::sum));
         int shotDown = facesSpaceCannon ? (int) Math.round(BattleMath.spaceCannonHits(opponent, planet)) : 0;
@@ -133,8 +164,16 @@ public class CombatForecast {
             int present = BoardView.count(planet, seat, type);
             if (present > 0) attackers.merge(type, present, Integer::sum);
         });
+        Map<UnitType, Integer> defenders =
+                new EnumMap<>(CombatForces.unitsOf(planet, opponent, BoardView.GROUND_FORCES));
+        if (conversion.isPresent() && defenders.getOrDefault(UnitType.Infantry, 0) > 0) {
+            defenders.merge(UnitType.Infantry, -1, Integer::sum);
+            defenders.remove(UnitType.Infantry, 0);
+            attackers.merge(conversion.get(), 1, Integer::sum);
+        }
+        if (defenders.values().stream().mapToInt(Integer::intValue).sum() == 0) return 1;
         Side attacking = new Side(seat, attackers);
-        Side defending = new Side(opponent, CombatForces.unitsOf(planet, opponent, BoardView.GROUND_FORCES));
+        Side defending = new Side(opponent, defenders);
         Map<UnitType, Integer> hurt = BattleMath.damagedAmong(planet, opponent, defending.units());
         Force defence = CombatForces.force(
                 opponent, CombatForces.combatants(game, tile, planet, defending, attacking, hurt), true);

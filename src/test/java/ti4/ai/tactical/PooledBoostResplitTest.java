@@ -311,19 +311,27 @@ class PooledBoostResplitTest extends BaseTi4Test {
         return moves.stream().mapToInt(UnitMove::count).sum();
     }
 
-    // Sol forecasts the Nekro strike on its fleet. An enabled viewer sees the pooled two-system strike; a control
-    // viewer sees today's forecast, where neither lane alone wins often enough to count.
+    // Sol forecasts the Nekro strike on its fleet. The forecast runs as Nekro (DecidingSeat.of(enemy) in EnemyIntent),
+    // so it follows the rival's flag, not the viewer's: with Nekro enabled it sees the pooled two-system strike, and
+    // with Nekro disabled it sees the old forecast, where neither lane alone wins often enough to count. Sol's own flag
+    // does not change it.
     @Test
-    void enemyIntentForecastsThePooledStrikeOnlyForAnEnabledViewer() {
+    void enemyIntentForecastsThePooledStrikeOnlyForAnEnabledRival() {
         slowAndFastFleets();
 
         OptionalDouble pooled =
                 DecidingSeat.of(test.sol, () -> EnemyIntent.attackWorth(test.game, test.nekro, target, test.sol));
         disableResplitFor(test.sol);
+        EnemyIntent.forget();
+        OptionalDouble viewerDisabled =
+                DecidingSeat.of(test.sol, () -> EnemyIntent.attackWorth(test.game, test.nekro, target, test.sol));
+        disableResplitFor(test.nekro);
+        EnemyIntent.forget();
         OptionalDouble today =
                 DecidingSeat.of(test.sol, () -> EnemyIntent.attackWorth(test.game, test.nekro, target, test.sol));
 
         assertThat(pooled).isPresent();
+        assertThat(viewerDisabled).isEqualTo(pooled);
         assertThat(pooled.getAsDouble()).isGreaterThan(today.orElse(Double.NEGATIVE_INFINITY));
     }
 }

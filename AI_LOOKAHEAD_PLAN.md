@@ -65,7 +65,7 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
       `same save`, `unchanged`) and whether a rule read `context.now()`. Idle decisions on an unchanged game are only
       3.3% of decision time, and 99.5% of them read the clock, so a timer could change their answer and skipping them
       is not safe. Idle decisions after a save are 13.8%. The seat's own turn on a fresh save (`press, saved`) is
-      66.6%, with `NekroBrain.takeTurn` alone at 46.5%; `TradeRules.startDeals` is 10.0% and
+      66.6%, with `StandardBrain.takeTurn` alone at 46.5%; `TradeRules.startDeals` is 10.0% and
       `StrategyCardRules.gainTokens` 7.8%. The earlier 28% idle share was inflated by idles that now cost less.
       Next candidate: share seat-independent work (win odds, threats, incoming forces) across seats and decisions on
       the same save.
@@ -89,6 +89,26 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     steps 5 and 7.
 - [ ] **4. Cheaper testing.** Paired continuations from snapshots with `decisionOverride`; randomized flags per seat.
   - Check: if the standard error is well above 0.08 VP at a one-round horizon, go back to whole-game A/B.
+  - Harness built 2026-11-20, not yet run: `ContinuationAbExperimentTest` (`-Dai.selfplay.continuation=true`,
+    `.flags=...`). Snapshots at the start of rounds 2-4, two arms per continuation seed with the treated half
+    swapped, common random numbers, one-round horizon; see the test README. Flags are switched through the seats'
+    stored values, so `decisionOverride` is not needed.
+  - With common random numbers an A/A run scores exactly 0, so the check reads the standard error of a real flag's
+    run; `crn=false` gives the unpaired noise.
+  - First run, 2026-11-21, DESPERATION_ACTION_SECRET (8 games, 96 pairs, 7 h 20 min wall on 8 threads): void.
+    Restoring the round-2 snapshot dropped Discord messages posted after it, and restoring a later snapshot never
+    brought them back, so round-3 arms and most round-4 arms stalled in the strategy phase with no pick prompt
+    (92% of pairs untouched, -0.007 +/- 0.012 VP from games that barely moved). `FakeDiscord` snapshots now keep the
+    channel and message objects; a one-game repro then finished all 4 arms at their stop round. Each arm that misses
+    its stop round now prints the stall report, and the summary counts arm endings.
+  - Rerun (2026-11-21) also void: after 17 h, with about 190 of 192 arms done and no stalled arm, another session
+    rebuilt this worktree's classes and a late arm hit `NoClassDefFoundError`. Pairs printed only at the end, so
+    none survived. The harness now prints each pair as it lands (`CONTPAIR-LIVE`) and keeps the other games when
+    one fails.
+  - Next: rerun the same flag (needs a yes) from its own detached worktree so no other build can touch its classes,
+    then compare sign and standard error with the whole-game -0.5 VP.
+  - Follow-up required: the harness is pushed unproven. Test it as above, then decide whether to keep it or throw
+    it away (delete `ContinuationAb*` and its README section) if it cannot match whole-game A/B at lower cost.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
   fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
   - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.
@@ -121,6 +141,29 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   in incoming-force scans fell from 5.1 ms to 2.3 ms per decision (3 games, seed 9300, contended), about 3-4% of
   thinking time. The audit found the other heavy board facts (defense, rankings, win odds) read the deciding seat's
   hidden hand or perspective, so they are not shared across seats.
+
+- 2026-11-23: `EnemyIntent` keeps a rival's predicted plans for every seat that asks on the same save, but the
+  imagined turn ran with the asking seat as the decider, so the READY_PUBLIC_POINTS and PROMISE_DEALS flags of
+  whichever seat asked first decided the plan for all of them (in an A/B, control seats reused treated predictions).
+  The imagined turn now decides as the rival itself: the rival's own flags apply and nobody's hand is known
+  (`EnemyIntentTest`). Imagined turns also hide the rival's promissory notes, as they hide its secrets and action
+  cards, so a defender's Ceasefire is no longer read from a hand the asker cannot see. An imagined rival still gets
+  no desperation boost. `TradeValue` imagines a partner the same way without sharing the answer; it was left as is.
+- 2026-11-23: `-Dai.sharecensus=true` (`ShareCensus`) counts the shareable answers that were worked out again, by
+  who asked and when, with keys that hold the asker's hidden hand and flags. It decides what to share next.
+- 2026-11-24: census of 2 full games (about 7,200 CPU-s, queue job 20261123-191140-share-census-2games). Work
+  repeated with the same key: win.odds 1,131 of 1,298 s (881 s same seat, same tick), secret.readiness 800 of 851 s
+  (largely inside win.odds), enemy.intent 449 of 3,140 s (379 s same seat, later tick: cache misses, since the
+  256-entry cache was emptied whenever it filled), combat.odds 295 of 300 s, incoming.force 40 of 133 s. Ceiling
+  about 1,500 to 1,900 CPU-s (20 to 25%); timings nest, so not additive.
+- 2026-11-24: acted on it. `WinOdds` keeps its answers for the rest of the tick in `TickMemo`, keyed on the deciding
+  seat and imagined seat as well as viewer, rival and loss, so no seat reuses an answer worked out from another
+  seat's hand or flags (`WinOddsTickMemoTest`; `-Dai.tickmemo.verify` on a round-one game: 1,526 shared answers,
+  0 differed). `EnemyIntent` now holds 4,096 answers and, when full, drops only those for older saves. Not yet
+  measured on full games. PlanInputs, SpendOutlook and DiplomacyUse keyed only on the seat, so an answer worked out
+  inside an imagined turn (hand hidden) was reused when that seat really decided, and the reverse: which one a seat
+  got depended on what was computed first. They now add `ImaginedTurn.cacheMark`; on trade seed 2894249192 the
+  new caches without it changed the game (failed `TradeFlowSelfPlayTest`), with it they replay the old game.
 
 ## Unknowns
 

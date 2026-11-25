@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.unit.MoveUnitService;
@@ -80,7 +81,7 @@ public class TacticalRetreatLLButtonHandler {
         Tile source = game.getTileByPosition(buttonID.substring("tacticalRetreatDestination_".length()));
         if (source == null || getSelection(game, SELECTED_SHIPS, player).isEmpty()) return;
         List<Button> buttons = new ArrayList<>();
-        for (String position : FoWHelper.getAdjacentTiles(game, source.getPosition(), player, false)) {
+        for (String position : Adjacency.of(game, player).forMovement().from(source.getPosition())) {
             Tile destination = game.getTileByPosition(position);
             if (destination != null && !FoWHelper.otherPlayersHaveShipsInSystem(player, destination, game)) {
                 buttons.add(Buttons.green(
@@ -104,8 +105,7 @@ public class TacticalRetreatLLButtonHandler {
         if (source == null
                 || destination == null
                 || getSelection(game, SELECTED_SHIPS, player).isEmpty()) return;
-        if (!FoWHelper.getAdjacentTiles(game, source.getPosition(), player, false)
-                        .contains(destination.getPosition())
+        if (!Adjacency.of(game, player).forMovement().from(source.getPosition()).contains(destination.getPosition())
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, destination, game)) return;
         sendCargoButtons(event, game, player, source, destination);
     }

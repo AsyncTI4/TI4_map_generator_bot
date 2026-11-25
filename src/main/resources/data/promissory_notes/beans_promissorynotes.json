@@ -24,7 +24,7 @@
         "color": "",
         "playArea": false,
         "source": "beans",
-        "text": "During a combat against a player that is not the Ashen Legion player: When 1 of your units would be destroyed during ground combat, it is not destroyed instead. Then, return this card to the Ashen Legion player. The Ashen Legion player captures 1 infantry from the supply."
+        "text": "During a combat against a player other than the Ashen Legion player: When 1 of your units would be destroyed during ground combat, it is not destroyed instead. Then, return this card to the Ashen Legion player. The Ashen Legion player captures 1 infantry from the supply."
     },
     {
         "alias": "bepniron",
@@ -53,6 +53,7 @@
         "faction": "netrunners",
         "color": "",
         "playArea": true,
+        "playImmediately": false,
         "source": "beans",
         "text": "When you research a non-unit upgrade, non-faction technology: You may place this card face up in your play area to ignore 1 prerequisite on that technology. At the start of the status phase, return this card to the Net-Runners player."
     },
@@ -73,6 +74,45 @@
         "playArea": true,
         "playImmediately": false,
         "text": "When you commit 1 or more infantry during invasion on a planet you do not control\n\nYou may commit 2 infantry from your reinforcements onto that planet.\n\nAt the end of your turn, return this card to the Valhavn player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnmigo",
+        "name": "Extraction Science",
+        "faction": "migo",
+        "color": "",
+        "playArea": false,
+        "text": "When you research a technology\n\nYou may return this card to the Mi-Go player to treat 1 of your technology specialties as any color.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepndeep",
+        "name": "Dark Matter",
+        "faction": "deep",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "ACTION:\n\nPlace this card face up in your play area and place a frontier token in your home system.\n\nAt the start of the status phase, return this card to The Deep player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnbloom",
+        "name": "Starter Culture",
+        "faction": "bloom",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "ACTION:\n\nPlace this card face up in your play area. You and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nAt the start of the status phase, return this card to the J'nahfa player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnchoir",
+        "name": "Dearly Departed",
+        "faction": "choir",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "When 1 of your non-fighter ships would be destroyed during combat:\n\nYou may place this card faceup in your play area instead.\n\nAt the end of your turn, return this card to the Ossyra player.",
         "source": "beans"
     }
 ]

@@ -1,0 +1,27 @@
+{
+  "id": "20261110-promise-deals",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Leave-one-out: what do promise deals add?",
+  "date": "2026-11-10",
+  "code": {
+    "commit": "before 14bebc007b",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "baseSeed": 7000,
+    "experimentsUnderTest": [
+      "PROMISE_DEALS"
+    ]
+  },
+  "estimate": {
+    "completePairs": 24,
+    "pointDifference": "+0.47 ± 0.20",
+    "treatmentWinShare": "0.68 ± 0.05"
+  },
+  "batch": null,
+  "verdict": "Kept.",
+  "notes": "One to three games of this series of runs were lost to a stack overflow in the Mecatol take (since fixed); those games still counted in their pairs."
+}

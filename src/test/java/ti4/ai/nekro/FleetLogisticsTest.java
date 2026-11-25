@@ -8,6 +8,7 @@ import static ti4.ai.AiTestGame.prompt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
@@ -18,7 +19,7 @@ import ti4.testUtils.BaseTi4Test;
 // with Warfare first, so the same ships stay free for a follow-up tactical action in the same turn.
 class FleetLogisticsTest extends BaseTi4Test {
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
 
     @BeforeEach

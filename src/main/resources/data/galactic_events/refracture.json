@@ -1,0 +1,9 @@
+[
+    {
+        "alias": "refracture_reference",
+        "name": "Refracture Reference",
+        "text": "Neutral units use the Refracture Reference II profiles. When The Fracture enters play, roll a d10 for its layout. A result of 1 uses the normal Fracture layout; other layouts require their configured Refracture setup.",
+        "complexity": 1,
+        "source": "merford"
+    }
+]

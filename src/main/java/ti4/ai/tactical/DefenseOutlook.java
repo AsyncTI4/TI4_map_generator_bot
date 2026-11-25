@@ -22,6 +22,7 @@ import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FighterWings;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.PlanetStake;
@@ -783,7 +784,7 @@ public final class DefenseOutlook {
     }
 
     private double ceasefire(Player enemy) {
-        return seat.getPromissoryNotes().containsKey(enemy.getColor() + CEASEFIRE) ? CEASEFIRE_FEAR : 1.0;
+        return ImaginedTurn.promissoryNotes(seat).containsKey(enemy.getColor() + CEASEFIRE) ? CEASEFIRE_FEAR : 1.0;
     }
 
     private double appetiteShare(

@@ -22,7 +22,8 @@ final class MapSideStatsSection {
 
     static boolean isDrawn(RenderContext ctx) {
         return drawsPlayerInfo(ctx.game(), ctx.displayType(), ctx.fog())
-                && !ctx.board().isShowingSeparateFracture();
+                && !ctx.board().isShowingSeparateFracture()
+                && ctx.focus() == null;
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {

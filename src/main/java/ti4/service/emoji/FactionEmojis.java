@@ -135,6 +135,10 @@ public enum FactionEmojis implements TI4Emoji {
     ashen,
     natau,
     valhavn,
+    migo,
+    deep,
+    bloom,
+    choir,
 
     // luminous
     arachnera,
@@ -248,7 +252,8 @@ public enum FactionEmojis implements TI4Emoji {
     enclave,
     raven,
     syndicate,
-    terminator; // baldrick
+    terminator,
+    xyrix; // baldrick
 
     @Override
     public String toString() {
@@ -466,10 +471,16 @@ public enum FactionEmojis implements TI4Emoji {
             case "crystellum" -> crystellum;
             case "natau" -> natau;
             case "valhavn" -> valhavn;
+            case "migo" -> migo;
+            case "deep" -> deep;
+            case "bloom" -> bloom;
+            case "choir" -> choir;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;
             case "opa" -> opa;
+
+            case "xyrix" -> xyrix;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

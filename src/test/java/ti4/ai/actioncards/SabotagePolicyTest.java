@@ -18,7 +18,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -479,7 +479,7 @@ class SabotagePolicyTest extends BaseTi4Test {
         AiPrompt roll = prompt("roll", PromptSource.COMBAT_THREAD, NOW, "combatRoll_204_Planet_arinam");
 
         Optional<AiDecision> early = SabotageRules.answerWindowsAimedAtSeat(table.test.contextAt(LATE, roll, parley));
-        AiDecision overall = new NekroBrain().decide(table.test.contextAt(LATE, roll, parley));
+        AiDecision overall = new StandardBrain().decide(table.test.contextAt(LATE, roll, parley));
 
         assertThat(early).isPresent();
         assertThat(AiTestGame.pressedId(early.get())).isIn("no_sabotage", "sabotage_ac_Parley_sol");

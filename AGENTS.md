@@ -126,6 +126,19 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   AI needs from inside `ti4.ai` (polling `ManagedGame`, diffing game state, pressing the
   real buttons) over adding hooks to engine code; if a seam is truly needed, keep it a
   one-liner or a small generic improvement and add it to the test's list in the same change.
+- **Draw game randomness from `RandomHelper.current()`.** Dice, deck shuffles, random picks
+  and every other random outcome go through
+  [RandomHelper](src/main/java/ti4/helpers/RandomHelper.java): `RandomHelper.current()`
+  (e.g. `Collections.shuffle(deck, RandomHelper.current())`, `RandomHelper.current().nextInt(1, 11)`),
+  `isOneInX` or `pickRandomFromList`. Never call `ThreadLocalRandom.current()`, `new Random()`
+  or `Math.random()`, or shuffle without a `Random`. A thread can be seeded so a game replays
+  the same; unseeded, `current()` is `ThreadLocalRandom`, so nothing changes in production.
+  Map rendering is the one exception: it uses `RenderRandom`. Move old call sites over when
+  you touch them.
+- **Read game time from `GameClock.currentTimeMillis()`** ([GameClock](src/main/java/ti4/helpers/GameClock.java))
+  when the time is stored in the game or decides what happens (save stamps, game creation, turn changes, agenda
+  flips, the AI's own time windows). It is the wall clock unless a thread sets its own clock: self-play sets its virtual clock, so a seed
+  replays the same game however fast the machine runs. Logging and timing measurements can stay on the wall clock.
 - **Agents, genomes and homebrew agents live apart.** Official agents are modules under
   `ti4.service.leader.agent.modules`. The agent core in `ti4.service.leader.agent` and those modules never name
   Twilight's Fall, genomes or homebrew. Genomes (Twilight's Fall and TK Nova) live in
@@ -139,6 +152,11 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
   fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
   isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Ask adjacency through `ti4.helpers.adjacency.Adjacency`, in the direction of whoever acts.**
+  `Adjacency.of(game, player).forMovement() / forVision() / forEffects()`, then `from(pos)` (what pos reaches),
+  `into(pos)` (what reaches pos) or `either(pos)` (communication only). Links can be one-way, so the acting side
+  needs access: a PDS covers T when `into(T)` holds its system, ships move along `from(origin)`. Abilities that say
+  "neighbor" use `Player.getAbilityNeighbours()`. The `FoWHelper.getAdjacentTiles*` overloads are deprecated.
 - **Never ping other players into a private cards-info thread.** A player's `#cards-info` thread
   (`getCardsInfoThread()`) is private: it shows their hand and secrets, and pinging someone in it adds them
   to the thread. Buttons pressed there reply there by default, so when a message is for another player
@@ -158,8 +176,8 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
   - 30k Content Lab cards: source `thirtyk`, files or classes named `thirtyk` / `ThirtyK*`, card ids
     ending in `30k` or `jmsc`.
-  - Wormholes: `WormholeModel`, wormhole tokens or attachments, `Tile.getWormholes`, the wormhole
-    methods in `FoWHelper`.
+  - Wormholes: `WormholeModel`, wormhole tokens or attachments, `Tile.getWormholes`, `WormholeRule`
+    in `ti4.helpers.adjacency`.
 
 ### Testing of new functionality and/or bug fixes
 The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot

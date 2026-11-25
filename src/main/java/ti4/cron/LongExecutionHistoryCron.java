@@ -11,10 +11,10 @@ public class LongExecutionHistoryCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                ExecutionHistoryManager.class, LongExecutionHistoryCron::logCacheStats, 0, 1, TimeUnit.MINUTES);
+                LongExecutionHistoryCron.class, LongExecutionHistoryCron::logLongExecutions, 0, 1, TimeUnit.MINUTES);
     }
 
-    private static void logCacheStats() {
+    private static void logLongExecutions() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         try {
             ExecutionHistoryManager.logLongExecutions();

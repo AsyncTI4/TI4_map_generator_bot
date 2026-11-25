@@ -44,12 +44,12 @@ import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameDatabaseSyncPipeline;
 import ti4.helpers.Storage;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.model.metadata.TechSummariesMetadataManager;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
@@ -90,6 +90,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
             .map(java.util.regex.Pattern::compile)
             .orElse(null);
     final List<String> watched = new ArrayList<>();
+    // Each change in a watched seat's idle-on-its-turn diagnosis, kept whole so the watched-trace tail cannot drop it.
+    final List<String> idleOnTurn = new ArrayList<>();
     final Map<String, Integer> pressOutcomes = new HashMap<>();
     final Map<String, Integer> pressedHandlers = new java.util.TreeMap<>();
     final Map<String, Integer> decisionReasons = new java.util.TreeMap<>();
@@ -100,6 +102,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final ExpeditionTracker expeditions = new ExpeditionTracker();
     final PromissoryTracker promissory = new PromissoryTracker();
     final LeaderTracker leaders = new LeaderTracker();
+    final FactionComponentTracker factionComponents = new FactionComponentTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -171,6 +174,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
     SelfPlayEnvironment(long startMillis) throws IOException {
         clock = new AtomicLong(startMillis);
+        // Game saves and the AI's own time checks read this thread's game clock; on the wall clock the same seed could
+        // play a different game depending on how fast the machine ran it.
+        ti4.helpers.GameClock.useForThisThread(clock::get);
         discord = new FakeDiscord(clock::get);
         storage = Files.createTempDirectory("ai-self-play");
         try {
@@ -397,6 +403,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     seat.faction(),
                     target.customId(),
                     outcome.outcome().name());
+            factionComponents.pressed(
+                    currentRound(),
+                    seat.faction(),
+                    target.customId(),
+                    outcome.outcome().name());
             if (target.customId().contains("purgeHacanHero")) noteHeroBuild(seat.faction());
             if (outcome.pressed()) {
                 String family = handlerFamily(target.customId());
@@ -504,6 +515,15 @@ final class SelfPlayEnvironment implements AutoCloseable {
         return ((Optional<FactionBrain>) result).map(this::recording);
     }
 
+    // A watched seat that does nothing on its own action-phase turn is the shape of a turn stall; the diagnosis says
+    // which early exit of its turn logic held it.
+    private static boolean idlesOnItsWatchedTurn(AiTurnContext context) {
+        return WATCH != null
+                && WATCH.matcher(context.faction()).find()
+                && context.isActivePlayer()
+                && "action".equalsIgnoreCase(context.game().getPhaseOfGame());
+    }
+
     private AiDecision overridden(AiTurnContext context, AiDecision decision) {
         java.util.function.BiFunction<AiTurnContext, AiDecision, AiDecision> override = decisionOverride;
         if (override == null) return decision;
@@ -535,9 +555,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 agendaDecisions.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
+                else if (idlesOnItsWatchedTurn(context)) recordIdleOnTurn(IdleDiagnosis.describe(context));
                 countReason(decision);
-                if (decision instanceof AiDecision.Press leaderPress)
+                if (decision instanceof AiDecision.Press leaderPress) {
                     leaders.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                    factionComponents.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                }
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());
@@ -555,12 +578,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // Reasons are grouped by their wording without system positions or other numbers, so the report shows how often
     // the AI chose each kind of decision (for example how many tactical actions were expansions).
     private void countReason(AiDecision decision) {
-        String reason =
-                switch (decision) {
-                    case AiDecision.Press press -> press.reason();
-                    case AiDecision.Unsure unsure -> "UNSURE: " + unsure.reason();
-                    default -> null;
-                };
+        String reason = switch (decision) {
+            case AiDecision.Press press -> press.reason();
+            case AiDecision.Unsure unsure -> "UNSURE: " + unsure.reason();
+            default -> null;
+        };
         if (reason == null) return;
         String kind = reason.replaceAll("\\d+", "#").replaceAll("\\s+#\\S*", "").trim();
         synchronized (decisionReasons) {
@@ -661,14 +683,13 @@ final class SelfPlayEnvironment implements AutoCloseable {
         Territory.Zone zone = target == null
                 ? Territory.Zone.NEUTRAL
                 : Territory.of(game, context.seat()).zone(target);
-        String area =
-                switch (zone) {
-                    case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
-                    case BORDER -> EXPAND_BORDER;
-                    case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
-                    case MECATOL -> EXPAND_MECATOL;
-                    case NEUTRAL -> EXPAND_ELSEWHERE;
-                };
+        String area = switch (zone) {
+            case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
+            case BORDER -> EXPAND_BORDER;
+            case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
+            case MECATOL -> EXPAND_MECATOL;
+            case NEUTRAL -> EXPAND_ELSEWHERE;
+        };
         return area + " " + roundBand(game.getRound());
     }
 
@@ -719,13 +740,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
     static final String PLAN_PREFIX = "plan: ";
 
     private void rememberReason(AiDecision decision) {
-        String reason =
-                switch (decision) {
-                    case AiDecision.Press press -> press.reason();
-                    case AiDecision.Unsure unsure -> unsure.reason();
-                    case AiDecision.Wait wait -> wait.reason();
-                    default -> null;
-                };
+        String reason = switch (decision) {
+            case AiDecision.Press press -> press.reason();
+            case AiDecision.Unsure unsure -> unsure.reason();
+            case AiDecision.Wait wait -> wait.reason();
+            default -> null;
+        };
         if (reason != null) lastDecisionReason = reason;
     }
 
@@ -790,6 +810,13 @@ final class SelfPlayEnvironment implements AutoCloseable {
     private String lastTraceLine = "";
     private int repeats;
 
+    synchronized void recordIdleOnTurn(String diagnosis) {
+        String stamped =
+                String.format("[t+%ds] round %d %s", (clock.get() - startOfGame) / 1000, currentRound(), diagnosis);
+        if (idleOnTurn.isEmpty() || !idleOnTurn.getLast().endsWith(diagnosis)) idleOnTurn.add(stamped);
+        record(diagnosis);
+    }
+
     synchronized void record(String line) {
         if (WATCH != null && WATCH.matcher(line).find()) {
             watched.add(String.format("[t+%ds] %s", (clock.get() - startOfGame) / 1000, line));
@@ -836,6 +863,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     public void close() {
         if (trajectory != null) trajectory.close();
         if (seeded) ti4.helpers.RandomHelper.unseedThisThread();
+        ti4.helpers.GameClock.useWallClockForThisThread();
         for (int i = mocks.size() - 1; i >= 0; i--) {
             try {
                 mocks.get(i).close();

@@ -17,12 +17,10 @@
         "joelir",
         "joeljr",
         "joel_jr",
-        "joel_ir",
         "jeol_jr",
         "jeoljr",
         "Jeol-Ir",
         "Joel-Ir",
-        "joelir",
         "jeol ir",
         "joel ir",
         "jolene",
@@ -132,6 +130,6 @@
         },
         "removeUnitCoordinate": true
     },
-    "flavourText": "*Heavily industrialized world. Pollution has killed all life outside of dome cities, but twin suns provide constant power for factories and huge populace.*",
+    "flavourText": "*Heavily industrialized world. Pollution has killed all life outside of dome cities, but twin suns provide constant power for factories and huge population.*",
     "source": "pok"
 }

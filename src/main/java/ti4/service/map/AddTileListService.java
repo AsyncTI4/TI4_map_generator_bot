@@ -37,7 +37,7 @@ import ti4.service.fow.GMService;
 @UtilityClass
 public class AddTileListService {
 
-    public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
+    public static boolean addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
         tileList = tileList.replace("\n", " ");
         tileList = tileList.replace(",", " ");
         tileList = tileList.replace("  ", " ");
@@ -45,14 +45,16 @@ public class AddTileListService {
         Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, game);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
-            return;
+            return false;
         }
 
         List<String> badTiles = new ArrayList<>();
+        boolean added = true;
         game.clearTileMap();
         try {
             badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
+            added = false;
             BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
             MessageHelper.replyToMessage(event, e.getMessage());
         }
@@ -67,6 +69,7 @@ public class AddTileListService {
 
         finishSetup(game, event);
         ShowGameService.simpleShowGame(game, event, DisplayType.map);
+        return added;
     }
 
     public static List<String> addTileMapToGame(Game game, Map<String, String> tileMap) throws Exception {

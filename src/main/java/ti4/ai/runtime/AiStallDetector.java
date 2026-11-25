@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaQueue;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.TacticalRules;
@@ -66,7 +66,7 @@ class AiStallDetector {
         if (round <= 1
                 && !game.isExtraSecretMode()
                 && seat.getSecretsUnscored().size() > 1
-                && NekroBrain.noRealObjectiveRevealed(game)) {
+                && StandardBrain.noRealObjectiveRevealed(game)) {
             reasons.add(new WaitReason(
                     "discarding a starting secret objective",
                     prompt -> prompt.isHidden() && prompt.hasHandlerPrefix("discardSecret_")));

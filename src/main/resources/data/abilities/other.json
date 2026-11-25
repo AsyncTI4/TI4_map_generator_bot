@@ -112,9 +112,9 @@
     },
     {
         "id": "the_tribuni",
-        "name": "The Tribuni",
+        "name": "The Tribunii",
         "faction": "keleres",
-        "permanentEffect": "During setup, choose an unplayed faction from among the Mentak, the Xxcha and The Argent Flight; take that faction's home system, command tokens and control markers. Additionally, take the Keleres Hero that corresponds to that faction",
+        "permanentEffect": "During setup, choose a Keleres hero that corresponds to an unused faction; take that faction's home system, command tokens, and control tokens. The unchosen Keleres heroes are not used.",
         "source": "codex3"
     },
     {

@@ -6,19 +6,25 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.DoubleSupplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -39,6 +45,7 @@ public class WinOdds {
     private static final String BOOK_OF_LATVINIA = "bookoflatvinia";
     private static final String CROWN_OF_EMPHIDIA = "emphidia";
     private static final String TOMB_OF_EMPHIDIA = "attachment_tombofemphidia.png";
+    private static final String TICK_MEMO = "win.odds";
     private static final ThreadLocal<Boolean> PRICING_MECATOL_TAKE = ThreadLocal.withInitial(() -> false);
 
     public record Odds(double duringAction, double byStatusScoring, double byStatusEnd) {
@@ -149,6 +156,48 @@ public class WinOdds {
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        List<Object> key = List.of(
+                viewer.getFaction(),
+                rival.getFaction(),
+                immediatePoints,
+                loss,
+                DecidingSeat.knowsHandOf(viewer),
+                Objects.toString(DecidingSeat.currentUserId(), ""),
+                ImaginedTurn.seatFaction(),
+                PRICING_MECATOL_TAKE.get());
+        Map<List<Object>, Odds> memo = TickMemo.mapFor(game, TICK_MEMO);
+        Odds found = memo.get(key);
+        if (found != null) {
+            return TickMemo.checked(
+                    TICK_MEMO, key, found, () -> computeOdds(game, viewer, rival, immediatePoints, loss));
+        }
+        Odds odds = counted(game, viewer, rival, immediatePoints, loss);
+        memo.put(key, odds);
+        return odds;
+    }
+
+    private static Odds counted(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        if (!ShareCensus.enabled()) return computeOdds(game, viewer, rival, immediatePoints, loss);
+        return ShareCensus.perSave(
+                "win.odds",
+                game,
+                List.of(
+                        rival.getFaction(),
+                        immediatePoints,
+                        loss,
+                        WinRace.weighsFeasibility(viewer),
+                        AiExperiments.enabled(viewer, AiExperiments.Experiment.CANNON_COVER_RISK),
+                        secretView(viewer, rival)),
+                () -> computeOdds(game, viewer, rival, immediatePoints, loss));
+    }
+
+    private static String secretView(Player viewer, Player rival) {
+        if (!DecidingSeat.knowsHandOf(viewer)) return "";
+        if (viewer == rival) return "own " + viewer.getFaction();
+        return new TreeSet<>(viewer.getSecretsUnscored().keySet()).toString();
+    }
+
+    private static Odds computeOdds(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
         try (Thinking.Span timing = Thinking.measure("winOdds.compute")) {
             Odds held = compute(game, viewer, rival, immediatePoints, loss, Optional.empty());
             if (held == Odds.CERTAIN || !WinRace.weighsFeasibility(viewer)) return held;

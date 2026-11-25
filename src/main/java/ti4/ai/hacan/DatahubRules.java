@@ -15,6 +15,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.strategy.CardFacade;
 import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
@@ -36,7 +37,6 @@ public class DatahubRules {
     private static final String FIELD = "~";
     private static final int TRADE_GOODS = 3;
     private static final double TRADE_GOOD_VALUE = 1.0;
-    private static final double STRATEGY_TOKEN_VALUE = 1.0;
     private static final double LOST_FOLLOW_VALUE = 1.5;
     private static final double RIVAL_SHARE = 0.5;
     private static final double MIN_GAIN = 0.5;
@@ -159,6 +159,6 @@ public class DatahubRules {
 
     private static double tokenCost(Game game, Player seat) {
         boolean losesFollow = seat.getStrategicCC() - 1 < StrategyCardRules.strategyTokensWantedForFollows(game, seat);
-        return STRATEGY_TOKEN_VALUE + (losesFollow ? LOST_FOLLOW_VALUE : 0);
+        return CardFacade.strategyToken() + (losesFollow ? LOST_FOLLOW_VALUE : 0);
     }
 }

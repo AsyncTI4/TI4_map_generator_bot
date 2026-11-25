@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,8 +16,7 @@ class LookAtTopEvent extends GameStateSubcommand {
 
     public LookAtTopEvent() {
         super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of events to look at")
-                .setRequiredRange(1, 60));
+        addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
     }
 
     @Override

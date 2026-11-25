@@ -27,13 +27,15 @@ public class DeveloperCommand implements ParentCommand {
                     new ProduceNucleusGenStats(),
                     new AnnounceActiveGames(),
                     new DatabasePersistence(),
+                    new CheckPersistenceDrift(),
                     new DeleteUserMessages(),
                     new PostMatchmakingButtons(),
                     new ModifyMatchmakingQueue(),
                     new ShowMatchmakingRatingHistory(),
                     new ShowGameMatchmakingRatings(),
                     new RunSql(),
-                    new ExportFinishedGame())
+                    new ExportFinishedGame(),
+                    new RestoreGameCategories())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

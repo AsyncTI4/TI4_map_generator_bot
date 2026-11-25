@@ -547,14 +547,13 @@ class OfferBuilder {
     }
 
     private static String describe(Missing missing) {
-        String what =
-                switch (missing.type()) {
-                    case PROMISSORY -> "a promissory note";
-                    case ACTION_CARDS -> "an action card";
-                    case PLANETS -> "a planet";
-                    case FRAGMENTS -> missing.remaining() + " " + missing.detail() + " relic fragments";
-                    default -> missing.remaining() + " " + missing.type().token();
-                };
+        String what = switch (missing.type()) {
+            case PROMISSORY -> "a promissory note";
+            case ACTION_CARDS -> "an action card";
+            case PLANETS -> "a planet";
+            case FRAGMENTS -> missing.remaining() + " " + missing.detail() + " relic fragments";
+            default -> missing.remaining() + " " + missing.type().token();
+        };
         return what + " from " + missing.sender().getFaction() + " to "
                 + missing.receiver().getFaction();
     }

@@ -26,6 +26,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -630,7 +631,7 @@ public class LostLegciesExploreHandler {
         }
 
         List<Button> destinations = new ArrayList<>();
-        for (String adjacent : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
+        for (String adjacent : Adjacency.of(game, player).forMovement().from(tile.getPosition())) {
             Tile adjacentTile = game.getTileByPosition(adjacent);
             if (adjacentTile == null || FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
                 continue;
@@ -688,7 +689,7 @@ public class LostLegciesExploreHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        if (!FoWHelper.getAdjacentTiles(game, origPos, player, false).contains(destPos)
+        if (!Adjacency.of(game, player).forMovement().from(origPos).contains(destPos)
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, destTile, game)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "That system is no longer eligible.");
             ButtonHelper.deleteMessage(event);

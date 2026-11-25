@@ -173,12 +173,11 @@ public class DraftSystemSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startSetup" -> startSetup(event);
-                    case "tfTourney" -> tfTourney(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startSetup" -> startSetup(event);
+            case "tfTourney" -> tfTourney(event);
+            default -> null;
+        };
         return (error == null ? "success" : error);
     }
 

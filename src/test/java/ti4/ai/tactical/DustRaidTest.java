@@ -3,12 +3,16 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.scoring.Desperation;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Player;
@@ -17,7 +21,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // Turn Their Fleets to Dust: a zero-move activation of a system whose ships our space cannon may wipe. The bar is
-// "worth a tactic token" (the token floor of 1.5), not "worth an attack", and the plan is a RAID, not an ATTACK.
+// "worth a tactic token" (a held token, 2.4), not "worth an attack", and the plan is a RAID, not an ATTACK.
 class DustRaidTest extends BaseTi4Test {
 
     private static final double VP = ObjectiveValue.VICTORY_POINT_VALUE;
@@ -56,26 +60,38 @@ class DustRaidTest extends BaseTi4Test {
         return TacticalPlanner.forTarget(test.game, test.nekro, neighbour).filter(plan -> plan.kind() == Kind.RAID);
     }
 
-    // Two neutral destroyers under two PDS dice on 6 die together a quarter of the time: 0.25 of a point (2.0), over
-    // the token floor.
+    // Two neutral destroyers under three PDS dice on 6 die together half the time: 0.5 of a point (4.0), over a token.
     @Test
-    void raidsNeutralShipsUnderOurPdsAtAQuarterChance() {
-        Tile quann = quannWithOurPds(2);
+    void raidsNeutralShipsUnderOurPdsAtAnEvenChance() {
+        Tile quann = quannWithOurPds(3);
         test.units(quann, "space", neutral, UnitType.Destroyer, 2);
 
         TacticalPlan plan = raid().orElseThrow();
 
         assertThat(plan.moves()).isEmpty();
-        assertThat(plan.score()).isCloseTo(VP * 0.25, within(EXACT));
+        assertThat(plan.score()).isCloseTo(VP * 0.5, within(EXACT));
     }
 
-    // Three destroyers need three hits from three dice: 12.5% of a point is 1.0, below the token floor.
+    // Two destroyers need both hits from two dice: a quarter of a point is 2.0, below a token.
     @Test
-    void doesNotRaidAtAnEighthOfAChance() {
-        Tile quann = quannWithOurPds(3);
-        test.units(quann, "space", neutral, UnitType.Destroyer, 3);
+    void doesNotRaidAtAQuarterChance() {
+        Tile quann = quannWithOurPds(2);
+        test.units(quann, "space", neutral, UnitType.Destroyer, 2);
 
         assertThat(raid()).isEmpty();
+    }
+
+    // With action secret desperation switched on, from round 5 the seat is desperate to score its action secrets this
+    // round. Two points behind a rival, this round's raid counts half as much again: a quarter chance is worth 3.0.
+    @Test
+    void raidsAtAQuarterChanceWhenDesperateAndBehind() {
+        AiExperiments.enable(test.nekro, EnumSet.of(Experiment.DESPERATION_ACTION_SECRET));
+        test.game.setRound(5);
+        test.points(test.sol, Desperation.POINTS_BEHIND);
+        Tile quann = quannWithOurPds(2);
+        test.units(quann, "space", neutral, UnitType.Destroyer, 2);
+
+        assertThat(raid().orElseThrow().score()).isCloseTo(VP * 0.25 * Desperation.BEHIND_FACTOR, within(EXACT));
     }
 
     @Test

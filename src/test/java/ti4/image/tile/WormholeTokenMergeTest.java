@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.model.Mapper;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.testUtils.BaseTi4Test;
 
@@ -65,6 +66,34 @@ class WormholeTokenMergeTest extends BaseTi4Test {
         // Below the game's threshold nothing merges.
         List<String> twoWormholes = List.of(ALPHA, BETA);
         assertThat(WormholeTokenMerge.apply(twoWormholes, 3).tokens()).isEqualTo(twoWormholes);
+    }
+
+    @Test
+    void ratRaceTokensMergeOnlyWithEachOther() {
+        String ratAlpha = "token_whratalpha.png";
+        String ratBeta = "token_whratbeta.png";
+        WormholeTokenMerge.DrawOrder order = WormholeTokenMerge.apply(List.of(ALPHA, ratAlpha, BETA, ratBeta), 2);
+
+        assertThat(order.tokens()).hasSize(2);
+        assertThat(order.tokens().stream().map(key -> order.merged().get(key).wormholes()))
+                .containsExactly(
+                        List.of(Wormhole.ALPHA, Wormhole.BETA), List.of(Wormhole.ALPHA_RAT, Wormhole.BETA_RAT));
+
+        // Each family needs the threshold on its own: one rat token stays a single token.
+        WormholeTokenMerge.DrawOrder oneRat = WormholeTokenMerge.apply(List.of(ALPHA, ratAlpha, BETA), 2);
+        assertThat(oneRat.tokens()).hasSize(2).contains(ratAlpha);
+    }
+
+    @Test
+    void oneWayTokensKeepTheirOwnRingedIcon() {
+        String alphaIn = Mapper.getTokenID("whalpha_in");
+        WormholeTokenMerge.DrawOrder order = WormholeTokenMerge.apply(List.of(ALPHA, alphaIn, BETA), 2);
+        assertThat(order.tokens()).hasSize(2).contains(alphaIn);
+
+        BufferedImage entry = OneWayWormholeIcon.image(Mapper.getOneWayWormholeToken(alphaIn));
+        BufferedImage exit = OneWayWormholeIcon.image(Mapper.getOneWayWormholeToken(Mapper.getTokenID("whalpha_out")));
+        assertThat(entry.getWidth()).isEqualTo(OneWayWormholeIcon.SIZE);
+        assertThat(pixels(entry)).isNotEqualTo(pixels(exit));
     }
 
     @Test

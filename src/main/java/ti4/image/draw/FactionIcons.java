@@ -56,8 +56,14 @@ public final class FactionIcons {
     @Nullable
     public static BufferedImage scaled(@Nullable Player player, int width, int height) {
         if (player == null) return null;
-        if (player.hasCustomFactionEmoji()) {
-            Emoji emoji = Emoji.fromFormatted(player.getFactionEmoji());
+        String customEmoji = player.hasCustomFactionEmoji() ? player.getFactionEmoji() : null;
+        return scaled(player.getFaction(), customEmoji, width, height);
+    }
+
+    @Nullable
+    public static BufferedImage scaled(String factionId, @Nullable String customEmoji, int width, int height) {
+        if (customEmoji != null) {
+            Emoji emoji = Emoji.fromFormatted(customEmoji);
             if (emoji instanceof CustomEmoji custom) {
                 return RemoteImages.readScaled(
                         custom.getImageUrl(), width - URL_ICON_PADDING, height - URL_ICON_PADDING);
@@ -66,7 +72,7 @@ public final class FactionIcons {
                 return ImageHelper.scale(ImageHelper.square(renderUnicode(unicode)), width, height);
             }
         }
-        return ofFaction(player.getFaction(), width, height);
+        return ofFaction(factionId, width, height);
     }
 
     @Nullable

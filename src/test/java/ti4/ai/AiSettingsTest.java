@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import ti4.ai.brain.FactionBrainRegistry;
+import ti4.ai.brain.StandardBrain;
 import ti4.testUtils.BaseTi4Test;
 
 class AiSettingsTest extends BaseTi4Test {
@@ -20,12 +22,24 @@ class AiSettingsTest extends BaseTi4Test {
         assertThat(AiSettings.refereeDelay(allAi.game))
                 .isLessThan(AiSettings.REFEREE_DELAY)
                 .isGreaterThanOrEqualTo(Duration.ofSeconds(10));
-        assertThat(AiSettings.maxActionsPerHour(allAi.game)).isGreaterThan(AiSettings.MAX_ACTIONS_PER_HOUR);
+        assertThat(AiSettings.runawayPressCapPerHour(allAi.game)).isGreaterThan(AiSettings.RUNAWAY_PRESS_CAP_PER_HOUR);
+        assertThat(AiSettings.channelFloodGap(allAi.game)).isZero();
 
         AiTestGame withHuman = new AiTestGame();
         withHuman.game.setStoredValue(AiSettings.PACE_KEY, AiSettings.FAST_PACE);
         assertThat(AiSettings.refereeDelay(withHuman.game)).isEqualTo(AiSettings.REFEREE_DELAY);
         assertThat(AiSettings.stallThreshold(withHuman.game)).isEqualTo(AiSettings.STALL_THRESHOLD);
+        assertThat(AiSettings.channelFloodGap(withHuman.game)).isEqualTo(AiSettings.CHANNEL_FLOOD_GAP);
+    }
+
+    // Every faction plays with the one rule list. Seats saved before the rename carry the brain id "nekro", which must
+    // still find it.
+    @Test
+    void everyFactionGetsTheStandardBrainAndOldNekroSeatsStillFindIt() {
+        assertThat(AiSettings.brainFor("nekro")).isEqualTo(StandardBrain.ID);
+        assertThat(AiSettings.brainFor("sol")).isEqualTo(StandardBrain.ID);
+        assertThat(FactionBrainRegistry.forBrainId("nekro"))
+                .containsSame(FactionBrainRegistry.forBrainId(StandardBrain.ID).orElseThrow());
     }
 
     // Patience with action secrets (not hurrying to meet their conditions) is on unless the JVM is started with

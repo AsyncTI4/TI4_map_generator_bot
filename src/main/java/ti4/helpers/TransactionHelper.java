@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -47,10 +48,12 @@ import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.card.TransactionGenerator;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -496,7 +499,7 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         clearEntanglement(game, p1, p2);
         if (!debtOnly) {
-            ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            LieInWaitService.check(p1, p2, game);
             if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
@@ -873,7 +876,7 @@ public class TransactionHelper {
                         if (viewer != null || (hidePrivateCardText && game.isLimitedWhispersMode())) {
                             trans.append("[REDACTED]");
                         } else {
-                            trans.append(furtherDetail.replace("fin777", " "));
+                            trans.append(MentionGuard.withoutAnyMentions(furtherDetail.replace("fin777", " ")));
                         }
                     }
                     default -> trans.append(" some odd thing: `").append(item).append('`');
@@ -1633,7 +1636,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetails_")
     public static void finishDealDetails(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + opposing.getFaction() + "_details_"
@@ -1664,7 +1667,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetailsInvert_")
     public static void finishDealDetailsInvert(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + opposing.getFaction() + "_receiving" + player.getFaction() + "_details_"
@@ -1965,8 +1968,10 @@ public class TransactionHelper {
             return;
         }
         String playerRepresentation = player.getRepresentation(false, false, true);
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
-            if (!neighbor.hasAbility("pillage")) {
+        for (Player neighbor : game.getRealPlayers()) {
+            if (neighbor == player
+                    || !neighbor.hasAbility("pillage")
+                    || !neighbor.getAbilityNeighbours().contains(player)) {
                 continue;
             }
             String neighborRepresentation = neighbor.getRepresentation(false, false, true);
@@ -2419,6 +2424,11 @@ public class TransactionHelper {
                 }
             }
             case "Hydromorphic" -> {
+                if (!p1.hasAbility("fluid_transfer")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Hydromorphic cards require _Fluid Transfer_ to be transacted.");
+                    return;
+                }
                 int cardNumber = Integer.parseInt(amountToTrans);
                 String cardId = p1.removeHydromorphicCard(cardNumber);
                 if (cardId == null) {
@@ -2520,14 +2530,13 @@ public class TransactionHelper {
                 } else {
                     String fragType = amountToTrans.substring(0, 3).toUpperCase();
                     int fragNum = Integer.parseInt(amountToTrans.charAt(3) + "");
-                    String trait =
-                            switch (fragType) {
-                                case "CRF" -> "cultural";
-                                case "HRF" -> "hazardous";
-                                case "IRF" -> "industrial";
-                                case "URF" -> "frontier";
-                                default -> "";
-                            };
+                    String trait = switch (fragType) {
+                        case "CRF" -> "cultural";
+                        case "HRF" -> "hazardous";
+                        case "IRF" -> "industrial";
+                        case "URF" -> "frontier";
+                        default -> "";
+                    };
                     RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game, false);
                     message2 = "";
                 }
@@ -2604,6 +2613,8 @@ public class TransactionHelper {
                 || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
                 || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
+                || XyrixTomeHandler.mayTransactWithNonNeighbor(game, player)
+                || XyrixTomeHandler.mayTransactWithNonNeighbor(game, player2)
                 || player2.getNeighbouringPlayers(false).contains(player)
                 || player.getNeighbouringPlayers(false).contains(player2)
                 || ThirtyKTransactions.mayTransact(game, player, player2);
@@ -2742,7 +2753,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getColor() + "_" + p2.getColor(), "Action Cards"));
         }
-        if (!seeP1 || !p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer")
+                && (!seeP1 || !p1.getHydromorphicCards().isEmpty())) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor(), "Hydromorphic Cards"));
         }
@@ -2959,7 +2971,7 @@ public class TransactionHelper {
                 && p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
-        if (!p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer") && !p1.getHydromorphicCards().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.green(factionChecker + "transact_Hydromorphic_" + p2.getFaction(), "Hydromorphic Cards"));
         }
@@ -3142,6 +3154,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        LieInWaitService.check(player, player2, game);
         if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }

@@ -18,6 +18,7 @@ public final class IronAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
+        IronLeadersHandler.setShipwrightKastelOwner(use.game(), use.user(), target);
         return AgentOutcome.offer(
                 Message.addressedTo(
                                 target,

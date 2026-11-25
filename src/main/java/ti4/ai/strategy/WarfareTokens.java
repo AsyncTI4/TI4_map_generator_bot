@@ -27,14 +27,27 @@ class WarfareTokens {
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
 
     static Optional<AiDecision> rebalance(AiTurnContext context) {
-        if (CardMessages.done(context, DONE_STEP)) return Optional.empty();
-        if (!CardMessages.done(context, OPEN_STEP)) return open(context);
-        return adjust(context);
+        return rebalance(context, 0);
     }
 
-    private static Optional<AiDecision> open(AiTurnContext context) {
+    static Optional<AiDecision> gainAndRebalance(AiTurnContext context) {
+        return rebalance(
+                context, Math.min(1, CommandTokenPolicy.gainWithinReinforcements(context.game(), context.seat())));
+    }
+
+    static boolean finished(AiTurnContext context) {
+        return CardMessages.done(context, DONE_STEP);
+    }
+
+    private static Optional<AiDecision> rebalance(AiTurnContext context, int gain) {
+        if (CardMessages.done(context, DONE_STEP)) return Optional.empty();
+        if (!CardMessages.done(context, OPEN_STEP)) return open(context, gain);
+        return adjust(context, gain);
+    }
+
+    private static Optional<AiDecision> open(AiTurnContext context, int gain) {
         Optional<String> surplus = CommandTokenPolicy.midRoundSurplus(context.game(), context.seat());
-        if (surplus.isEmpty()) return finish(context);
+        if (surplus.isEmpty() && gain == 0) return finish(context);
         Optional<Match> redistribute = Prompts.owned(
                 Prompts.thisTurn(context), context.faction(), handler -> handler.startsWith(REDISTRIBUTE));
         if (redistribute.isEmpty()) {
@@ -44,13 +57,14 @@ class WarfareTokens {
         }
         CardMessages.markDone(context, OPEN_STEP);
         context.memory().put(SINCE_KEY + context.turnKey(), String.valueOf(context.now()));
-        return Optional.of(redistribute
-                .get()
-                .press("move " + poolName(surplus.get())
-                        + " command tokens the round plan does not need into the pools it does"));
+        String reason = gain > 0
+                ? "gain the command token Warfare gives back"
+                : "move " + poolName(surplus.get())
+                        + " command tokens the round plan does not need into the pools it does";
+        return Optional.of(redistribute.get().press(reason));
     }
 
-    private static Optional<AiDecision> adjust(AiTurnContext context) {
+    private static Optional<AiDecision> adjust(AiTurnContext context, int gain) {
         Game game = context.game();
         Player seat = context.seat();
         long since = since(context);
@@ -61,8 +75,11 @@ class WarfareTokens {
             if (done.isEmpty()) continue;
             int moves = moves(context);
             int netGain = CommandTokenPolicy.netGainSoFar(game, seat);
-            if (netGain < 0) {
-                Optional<PromptButton> grow = prompt.enabledHandler(CommandTokenPolicy.poolToRefill(game, seat));
+            if (netGain < gain) {
+                String pool = moves == 0 && netGain >= 0
+                        ? CommandTokenPolicy.poolToGrow(game, seat)
+                        : CommandTokenPolicy.poolToRefill(game, seat);
+                Optional<PromptButton> grow = prompt.enabledHandler(pool);
                 if (grow.isPresent()) return step(context, prompt, grow.get(), moves, "gain a command token");
             }
             boolean withinBudget = moves < 2 * (totalTokens(seat) - netGain);

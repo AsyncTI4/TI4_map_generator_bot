@@ -112,7 +112,7 @@ public class CrystellumLeadersHandler {
         }
 
         RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), returned + " fighter");
-        game.setStoredValue(HERO_BUDGET + player.getFaction(), Integer.toString(returned * 4));
+        game.setStoredValue(HERO_BUDGET + player.getFaction(), Integer.toString(returned * 2));
         ButtonHelper.deleteMessage(event);
         sendCrystellumHeroSystemButtons(event, game, player);
     }

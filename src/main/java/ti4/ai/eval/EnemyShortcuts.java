@@ -23,7 +23,7 @@ public class EnemyShortcuts {
     private static final String LINKS_MEMO = "shortcut.links";
 
     public static boolean imagined(Game game, Player seat) {
-        return DecidingSeat.orSelf(game, seat) != seat;
+        return DecidingSeat.orSelf(game, seat) != seat || ImaginedTurn.imagines(seat);
     }
 
     @Nullable

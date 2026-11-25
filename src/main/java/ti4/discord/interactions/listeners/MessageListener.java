@@ -30,6 +30,7 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.async.BanCleanupService;
@@ -68,9 +69,8 @@ class MessageListener extends ListenerAdapter {
             "this isn’t okay",
             "crossed a line",
             "personal attack",
-            "harassment",
-            "harassing",
             "you’re being rude",
+            "you insulted me",
             "trying to cheat",
             "so sensitive",
             "cry about it",
@@ -176,7 +176,7 @@ class MessageListener extends ListenerAdapter {
                 && message.getChannel().getName().toLowerCase().contains("cards info")
                 && !message.getAuthor().isBot()) {
             message.reply(
-                            message.getContentRaw()
+                            withOnlyBothelperMentions(message)
                                     + "\n\nEchoing because normal users cant ping bothelpers into private threads created by the bot.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
@@ -185,6 +185,17 @@ class MessageListener extends ListenerAdapter {
             message.reply(BOTHELPER_MENTION_REMINDER_TEXT).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return shouldRespondToBotHelperPing;
+    }
+
+    private static String withOnlyBothelperMentions(Message message) {
+        String text = MentionGuard.withoutAnyMentions(message.getContentRaw());
+        for (Role bothelperRole : JdaService.bothelperRoles) {
+            if (message.getMentions().getRoles().contains(bothelperRole)) {
+                text = bothelperRole.getAsMention() + " " + text;
+                break;
+            }
+        }
+        return text;
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
@@ -244,9 +255,7 @@ class MessageListener extends ListenerAdapter {
         if (!message.getAttachments().isEmpty() && !(event.getChannel() instanceof ThreadChannel)) {
             Member member = event.getMember();
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount + completedGames < 1) {
+            if (!UserGameInfoService.hasSeatInAnUnabandonedGame(managedPlayer)) {
                 BanCleanupService.banSpamAccount(event, event.getAuthor());
                 return true;
             }

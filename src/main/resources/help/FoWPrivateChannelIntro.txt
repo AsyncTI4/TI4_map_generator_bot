@@ -13,7 +13,8 @@ __**Communication Tips:**__
 
 __**Action Card Tips:**__
 > `/fow whisper anon:y` – Anonymously notify a player they are the target.
-> `/fow ping_system` – Announce a system/planet target to players who can see that system.
+> `/fow ping system` – Alert the players next to a system with a message.
+> `/fow ping target_system`, `target_planet`, `target_player` – Announce the target of your action card.
 > `/fow announce` – Make an anonymous announcement to the main channel.
 
 __**Combat Tips:**__

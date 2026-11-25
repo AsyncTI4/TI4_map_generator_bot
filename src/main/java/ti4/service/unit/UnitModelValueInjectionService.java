@@ -20,6 +20,7 @@ import ti4.model.UnitModel;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
+import ti4.service.map.RefractureRulesService;
 
 @UtilityClass
 public class UnitModelValueInjectionService {
@@ -51,6 +52,13 @@ public class UnitModelValueInjectionService {
 
         UnitValueInjection values = getPlayerUnitValueInjection(player, unit);
         UnitModel injectedUnit = values.isEmpty() ? unit : injectValues(unit, values);
+        if (RefractureRulesService.hasDoubledDemeterCapacity(player.getGame(), player)
+                && injectedUnit.getCapacityValue() > 0) {
+            if (injectedUnit == unit) {
+                injectedUnit = copyUnit(unit);
+            }
+            injectedUnit.setCapacityValue(injectedUnit.getCapacityValue() * 2);
+        }
         String salvageRules = IronSalvageRelicHandler.getUnitRulesText(player, unit.getUnitType());
         if (!salvageRules.isBlank()) {
             if (injectedUnit == unit) injectedUnit = copyUnit(unit);
@@ -201,6 +209,30 @@ public class UnitModelValueInjectionService {
             if (pds != null) {
                 injectedUnit = addLightrailOrdnanceAttributes(injectedUnit, pds);
             }
+        }
+        UnitModel openSourceProfile = Mapper.getUnit(player.getGame().getStoredValue("theodisiOpenSourceRoboticsUnit"));
+        if (ButtonHelper.isLawInPlay(player.getGame(), "opensourcerobotics")
+                && openSourceProfile != null
+                && unit.getUnitType() == openSourceProfile.getUnitType()) {
+            if (injectedUnit == unit) injectedUnit = copyUnit(unit);
+            String openSourceAbility = openSourceProfile.getAbility().orElse("");
+            String openSourceLabel = "**Open Source Robotics — " + openSourceProfile.getName() + "**";
+            injectedUnit.setName(unit.getName() + " | " + openSourceProfile.getName());
+            injectedUnit.setAbility(
+                    openSourceAbility.isBlank() ? openSourceLabel : openSourceLabel + "\n" + openSourceAbility);
+            injectedUnit.setProductionValue(openSourceProfile.getProductionValue());
+            injectedUnit.setCapacityValue(openSourceProfile.getCapacityValue());
+            injectedUnit.setSustainDamage(openSourceProfile.getSustainDamage());
+            injectedUnit.setPlanetaryShield(openSourceProfile.getPlanetaryShield());
+            injectedUnit.setDeepSpaceCannon(openSourceProfile.getDeepSpaceCannon());
+            injectedUnit.setDisablesPlanetaryShield(openSourceProfile.getDisablesPlanetaryShield());
+            injectedUnit.setCanBeDirectHit(openSourceProfile.getCanBeDirectHit());
+            injectedUnit.setAfbDieCount(openSourceProfile.getAfbDieCount());
+            injectedUnit.setAfbHitsOn(openSourceProfile.getAfbHitsOn());
+            injectedUnit.setBombardDieCount(openSourceProfile.getBombardDieCount());
+            injectedUnit.setBombardHitsOn(openSourceProfile.getBombardHitsOn());
+            injectedUnit.setSpaceCannonDieCount(openSourceProfile.getSpaceCannonDieCount());
+            injectedUnit.setSpaceCannonHitsOn(openSourceProfile.getSpaceCannonHitsOn());
         }
         return injectedUnit;
     }
@@ -409,7 +441,7 @@ public class UnitModelValueInjectionService {
         }
 
         if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
-            integers.combatHitsOn(-2);
+            integers.combatHitsOn(-1);
         }
 
         if (player.hasRelic("salvage_war_sun") && unit.getUnitType() == UnitType.Warsun) {
@@ -418,6 +450,15 @@ public class UnitModelValueInjectionService {
         }
         if (player.hasRelic("salvage_flagship") && unit.getUnitType() == UnitType.Flagship) {
             integers.moveValue(1);
+            if (unit.getSpaceCannonDieCount() < 1) {
+                integers.spaceCannonDieCount(1, true).spaceCannonHitsOn(6, true);
+            }
+            if (unit.getBombardDieCount() < 1) {
+                integers.bombardDieCount(1, true).bombardHitsOn(6, true);
+            }
+            if (unit.getAfbDieCount() < 1) {
+                integers.afbDieCount(1, true).afbHitsOn(6, true);
+            }
         }
         if (player.hasRelic("salvage_dreadnought") && unit.getUnitType() == UnitType.Dreadnought) {
             integers.capacityValue(1);
@@ -426,7 +467,7 @@ public class UnitModelValueInjectionService {
             integers.combatHitsOn(-1);
         }
         if (player.hasRelic("salvage_cruiser") && unit.getUnitType() == UnitType.Cruiser) {
-            integers.capacityValue(1).spaceCannonDieCount(1).spaceCannonHitsOn(8, true);
+            floats.cost(-1);
         }
         if (player.hasRelic("salvage_destroyer") && unit.getUnitType() == UnitType.Destroyer) {
             integers.combatHitsOn(-1);
@@ -520,6 +561,10 @@ public class UnitModelValueInjectionService {
             integers.spaceCannonDieCount(2);
             integers.spaceCannonHitsOn(
                     Math.max(1, 10 - ButtonHelper.getNumberOfUnitsOnTheBoard(player.getGame(), player, "pds", false)));
+        }
+
+        if (player.hasUnlockedBreakthrough("choirbt") && unit.getCapacityValue() > 0 && unit.getIsShip()) {
+            booleans.sustainDamage(true);
         }
 
         return UnitValueInjection.of(integers, floats, booleans);

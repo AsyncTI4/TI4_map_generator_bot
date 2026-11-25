@@ -14,6 +14,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -21,9 +22,7 @@ class SendTG extends GameStateSubcommand {
 
     public SendTG() {
         super(Constants.SEND_TG, "Send trade goods to player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count")
-                .setRequiredRange(1, 999)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.TARGET_FACTION_OR_COLOR,
@@ -84,5 +83,6 @@ class SendTG extends GameStateSubcommand {
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, tgString, null);
         }
         TransactionHelper.checkTransactionLegality(game, player, targetPlayer);
+        LieInWaitService.check(player, targetPlayer, game);
     }
 }

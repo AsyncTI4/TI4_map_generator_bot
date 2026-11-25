@@ -42,6 +42,8 @@ class ListDeadGames extends Subcommand {
             LocalDate gameCreationDay = Instant.ofEpochMilli(game.getCreationDateTime())
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
+            // TODO: custom-named games (tourney7semi4, tournament prefixes like t8p01) are never listed as dead.
+            //  Recognise them via the tournament_entry game names or a game flag instead of the "pbd" prefix.
             if (Math.abs(ChronoUnit.DAYS.between(now, gameCreationDay)) < 30
                     || !game.getName().contains("pbd")
                     || game.getName().contains("test")) {

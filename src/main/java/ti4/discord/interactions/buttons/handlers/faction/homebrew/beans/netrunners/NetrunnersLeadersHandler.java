@@ -48,7 +48,7 @@ public class NetrunnersLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()
-                        + ", resolve each Hacker Man pool control token with _Power Surge - Network Overload_.",
+                        + ", choose up to 3 players with control tokens in your Hacker Man pool to resolve with _Power Surge - Network Overload_.",
                 buttonsWithDone);
     }
 
@@ -210,6 +210,7 @@ public class NetrunnersLeadersHandler {
                 .map(Mapper::getTech)
                 .filter(java.util.Objects::nonNull)
                 .filter(technology -> !player.hasTech(technology.getAlias()))
+                .filter(technology -> !technology.isFactionTech())
                 .sorted(Comparator.comparing(TechnologyModel::getName))
                 .toList();
     }

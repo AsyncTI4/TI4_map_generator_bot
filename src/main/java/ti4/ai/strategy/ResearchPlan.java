@@ -107,14 +107,13 @@ public record ResearchPlan(
 
     private static String describeGoal(Goal goal) {
         String points = goal.points() > 0 ? " (" + goal.points() + " VP)" : "";
-        String status =
-                switch (goal.status()) {
-                    case READY -> " ready to score";
-                    case SCAR_PURCHASE -> " needs an Entropic Scar purchase";
-                    case FEASIBLE -> " needs " + goal.needed() + " researches, feasible";
-                    case TOO_LONG -> " needs " + goal.needed() + " researches, too long";
-                    case UNREACHABLE -> " unreachable";
-                };
+        String status = switch (goal.status()) {
+            case READY -> " ready to score";
+            case SCAR_PURCHASE -> " needs an Entropic Scar purchase";
+            case FEASIBLE -> " needs " + goal.needed() + " researches, feasible";
+            case TOO_LONG -> " needs " + goal.needed() + " researches, too long";
+            case UNREACHABLE -> " unreachable";
+        };
         String notes = goal.notes().isEmpty() ? "" : " [" + String.join("; ", goal.notes()) + "]";
         return goal.id() + points + status + notes;
     }

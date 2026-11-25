@@ -3,6 +3,7 @@ package ti4.service.player;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -35,6 +36,9 @@ public class RefreshCardsService {
             for (Leader leader : leads) {
                 if (!leader.isLocked()) {
                     if (leader.isActive() && !"zealotshero".equalsIgnoreCase(leader.getId())) {
+                        if ("xyrixhero".equalsIgnoreCase(leader.getId())) {
+                            XyrixLeadersHandler.clearHeroState(game, player);
+                        }
                         player.removeLeader(leader.getId());
                         ButtonHelperHeroes.checkForMykoHero(game, leader.getId(), player);
                     } else {

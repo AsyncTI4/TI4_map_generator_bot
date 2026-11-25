@@ -18,6 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -51,8 +53,10 @@ import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.PlayerAreaWarningService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
+import ti4.service.tech.EntropicScarService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -62,6 +66,11 @@ import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public final class StatusHelper {
+
+    private static final String NOT_SCORING_PUBLIC =
+            " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
+    private static final String NOT_SCORING_SECRET =
+            " has opted not to score a secret objective at this point in time.";
 
     public static void announceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
@@ -298,6 +307,8 @@ public final class StatusHelper {
         }
 
         String messageText;
+        List<Player> notScoringPublic = new ArrayList<>();
+        List<Player> notScoringSecret = new ArrayList<>();
         for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
             List<Integer> scorableInts = new ArrayList<>();
@@ -331,16 +342,24 @@ public final class StatusHelper {
                 }
             }
 
+            boolean canScorePublicObjectives = Helper.canPlayerScorePOs(game, player);
+            boolean scarTechnologyCouldEnableScoring = scorables.isEmpty()
+                    && canScorePublicObjectives
+                    && EntropicScarService.couldScorePublicObjectiveAfterScar(game, player);
+
             if (!game.getStoredValue(keyV).isEmpty()
-                    && Helper.canPlayerScorePOs(game, player)
+                    && canScorePublicObjectives
                     && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
                 poScoring(null, player, game.getStoredValue(keyV), game, player.getCorrectChannel());
             } else {
-                if (scorables.isEmpty()) {
+                if (scarTechnologyCouldEnableScoring) {
+                    messageText = player.getRepresentation()
+                            + ", you may become eligible to score a public objective after resolving Entropic Scar. Resolve that choice before choosing whether to score a public objective.";
+                } else if (scorables.isEmpty()) {
                     messageText = player.getRepresentation()
                             + ", the bot does not believe that you can score any public objectives.";
                 } else {
-                    if (Helper.canPlayerScorePOs(game, player)) {
+                    if (canScorePublicObjectives) {
                         messageText = player.getRepresentation()
                                 + ", as a reminder, the bot believes you are capable of scoring the following public objective"
                                 + (scorables.size() == 1 ? "" : "s") + ":\n";
@@ -353,10 +372,9 @@ public final class StatusHelper {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
 
-            if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
-                String message = player.getRepresentation()
-                        + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            if (shouldAutoMarkNoPublicObjective(
+                    !scorables.isEmpty(), canScorePublicObjectives, scarTechnologyCouldEnableScoring)) {
+                announceNotScoring(game, player, notScoringPublic, NOT_SCORING_PUBLIC);
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
                 key2 = "queueToScorePOs";
                 key3 = "potentialScorePOBlockers";
@@ -408,10 +426,8 @@ public final class StatusHelper {
                 } else if (player.getSo() == 0
                         || player.isNpc()
                         || userSettings.getSandbagPref().contains("bot")) {
-                    String message = player.getRepresentation()
-                            + " has opted not to score a secret objective at this point in time.";
                     game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    announceNotScoring(game, player, notScoringSecret, NOT_SCORING_SECRET);
                     key2 = "queueToScoreSOs";
                     key3 = "potentialScoreSOBlockers";
                     if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
@@ -432,6 +448,7 @@ public final class StatusHelper {
             }
             ActionCardHelper.sendPlotCardInfo(game, player);
         }
+        sendNotScoringSummary(game, notScoringPublic, notScoringSecret);
 
         List<Button> poButtons = getScoreObjectiveButtons(game);
         Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
@@ -485,6 +502,48 @@ public final class StatusHelper {
         }
     }
 
+    private static void announceNotScoring(Game game, Player player, List<Player> batch, String message) {
+        if (!batchesStatusNotices(game)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + message);
+            return;
+        }
+        batch.add(player);
+    }
+
+    // TODO: batching would also spare any big non-fog game a line per player; megagame-only until agreed upstream.
+    static boolean batchesStatusNotices(Game game) {
+        return MegagameGroupService.hasTagOutsideFog(game);
+    }
+
+    private static void sendNotScoringSummary(Game game, List<Player> notScoringPublic, List<Player> notScoringSecret) {
+        String summary = notScoringSummary(namesOf(notScoringPublic), namesOf(notScoringSecret));
+        if (!summary.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary);
+        }
+    }
+
+    private static List<String> namesOf(List<Player> players) {
+        return players.stream().map(Player::getRepresentationNoPing).toList();
+    }
+
+    static String notScoringSummary(List<String> notScoringPublic, List<String> notScoringSecret) {
+        List<String> lines = new ArrayList<>();
+        if (!notScoringPublic.isEmpty()) {
+            lines.add("Marked as not scoring a public objective, as the bot believes they cannot score one: "
+                    + String.join(", ", notScoringPublic) + ".");
+        }
+        if (!notScoringSecret.isEmpty()) {
+            lines.add("Opted not to score a secret objective at this point in time: "
+                    + String.join(", ", notScoringSecret) + ".");
+        }
+        return String.join("\n", lines);
+    }
+
+    static boolean shouldAutoMarkNoPublicObjective(
+            boolean hasScorableObjectives, boolean canScorePublicObjectives, boolean scarTechnologyCouldEnableScoring) {
+        return !canScorePublicObjectives || (!hasScorableObjectives && !scarTechnologyCouldEnableScoring);
+    }
+
     public static List<Player> getPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
             return PriorityTrackHelper.getPriorityTrack(game).stream()
@@ -499,7 +558,7 @@ public final class StatusHelper {
     public static void handleStatusPhaseMiddle(Game game) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
+            for (Player p2 : vaden.getAbilityNeighbours()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
@@ -604,10 +663,15 @@ public final class StatusHelper {
             }
         }
 
+        List<String> missedFollows = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             String ms2 = StartTurnService.getMissedSCFollowsText(game, p2);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
+                if (batchesStatusNotices(game)) {
+                    missedFollows.add(ms2);
+                } else {
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
+                }
             }
 
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
@@ -626,6 +690,9 @@ public final class StatusHelper {
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
             }
+        }
+        if (!missedFollows.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), String.join("\n", missedFollows));
         }
 
         // Optional abilities
@@ -782,14 +849,7 @@ public final class StatusHelper {
         }
         for (Map.Entry<Player, Integer> entry : scars.entrySet()) {
             Player player = entry.getKey();
-            List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
-            if (game.isTwilightsFallMode()) {
-                factionTechs.add("antimatter");
-                factionTechs.add("wavelength");
-            }
-            factionTechs.remove("vax");
-            factionTechs.remove("vay");
-            player.getTechs().forEach(factionTechs::remove);
+            List<String> factionTechs = EntropicScarService.getAvailableTechnologies(game, player);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
                         TechnologyModel model = Mapper.getTech(tech);
@@ -1087,9 +1147,14 @@ public final class StatusHelper {
                             game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                         }
                         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-                            if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
-                                Helper.resolvePOScoringQueue(game, event);
+                            if (LunariumLeaderHandler.isHeroActive(player)) {
+                                LunariumLeaderHandler.offerDoneScoringSecretsButton(game, player);
+                            } else {
+                                game.setStoredValue(
+                                        key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                                if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
+                                    Helper.resolvePOScoringQueue(game, event);
+                                }
                             }
                         }
 
@@ -1167,6 +1232,7 @@ public final class StatusHelper {
         if (!isStatusScoring(game)) {
             return;
         }
+        KaloraAbilityHandler.resolveStatusPhaseScoring(game);
         List<GameSubEvent> subEvents = GameEventDraft.drain(game);
         if (subEvents.isEmpty()) {
             return;

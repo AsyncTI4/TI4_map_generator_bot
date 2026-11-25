@@ -161,11 +161,10 @@ public class NorrSupremacyRules {
         List<AiPrompt> fresh = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> prompt.createdAtMillis() >= flow.since() - CLOCK_SKEW_MILLIS)
                 .toList();
-        Optional<AiDecision> step =
-                switch (flow.stage()) {
-                    case RESOLVING -> answerChoice(context, fresh);
-                    case GAINING -> gainToken(context, fresh);
-                };
+        Optional<AiDecision> step = switch (flow.stage()) {
+            case RESOLVING -> answerChoice(context, fresh);
+            case GAINING -> gainToken(context, fresh);
+        };
         if (step.isPresent()) return step;
         long until = flow.since() + STEP_WAIT_MILLIS;
         if (context.now() < until) return Optional.of(new AiDecision.Wait(until, "N'orr Supremacy"));

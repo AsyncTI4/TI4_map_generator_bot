@@ -18,8 +18,7 @@ class DealSO extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1")
-                .setRequiredRange(1, 10));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
     }
 
     @Override

@@ -17,6 +17,15 @@ public class ImaginedTurn {
         return IMAGINED.get() != null;
     }
 
+    public static String seatFaction() {
+        @Nullable Player seat = IMAGINED.get();
+        return seat == null ? "" : seat.getFaction();
+    }
+
+    public static String cacheMark(Player seat) {
+        return imagines(seat) ? "|imagined" : "";
+    }
+
     public static boolean imagines(Player seat) {
         return IMAGINED.get() == seat;
     }
@@ -42,5 +51,9 @@ public class ImaginedTurn {
 
     public static Map<String, Integer> actionCards(Player seat) {
         return imagines(seat) ? Map.of() : seat.getActionCards();
+    }
+
+    public static Map<String, Integer> promissoryNotes(Player seat) {
+        return imagines(seat) ? Map.of() : seat.getPromissoryNotes();
     }
 }

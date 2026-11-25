@@ -1,0 +1,27 @@
+{
+  "id": "20261110-all-seed9100",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Do all the experiments together beat all of them off, after the stack overflow fix?",
+  "date": "2026-11-10",
+  "code": {
+    "commit": "eaaf376392 (documented in)",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "baseSeed": 9100,
+    "experimentsUnderTest": "all"
+  },
+  "estimate": {
+    "completePairs": 24,
+    "pointDifference": "+0.29 ± 0.21",
+    "treatmentWinShare": "0.60 ± 0.07"
+  },
+  "batch": {
+    "roundLeaderTable": "5.6 / 10.2 / 42.5"
+  },
+  "verdict": "Everything on beats everything off; all experiments stay on.",
+  "notes": "All 48 games ended on points."
+}

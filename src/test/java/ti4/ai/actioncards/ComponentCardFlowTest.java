@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
@@ -426,7 +426,7 @@ class ComponentCardFlowTest extends BaseTi4Test {
     // ---- the turn --------------------------------------------------------------------------
 
     private AiDecision brainDecision(AiPrompt... prompts) {
-        return new NekroBrain().decide(table.test.contextAt(SETTLED, prompts));
+        return new StandardBrain().decide(table.test.contextAt(SETTLED, prompts));
     }
 
     // A component action card is the turn's action: the AI holds its turn while the card is in play, ends it once the

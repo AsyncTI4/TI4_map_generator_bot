@@ -77,7 +77,7 @@ public class DiscardSecretService {
         }
         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
             game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            Helper.resolveQueue(game);
+            Helper.resolveQueueSavingFirst(game, "Imperial queue drawn after discarding a secret objective");
         }
     }
 }

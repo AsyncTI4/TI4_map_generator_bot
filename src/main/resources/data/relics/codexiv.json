@@ -10,9 +10,9 @@
     {
         "alias": "circletofthevoid",
         "name": "Circlet of the Void",
-        "text": "Your units do not roll for gravity rifts, and you ignore the effects of all other anomalies on movement.\n\nACTION: Exhaust this card to explore a frontier token in a system that does not contain any other players' ships.",
+        "text": "Your units do not roll for gravity rifts, and you ignore the movement effects of other anomalies.\n\nACTION: Exhaust this card to explore a frontier token in a system that does not contain any other players' ships.",
         "notes": "Gravity rifts still grant the +1 to movement. There must be at least one system containing a frontier token to use the component action.",
-        "flavourText": "Xuange touched the silver circlet that sat upon their temple. The pride of the Archive. Knowledge of the stars, passed down from the First, fated for the Last.",
+        "flavourText": "Xuange touched the jeweled circlet that sat upon their temple. The pride of the Archive. Knowledge of the stars, passed down from the First, fated for the Last.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/circletofthevoid.png?raw=true",
         "source": "codex4"
     },

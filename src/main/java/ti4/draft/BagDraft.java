@@ -34,6 +34,8 @@ public abstract class BagDraft {
             case "frankendraz" -> new FrankenDrazDraft(game);
             case "twilights_fall" -> new TwilightsFallFrankenDraft(game);
             case "inaugural_splice" -> new InauguralSpliceFrankenDraft(game);
+            case "auction_franken" -> new AuctionFrankenDraft(game);
+            case "auction_frankendraz" -> new AuctionFrankenDrazDraft(game);
             default -> null;
         };
     }
@@ -123,6 +125,7 @@ public abstract class BagDraft {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                     List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
+                    BagDraftEventRecorder.recordPicks(owner, p, draftableItems, "AUTO");
                     clearBagChannel(p);
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);

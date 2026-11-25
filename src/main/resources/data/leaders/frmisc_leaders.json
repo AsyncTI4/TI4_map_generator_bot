@@ -1,0 +1,36 @@
+[
+    {
+        "id": "xyrixagent",
+        "faction": "xyrix",
+        "type": "agent",
+        "name": "Caerax the Curator",
+        "title": "Literary Liaison",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card and choose another player. That player may give you an action card from their hand to perform the secondary ability of a readied or unchosen strategy card of your choice without spending a command token.",
+        "unlockCondition": "Always Unlocked",
+        "source": "frmisc"
+    },
+    {
+        "id": "xyrixcommander",
+        "faction": "xyrix",
+        "type": "commander",
+        "name": "Strificus the Seeker",
+        "title": "Archivist Assistant",
+        "abilityWindow": "Ongoing",
+        "abilityText": "You may have three additional action cards in your hand, game effects cannot prevent you from using this effect.",
+        "unlockCondition": "Discard or play an action card.",
+        "source": "frmisc"
+    },
+    {
+        "id": "xyrixhero",
+        "faction": "xyrix",
+        "type": "hero",
+        "name": "Archeron the Ascendant",
+        "title": "Pompous Pontificator",
+        "abilityName": "Intillectual Immunity - Eternal Erudition",
+        "abilityWindow": "At the start of the strategy phase:",
+        "abilityText": "You may place this card near the game board and add one action card from the discard pile or one action card that has been purged to your hand. Your opponents cannot play action cards during your turn. At the end of the game round, purge this card",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "frmisc"
+    }
+]

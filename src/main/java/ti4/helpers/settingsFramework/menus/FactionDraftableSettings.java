@@ -99,11 +99,10 @@ public class FactionDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "homebrewFactionsOnly" -> prioritizeHomebrewFactions();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "homebrewFactionsOnly" -> prioritizeHomebrewFactions();
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

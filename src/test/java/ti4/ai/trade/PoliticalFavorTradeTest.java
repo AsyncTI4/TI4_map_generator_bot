@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.within;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.strategy.CardFacade;
 import ti4.testUtils.BaseTi4Test;
 
 // The Xxcha pays a strategy token each time a holder plays Political Favor and loses the agenda it may have wanted, so
@@ -32,7 +33,7 @@ class PoliticalFavorTradeTest extends BaseTi4Test {
     void costsATokenForEachAgendaPhaseStillToComeOnTopOfTheBase() {
         test.game.setRound(2);
 
-        assertThat(giveCost()).isCloseTo(5 + 3, within(EXACT));
+        assertThat(giveCost()).isCloseTo(5 + 3 * CardFacade.strategyToken(), within(EXACT));
     }
 
     @Test

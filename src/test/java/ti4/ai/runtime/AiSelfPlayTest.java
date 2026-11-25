@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -32,7 +31,11 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     @Test
     void sixAiSeatsPlayTheirFirstRound() throws Exception {
+        ti4.ai.brain.TickMemo.resetVerification();
         SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, 5000);
+        if (ti4.ai.brain.TickMemo.verifying()) {
+            ti4.ai.brain.TickMemo.verificationLines().forEach(System.out::println);
+        }
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
     }
@@ -119,6 +122,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         ti4.ai.trace.TimingReport.reset();
         ti4.ai.brain.TickMemo.resetVerification();
         ti4.ai.trace.ShadowCheck.reset();
+        FactionComponentTracker.BATCH.clear();
+        java.util.Optional<AbRecord> record = AbRecord.start("AiSelfPlayTest#sixAiSeatsPlayFullGames", games, threads);
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -160,6 +165,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         printTempo(outcomes);
         if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
         AgendaTracker.report(outcomes);
+        FactionComponentTracker.printBatch();
+        record.ifPresent(run -> run.finish(outcomes, SelfPlayGame.Ending::finished, batchSeconds));
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),
@@ -298,6 +305,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         // -Dai.shadow=true: the seats played the current answer; this counts the decisions a candidate would change.
         if (ti4.ai.trace.ShadowCheck.enabled()) {
             ti4.ai.trace.ShadowCheck.lines().forEach(System.out::println);
+        }
+        // -Dai.sharecensus=true: how often a shareable answer was worked out again with the same key, and by whom.
+        if (ti4.ai.trace.ShareCensus.enabled()) {
+            ti4.ai.trace.ShareCensus.lines().forEach(System.out::println);
         }
     }
 
@@ -1261,6 +1272,24 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     // -Dai.selfplay.factions=sol,jolnar,xxcha,yin,nekro,sardakk seats those factions instead of the six built-out
     // default factions (AiSettings.DEFAULT_FACTIONS).
+    // -Dai.selfplay.factionpool=a,b,...,i seats six of the pool in each game, the window moving three factions on
+    // from one game to the next, so a batch spreads every faction of a pool larger than the table over its games.
+    private static List<String> factions(int slot) {
+        String pool = System.getProperty("ai.selfplay.factionpool", "");
+        if (pool.isBlank()) return factions();
+        List<String> factions = List.of(pool.split(",")).stream()
+                .map(String::trim)
+                .filter(faction -> !faction.isEmpty())
+                .toList();
+        int seats = Math.min(SEATS_FROM_POOL, factions.size());
+        List<String> seated = new ArrayList<>();
+        for (int i = 0; i < seats; i++) seated.add(factions.get((slot * POOL_STEP + i) % factions.size()));
+        return seated;
+    }
+
+    private static final int SEATS_FROM_POOL = 6;
+    private static final int POOL_STEP = 3;
+
     private static List<String> factions() {
         String chosen = System.getProperty("ai.selfplay.factions", "");
         if (chosen.isBlank()) return FACTIONS;
@@ -1270,15 +1299,12 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
     }
 
-    private static final boolean SEEDED_BATCH = System.getProperty("ai.selfplay.seed") != null;
-    private static final long SEEDED_CLOCK_START = 1_790_000_000_000L;
-
     // Every game gets its own thread, environment and fake Discord. Their virtual clocks start a millisecond apart and
     // only ever move in whole steps, so no two games can stamp the same message id. With -Dai.selfplay.seed the clock
     // start and game names are fixed too, since message ids and names feed the AI: the same seed then replays the
     // batch.
     private static List<SelfPlayGame.Outcome> playAll(int games, int threads) throws Exception {
-        long clockStart = SEEDED_BATCH ? SEEDED_CLOCK_START : System.currentTimeMillis();
+        long clockStart = SelfPlayGame.CLOCK_START;
         if (threads == 1) {
             List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
             for (int i = 0; i < games; i++)
@@ -1328,16 +1354,17 @@ class AiSelfPlayTest extends BaseTi4Test {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
             String name = SelfPlayGame.AB.isPresent()
                     ? "aiab" + Math.floorMod(SelfPlayGame.seedFor(slot), 1_000_000L) + (slot % 2 == 0 ? "a" : "b")
-                    : SEEDED_BATCH
-                            ? "aiseed" + Math.floorMod(SelfPlayGame.BASE_SEED + slot, 1_000_000L)
-                            : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+                    : SelfPlayGame.seededName("aiseed", SelfPlayGame.BASE_SEED + slot);
             SelfPlayGame game = new SelfPlayGame(env, name, slot);
             GameRecorder recorder = GameRecorder.root().isPresent() ? record(env, name, slot, clockStart) : null;
             try {
-                game.setUp(factions());
+                game.setUp(factions(slot));
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
                 System.out.println(outcome.report());
                 env.leaders.lines().forEach(line -> System.out.println("LEADERS " + game.name + " " + line));
+                FactionComponentTracker.Summary components = env.factionComponents.summary(game.name);
+                FactionComponentTracker.BATCH.add(components);
+                components.lines().forEach(line -> System.out.println("FACTIONUSE " + game.name + " " + line));
                 // Every channel and thread in this game's fake Discord must be its own; anything else means a call was
                 // routed to the wrong game while several games ran at once.
                 List<String> foreign = env.discord.channels().stream()

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
-import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Guild;
@@ -35,6 +34,7 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.PanelPickers;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -132,13 +132,10 @@ public class CreateGameButtonHandler {
     public static void editPlayers(ButtonInteractionEvent event) {
         String modalID = "signupModal";
         String fieldID = "players";
-        EntitySelectMenu menu = EntitySelectMenu.create(fieldID, SelectTarget.USER)
-                .setPlaceholder("Choose your players") // shows the placeholder indicating what this menu is for
-                .setRequiredRange(1, 8)
-                .build();
+        EntitySelectMenu menu = PanelPickers.users(fieldID, "Choose your players", List.of(), 1, 8);
 
         Modal modal = Modal.create(modalID, "Players For The Game")
-                .addComponents(Label.of("Select Players", menu))
+                .addComponents(PanelPickers.inForm("Select Players", menu))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -190,14 +187,10 @@ public class CreateGameButtonHandler {
     public static void removePlayers(ButtonInteractionEvent event) {
         String modalID = "removeSignupModal";
         String fieldID = "players";
-        EntitySelectMenu menu = EntitySelectMenu.create(fieldID, SelectTarget.USER)
-                .setPlaceholder(
-                        "Choose your players to remove") // shows the placeholder indicating what this menu is for
-                .setRequiredRange(1, 8)
-                .build();
+        EntitySelectMenu menu = PanelPickers.users(fieldID, "Choose your players to remove", List.of(), 1, 8);
 
         Modal modal = Modal.create(modalID, "Removing Players In The Game")
-                .addComponents(Label.of("Select Players", menu))
+                .addComponents(PanelPickers.inForm("Select Players", menu))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -286,23 +279,16 @@ public class CreateGameButtonHandler {
 
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
             var userSettings = UserSettingsManager.get(member.getId());
-            if (managedPlayer != null) {
-                String trackRecord = userSettings.getTrackRecord();
-                int droppedGames = 0;
-                droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
-                droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
-                completedGames += droppedGames;
-            }
             if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
                 memberList
                         .append("⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
                         .append(" ongoing, ")
-                        .append(completedGames + 3)
+                        .append(UserGameInfoService.standardGameLimit(managedPlayer))
                         .append("-game limit) ");
             } else {
+                int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
                 memberList.append(' ').append(completedGames).append(" games completed. ");
             }
             List<Integer> threeFastestDays = UserGameInfoService.get()
@@ -473,6 +459,7 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        CreateGameService.lockFromCreatingGames(event);
         removeLaunchedMembersFromMatchmakingQueue(members, gameName, event);
 
         MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMessage);

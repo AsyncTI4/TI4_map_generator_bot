@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.testUtils.BaseTi4Test;
 
 class GameManagerManagedPlayerTest extends BaseTi4Test {
@@ -71,6 +70,42 @@ class GameManagerManagedPlayerTest extends BaseTi4Test {
 
         assertThat(gameNamesOf(departedUserId)).doesNotContain(savedGame.getName());
         assertThat(gameNamesOf(remainingUserId)).containsExactly(savedGame.getName());
+    }
+
+    @Test
+    void reloadRefreshesCachedRevisionEvenWhenTimestampMatches() {
+        verifyRestoredRevision(true);
+    }
+
+    @Test
+    void undoRefreshesCachedRevisionEvenWhenTimestampMatches() {
+        verifyRestoredRevision(false);
+    }
+
+    private static void verifyRestoredRevision(boolean reload) {
+        Game saved = newGame("managed-revision");
+        saved.setRevisionKey("saved");
+        Game restored = new Game();
+        restored.setName(saved.getName());
+        restored.setLastModifiedDate(saved.getLastModifiedDate());
+        restored.setRevisionKey("restored");
+        try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
+                MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
+                MockedStatic<GameUndoService> undos = mockStatic(GameUndoService.class);
+                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class)) {
+            saves.when(() -> GameSaveService.save(saved, "initial")).thenReturn(true);
+            loads.when(() -> GameLoadService.load(saved.getName())).thenReturn(restored);
+            undos.when(() -> GameUndoService.undo(saved)).thenReturn(restored);
+            GameManager.save(saved, "initial");
+            ManagedGame cached = GameManager.getManagedGame(saved.getName());
+            assertThat(cached.getRevisionKey()).isEqualTo("saved");
+            assertThat(cached.matches(saved)).isTrue();
+            assertThat(cached.matches(restored)).isFalse();
+            if (reload) GameManager.reload(saved.getName());
+            else GameManager.undo(saved);
+            assertThat(GameManager.getManagedGame(saved.getName()).getRevisionKey())
+                    .isEqualTo("restored");
+        }
     }
 
     private static Game newGame(String prefix) {

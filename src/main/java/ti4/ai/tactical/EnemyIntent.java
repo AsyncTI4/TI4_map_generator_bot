@@ -8,11 +8,12 @@ import java.util.OptionalDouble;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
-import ti4.ai.AiExperiments;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner.Candidate;
 import ti4.ai.tactical.TacticalPlanner.Context;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,7 +22,7 @@ import ti4.game.Tile;
 @UtilityClass
 class EnemyIntent {
 
-    private static final int MAX_CACHED = 256;
+    static final int MAX_CACHED = 4096;
     private static final Map<String, Cached> CACHE = new ConcurrentHashMap<>();
 
     private record Cached(WeakReference<Game> game, long modified, Object value) {
@@ -29,16 +30,18 @@ class EnemyIntent {
         boolean isFor(Game current) {
             return game.get() == current && modified == current.getLastModifiedDate();
         }
+
+        boolean stale() {
+            Game current = game.get();
+            return current == null || !isFor(current);
+        }
     }
 
     static Optional<List<TacticalPlan>> ranked(Game game, Player enemy) {
         try (Thinking.Span timing = Thinking.measure("enemy.ranked")) {
             if (ImaginedTurn.underway()) return Optional.empty();
             return Optional.of(remembered(
-                    game,
-                    enemy,
-                    enemy.getFaction(),
-                    () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
+                    game, enemy.getFaction(), () -> imagined(enemy, () -> TacticalPlanner.ranked(game, enemy))));
         }
     }
 
@@ -46,27 +49,36 @@ class EnemyIntent {
         if (ImaginedTurn.underway()) return OptionalDouble.empty();
         return remembered(
                 game,
-                enemy,
                 enemy.getFaction() + "|" + tile.getPosition() + "|" + defender.getFaction(),
-                () -> ImaginedTurn.of(enemy, () -> bestAttack(game, enemy, tile, defender)));
+                () -> imagined(enemy, () -> bestAttack(game, enemy, tile, defender)));
     }
 
-    private static String experimentMarks(Game game, Player enemy) {
-        String memory = AttackLedger.remembers(game, enemy) ? "|" + AiExperiments.Experiment.ATTACK_MEMORY : "";
-        String pooled =
-                TacticalPlanner.poolsMoveBoosts(game, enemy) ? "|" + AiExperiments.Experiment.POOLED_BOOST_RESPLIT : "";
-        return memory + pooled;
+    static <T> T imagined(Player enemy, Supplier<T> turn) {
+        return ImaginedTurn.of(enemy, () -> DecidingSeat.of(enemy, turn));
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T remembered(Game game, Player enemy, String key, Supplier<T> compute) {
-        String fullKey = game.getName() + "|" + key + experimentMarks(game, enemy);
+    static <T> T remembered(Game game, String key, Supplier<T> compute) {
+        String fullKey = game.getName() + "|" + key;
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
-        T value = compute.get();
-        if (CACHE.size() > MAX_CACHED) CACHE.clear();
+        T value = ShareCensus.perSave("enemy.intent", game, fullKey, compute);
+        if (CACHE.size() >= MAX_CACHED) evict();
         CACHE.put(fullKey, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), value));
         return value;
+    }
+
+    static void evict() {
+        CACHE.values().removeIf(Cached::stale);
+        if (CACHE.size() >= MAX_CACHED) CACHE.clear();
+    }
+
+    static int cachedCount() {
+        return CACHE.size();
+    }
+
+    static void forget() {
+        CACHE.clear();
     }
 
     private static OptionalDouble bestAttack(Game game, Player enemy, Tile tile, Player defender) {

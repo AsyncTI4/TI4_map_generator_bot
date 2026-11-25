@@ -106,21 +106,20 @@ public class ThirtyKHazardousExploreHandler {
             }
             RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 inf " + planetID);
         }
-        String outcome =
-                switch (effect) {
-                    case EMERGENT_DEFENSES -> {
-                        AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + planetID);
-                        yield "brought a buried defense battery online: 1 PDS placed on "
-                                + Helper.getPlanetRepresentation(planetID, game) + " (_Emergent Defenses_)";
-                    }
-                    case PILOT_RECOVERY -> {
-                        player.setFleetCC(player.getFleetCC() + 1);
-                        yield "recovered the downed pilots: 1 command token placed in their fleet pool (_Pilot"
-                                + " Recovery Program_)";
-                    }
-                    case LOST_AND_FOUND -> placeLostAndFoundDestroyer(event, game, player, tile);
-                    default -> "resolved the exploration";
-                };
+        String outcome = switch (effect) {
+            case EMERGENT_DEFENSES -> {
+                AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + planetID);
+                yield "brought a buried defense battery online: 1 PDS placed on "
+                        + Helper.getPlanetRepresentation(planetID, game) + " (_Emergent Defenses_)";
+            }
+            case PILOT_RECOVERY -> {
+                player.setFleetCC(player.getFleetCC() + 1);
+                yield "recovered the downed pilots: 1 command token placed in their fleet pool (_Pilot"
+                        + " Recovery Program_)";
+            }
+            case LOST_AND_FOUND -> placeLostAndFoundDestroyer(event, game, player, tile);
+            default -> "resolved the exploration";
+        };
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + (removeInfantry ? " removed 1 infantry and " : " ") + outcome + ".");
