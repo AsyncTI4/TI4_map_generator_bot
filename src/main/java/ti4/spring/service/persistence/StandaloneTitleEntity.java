@@ -28,6 +28,8 @@ import lombok.Setter;
                         columnNames = {"user_id", "title", "source"}))
 public class StandaloneTitleEntity {
 
+    public static final String DEFAULT_EMOJI = "LegendaryPlanet";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -41,4 +43,7 @@ public class StandaloneTitleEntity {
 
     @Column(name = "source", nullable = false)
     private String source;
+
+    @Column(name = "emoji")
+    private String emoji;
 }
