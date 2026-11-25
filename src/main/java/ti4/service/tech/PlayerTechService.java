@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
@@ -257,6 +258,7 @@ public class PlayerTechService {
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
         String hyphalMigrationTarget = "";
+        String wardstoneLatticeContext = "";
         if (tech.contains("dskortg")) {
             String[] splitTech = tech.split("_");
             if (splitTech.length > 1) {
@@ -271,6 +273,10 @@ public class PlayerTechService {
         if (tech.startsWith("bebloomg_")) {
             hyphalMigrationTarget = tech.substring("bebloomg_".length());
             tech = "bebloomg";
+        }
+        if (tech.startsWith("aojotunnwl_")) {
+            wardstoneLatticeContext = tech.substring("aojotunnwl_".length());
+            tech = "aojotunnwl";
         }
         String inf = "";
         if (tech.contains("_inf") && tech.contains("absol_aida")) {
@@ -360,6 +366,8 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "aojotunnwl" ->
+                JotunnTechHandler.resolveWardstoneLattice(event, game, player, wardstoneLatticeContext);
             case "frmiscxyrixg" -> XyrixTechHandler.offerIntergalacticLibraryLoans(game, player);
             case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
             case "bebloomg" -> {

@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
@@ -456,6 +457,7 @@ public class ExploreService {
                     "Resolve " + Mapper.getExplore(cardID).getName()));
 
             RevenantLeadersHandler.addArlirMirroredButton(buttons, game, player, planetName, cardID, drawColor);
+            JotunnLeadersHandler.addExploreButton(buttons, player, tile, cardID);
 
             if (buttons.size() > 1) {
                 List<MessageEmbed> embeds = List.of(Mapper.getExplore(cardID).getRepresentationEmbed());

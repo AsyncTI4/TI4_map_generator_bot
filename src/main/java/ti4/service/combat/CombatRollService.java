@@ -51,6 +51,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
@@ -251,6 +255,12 @@ public class CombatRollService {
                 opponent.factionButtonChecker()
                         + CancelGroundHitsButtonId.of(tile.getPosition(), hits, combatPlanet.getName()),
                 "Cancel a Hit"));
+        if (opponent.hasTechReady("aojotunnwl")
+                && JotunnAbilityHandler.hasJotunnStructure(opponent, game, tile)
+                && JotunnTechHandler.getAdjacentStructureCount(game, opponent, tile) > 0) {
+            buttons.add(JotunnTechHandler.getWardstoneLatticeButton(
+                    opponent, tile.getPosition(), combatPlanet.getName(), hits));
+        }
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                 buttons, game, opponent, tile, "ground", hits);
         AshenPromissoryHandler.addFromTheAshesButton(buttons, game, opponent, player, tile, combatPlanet, hits);
@@ -827,6 +837,13 @@ public class CombatRollService {
         }
         extraRolls.addAll(ThirtyKActionCardHooks.finalStandExtraRolls(game, player, combatOnHolder, rollType));
 
+        if (JotunnAbilityHandler.isRimeShieldActive(game, player, tile, rollType)
+                || JotunnPromissoryHandler.isRimeBoundActive(game, player, tile, rollType)) {
+            modifiers.clear();
+            extraRolls.clear();
+            tempMods.clear();
+        }
+
         CombatRollResult rollResult = rollForUnitsWithResult(
                 playerUnitsByQuantity,
                 extraRolls,
@@ -860,6 +877,9 @@ public class CombatRollService {
         RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        if (rollType == CombatRollType.SpaceCannonOffence) {
+            JotunnLeadersHandler.resolveCommander(event, game, player, opponent, tile, h, playerUnitsByQuantity);
+        }
         if (rollType == CombatRollType.combatround) {
             TheodisiLegendaryButtonHandler.offerPelorHit(
                     game, player, opponent, tile, combatOnHolder, rollType, h, event);
@@ -1057,6 +1077,12 @@ public class CombatRollService {
                                                 + CancelGroundHitsButtonId.of(
                                                         tile.getPosition(), h, combatOnHolder.getName()),
                                         "Cancel a Hit"));
+                                if (opponent.hasTechReady("aojotunnwl")
+                                        && JotunnAbilityHandler.hasJotunnStructure(opponent, game, tile)
+                                        && JotunnTechHandler.getAdjacentStructureCount(game, opponent, tile) > 0) {
+                                    buttons.add(JotunnTechHandler.getWardstoneLatticeButton(
+                                            opponent, tile.getPosition(), combatOnHolder.getName(), h));
+                                }
                                 TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                         buttons, game, opponent, tile, "ground", h);
                                 AshenPromissoryHandler.addFromTheAshesButton(
@@ -1169,6 +1195,12 @@ public class CombatRollService {
                             buttons.add(Buttons.gray(
                                     factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Cancel a Hit"));
+                            if (opponent.hasTechReady("aojotunnwl")
+                                    && JotunnAbilityHandler.hasJotunnStructure(opponent, game, tile)
+                                    && JotunnTechHandler.getAdjacentStructureCount(game, opponent, tile) > 0) {
+                                buttons.add(JotunnTechHandler.getWardstoneLatticeButton(
+                                        opponent, tile.getPosition(), Constants.SPACE, h));
+                            }
                             TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                     buttons, game, opponent, tile, "space", h);
                             VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, h);
@@ -3574,6 +3606,9 @@ public class CombatRollService {
         if (sigilCannon != null) {
             output.put(new ImmutablePair<>(sigilCannon, spaceHolder), 1);
         }
+        JotunnAbilityHandler.getWardstoneDoctrinePds(game, player, tile)
+                .ifPresent(pds -> output.merge(pds, 1, Integer::sum));
+        JotunnLeadersHandler.addDeepFrostCannons(game, player, output);
 
         Map<UnitModel, Integer> flatOutput = new LinkedHashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
