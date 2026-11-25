@@ -333,8 +333,13 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 .meta { color: var(--muted); font-size: 13px; display: flex; gap: 18px; flex-wrap: wrap; }
 .meta b { color: var(--text); font-weight: 600; }
 main { padding: 0 20px 24px; max-width: 1500px; margin: 0 auto; }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
-@media (max-width: 1050px) { .grid { grid-template-columns: 1fr; } }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); grid-template-areas: "run log" "rest log"; grid-template-rows: auto 1fr; gap: 0 20px; align-items: start; }
+#runSec { grid-area: run; } #logSec { grid-area: log; align-self: stretch; } #restSec { grid-area: rest; }
+#logSec .log-card { margin-top: 22px; }
+@media (max-width: 1050px) {
+  .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "run" "log" "rest"; }
+  .log-card { position: static; height: 70vh; }
+}
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
 .card.selectable { cursor: pointer; }
 .card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -383,13 +388,15 @@ code { font: 11.5px ui-monospace, Consolas, monospace; word-break: break-all; }
   <div class="meta" id="meta"></div>
 </header>
 <main class="grid">
-  <section>
+  <section id="runSec">
     <h2>Running</h2><div id="running"></div>
+  </section>
+  <section id="restSec">
     <h2>Queued</h2><div id="queued"></div>
     <h2>Awaiting approval</h2><div id="awaiting"></div>
     <h2>Recently finished</h2><div id="finished"></div>
   </section>
-  <section>
+  <section id="logSec">
     <div class="card log-card">
       <div class="log-head">
         <select id="logJob"></select>
@@ -567,12 +574,13 @@ function openLog(id) {
   if (source) source.close();
   logJob = id;
   lines = [];
-  $("log").textContent = "";
+  $("log").textContent = "Waiting for log output…";
   document.querySelectorAll("[data-job]").forEach(el => el.classList.toggle("selected", el.dataset.job === id));
   $("logJob").value = id;
   source = new EventSource("/api/log?id=" + encodeURIComponent(id));
   source.onmessage = e => {
     const added = JSON.parse(e.data);
+    if (!lines.length) $("log").textContent = "";
     lines.push(...added);
     if (lines.length > MAX_LINES) { lines = lines.slice(-MAX_LINES); redraw(); return; }
     const re = filterRegex();
