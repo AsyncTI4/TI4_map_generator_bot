@@ -61,6 +61,8 @@ const argValue = (job, key) => job.args?.find(a => a.startsWith(`-D${key}=`))?.s
 const GAME_LINE = /^Game (\d+)\/(\d+) finished: (\S+) in round (\d+), victory points \{([^}]*)\}, wall time (\d+)s(?:, game thread CPU (\d+)s)?/;
 const GAME_ROUND = /(?<![A-Za-z0-9])(aiab\d+[ab]|aiseed\d+)(?:-round-(\d+)| r(\d+)(?![0-9]))/;
 const AGENDA_HEADER = /^AGENDA TRACE (\S+) r(\d+) #(\d+)/;
+const TURNS_SUMMARY = /^TURNS (\S+) (\w*): (\d+), average game time \d+s, average AI thinking ([\d.]+)s/;
+const NOT_SEATS = new Set(["", "strategy", "statusscoring", "statushomework", "agenda"]);
 
 // Incremental scan per log: only bytes appended since the last look are read.
 const scans = new Map();
@@ -99,11 +101,19 @@ function scanLog(id) {
 
 function liveGame(scan, name) {
   let game = scan.live.get(name);
-  if (!game) scan.live.set(name, (game = { round: null, agendas: 0 }));
+  if (!game) scan.live.set(name, (game = { round: null, agendas: 0, turns: 0, thinkSeconds: 0 }));
   return game;
 }
 
 function readGameMentions(scan, line) {
+  const turns = TURNS_SUMMARY.exec(line);
+  if (turns) {
+    if (NOT_SEATS.has(turns[2])) return;
+    const game = liveGame(scan, turns[1]);
+    game.turns += Number(turns[3]);
+    game.thinkSeconds += Number(turns[3]) * Number(turns[4]);
+    return;
+  }
   const agenda = AGENDA_HEADER.exec(line);
   if (agenda) {
     const game = liveGame(scan, agenda[1]);
@@ -192,7 +202,14 @@ function gameRows(job, scan, total, started, now) {
     const game = slotGame(job, slot);
     const done = finished.get(slot);
     const live = game.name ? scan.live.get(game.name) : null;
-    const row = { index: slot + 1, ...game, round: done?.round ?? live?.round ?? null, agendas: live?.agendas ?? 0 };
+    const row = {
+      index: slot + 1,
+      ...game,
+      round: done?.round ?? live?.round ?? null,
+      agendas: live?.agendas ?? 0,
+      turns: live?.turns || null,
+      thinkPerTurn: live?.turns ? live.thinkSeconds / live.turns : null,
+    };
     if (slot >= startedCount && !done) {
       rows.push({ ...row, state: running ? "waiting" : "not played" });
       continue;
@@ -201,7 +218,7 @@ function gameRows(job, scan, total, started, now) {
     const start = free.shift();
     if (done) {
       free.push(start + done.wallSeconds * 1000);
-      rows.push({ ...row, state: "finished", vp: done.vp, wallSeconds: done.wallSeconds, end: done.end });
+      rows.push({ ...row, state: "finished", vp: done.vp, wallSeconds: done.wallSeconds, cpuSeconds: done.cpuSeconds, end: done.end });
     } else {
       free.push(Infinity);
       rows.push({ ...row, state: running ? "playing" : "unfinished", startedAt: start, wallSeconds: running ? Math.max(0, (now - start) / 1000) : null });
@@ -444,7 +461,7 @@ main { padding: 0 20px 24px; max-width: 1500px; margin: 0 auto; }
 .small { font-size: 12px; color: var(--muted); }
 .stale { color: var(--warn); font-weight: 600; }
 table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 10px; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th, td { text-align: left; padding: 4px 7px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
 td.win { color: var(--ok); font-weight: 700; }
 .tablewrap { overflow-x: auto; }
@@ -567,18 +584,23 @@ function gamesTable(j, openByDefault) {
     const top = g.vp ? Math.max(...Object.values(g.vp)) : null;
     const clickable = g.name && g.state !== "waiting" && g.state !== "not played";
     const attrs = clickable ? ' class="game-row' + (logJob === j.id && logGame === g.name ? " selected" : "") + '" data-game="' + esc(g.name) + '" data-game-job="' + esc(j.id) + '" title="Show only this game\'s log lines"' : ' class="dim"';
-    const wall = g.wallSeconds == null ? "" : (g.state === "playing" ? "~" : "") + dur(g.wallSeconds * 1000);
-    const end = g.end ? g.end.replace("_", " ").toLowerCase() : g.state;
+    const time = g.wallSeconds == null ? "" : (g.state === "playing" ? "~" : "") + dur(g.wallSeconds * 1000);
+    const perRound = g.wallSeconds && g.round ? Math.round(g.wallSeconds / 60 / g.round) + " min" : "";
+    const label = g.end && g.end !== "VICTORY_POINTS" ? g.end.replace(/_/g, " ").toLowerCase() : g.state;
+    const winners = g.vp ? Object.keys(g.vp).filter(f => g.vp[f] === top) : [];
+    const think = g.thinkPerTurn == null ? "" : g.turns + " / " + g.thinkPerTurn.toFixed(1) + "s";
     return "<tr" + attrs + "><td>" + g.index + "</td><td>" + (g.seed != null ? esc(g.seed) + (g.side ? " " + esc(g.side) : "") : "") + "</td>" +
-      '<td><span class="pill s-' + (g.state === "playing" ? "running" : g.state === "finished" ? "done" : g.state === "unfinished" ? "failed" : "queued") + '">' + esc(g.state) + "</span></td>" +
-      "<td>" + (g.round ?? "") + "</td><td>" + (g.agendas || "") + "</td>" +
+      '<td><span class="pill s-' + (g.state === "playing" ? "running" : g.state === "finished" && label === "finished" ? "done" : g.state === "finished" || g.state === "unfinished" ? "failed" : "queued") + '">' + esc(label) + "</span></td>" +
+      "<td><b>" + time + "</b></td><td>" + (g.round ?? "") + "</td><td>" + perRound + "</td><td>" + (g.agendas || "") + "</td>" +
+      '<td class="win">' + esc(winners.join(", ")) + (winners.length ? " " + top : "") + "</td>" +
       factions.map(f => '<td class="' + (g.vp && g.vp[f] === top ? "win" : "") + '">' + (g.vp?.[f] ?? "") + "</td>").join("") +
-      "<td>" + wall + "</td><td>" + esc(end) + "</td></tr>";
+      "<td>" + (g.cpuSeconds != null ? dur(g.cpuSeconds * 1000) : "") + "</td><td>" + think + "</td></tr>";
   }).join("");
   const summary = ["playing", "finished", "unfinished", "waiting", "not played"].filter(s => counts[s]).map(s => counts[s] + " " + s).join(" · ");
   const open = openTables.has(j.id) || (openByDefault && !openTables.has("closed:" + j.id));
-  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap"><table><tr><th>Game</th><th>Seed</th><th>Status</th><th>Round</th><th>Agendas</th>' +
-    factions.map(f => "<th>" + esc(f) + "</th>").join("") + "<th>Wall</th><th>End</th></tr>" + body + "</table></div></details>";
+  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap"><table><tr><th>Game</th><th>Seed</th><th>Status</th><th title="How long the game took, or has been running (~)">Time</th><th>Round</th><th title="Average real time per round">Per round</th><th>Agendas</th><th>Winner</th>' +
+    factions.map(f => '<th title="' + esc(f) + ' victory points">' + esc(f) + "</th>").join("") +
+    '<th title="CPU time of the game\'s thread">CPU</th><th title="Faction turns, and average AI thinking per turn">Turns / think</th></tr>' + body + "</table></div></details>";
 }
 
 function argsBlock(j) {
