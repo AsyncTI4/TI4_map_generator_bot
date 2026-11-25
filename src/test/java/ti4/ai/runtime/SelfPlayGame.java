@@ -256,7 +256,7 @@ final class SelfPlayGame {
         this.slot = slot;
         this.seed = seed;
         this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + slot);
-        this.turnDurations = new TurnDurations(name);
+        this.turnDurations = new TurnDurations(name, SelfPlayGame::printTurn);
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -768,9 +768,12 @@ final class SelfPlayGame {
     private void printTurnDurations() {
         List<TurnDurations.Turn> turns = turnDurations.finish(env.now());
         synchronized (System.out) {
-            turns.forEach(turn -> System.out.println(turn.line()));
             TurnDurations.summary(turns).forEach(System.out::println);
         }
+    }
+
+    private static void printTurn(TurnDurations.Turn turn) {
+        System.out.println(turn.line());
     }
 
     private Outcome outcome(Ending ending, Game game, int ticks) {

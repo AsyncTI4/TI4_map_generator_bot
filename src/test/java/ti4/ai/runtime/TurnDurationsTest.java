@@ -44,4 +44,25 @@ class TurnDurationsTest extends BaseTi4Test {
                 .contains("TURNS g nekro: 2, average game time 45s, average AI thinking 1.3s, longest r2 #1 60s");
         assertThat(durations.finish(130_000)).isEmpty();
     }
+
+    // Each turn reaches the listener as soon as the next one opens, not when the game ends, so a long game's log shows
+    // its turns while it is still playing.
+    @Test
+    void eachTurnIsHandedOverAsSoonAsItCloses() {
+        AiTestGame test = new AiTestGame();
+        List<TurnDurations.Turn> heard = new java.util.ArrayList<>();
+        TurnDurations durations = new TurnDurations("g", heard::add);
+        test.game.setRound(3);
+        test.game.setPhaseOfGame("action");
+        test.game.setActivePlayerID(test.nekro.getUserID());
+        durations.observe(test.game, 0);
+        assertThat(heard).isEmpty();
+
+        test.game.setActivePlayerID(test.sol.getUserID());
+        durations.observe(test.game, 40_000);
+        assertThat(heard).extracting(TurnDurations.Turn::who).containsExactly("nekro");
+
+        durations.finish(90_000);
+        assertThat(heard).extracting(TurnDurations.Turn::who).containsExactly("nekro", "sol");
+    }
 }

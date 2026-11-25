@@ -64,7 +64,7 @@ const argValue = (job, key) => job.args?.find(a => a.startsWith(`-D${key}=`))?.s
 const GAME_LINE = /^Game (\d+)\/(\d+) finished: (\S+) in round (\d+), victory points \{([^}]*)\}, wall time (\d+)s(?:, game thread CPU (\d+)s)?/;
 const GAME_ROUND = /(?<![A-Za-z0-9])(aiab\d+[ab]|aiseed\d+)(?:-round-(\d+)| r(\d+)(?![0-9]))/;
 const AGENDA_HEADER = /^AGENDA TRACE (\S+) r(\d+) #(\d+)/;
-const TURNS_SUMMARY = /^TURNS (\S+) (\w*): (\d+), average game time \d+s, average AI thinking ([\d.]+)s/;
+const TURN_LINE = /^TURN (\S+) r\d+ (\w*) #\d+: game time \d+s, AI thinking ([\d.]+)s/;
 const NOT_SEATS = new Set(["", "strategy", "statusscoring", "statushomework", "agenda"]);
 
 // Incremental scan per log: only bytes appended since the last look are read.
@@ -109,12 +109,12 @@ function liveGame(scan, name) {
 }
 
 function readGameMentions(scan, line) {
-  const turns = TURNS_SUMMARY.exec(line);
-  if (turns) {
-    if (NOT_SEATS.has(turns[2])) return;
-    const game = liveGame(scan, turns[1]);
-    game.turns += Number(turns[3]);
-    game.thinkSeconds += Number(turns[3]) * Number(turns[4]);
+  const turn = TURN_LINE.exec(line);
+  if (turn) {
+    if (NOT_SEATS.has(turn[2])) return;
+    const game = liveGame(scan, turn[1]);
+    game.turns += 1;
+    game.thinkSeconds += Number(turn[3]);
     return;
   }
   const agenda = AGENDA_HEADER.exec(line);

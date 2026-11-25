@@ -293,8 +293,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 if (arg instanceof Throwable throwable) failure = throwable;
             }
             if (failure != null) line.append("| ").append(stackSummary(failure));
+            // The AI's own slow, aborted and cut-short warnings name their game, so they go to the log as they happen
+            // too; the game's report still repeats the tail of every warning when it ends.
+            String problem = line.toString().trim();
+            if (problem.startsWith(name.toUpperCase() + ": AI thinking ")) System.out.println(problem);
             synchronized (botProblems) {
-                if (botProblems.size() < 2000) botProblems.add(line.toString().trim());
+                if (botProblems.size() < 2000) botProblems.add(problem);
             }
             return null;
         }
