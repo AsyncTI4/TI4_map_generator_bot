@@ -734,10 +734,13 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             }
         }
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
 
-        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
+        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile) && uH != null) {
+            Set<String> tokenList = uH.getTokenList();
+            boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
             Planet p = tile.getUnitHolderFromPlanet(planet);
-            if (p != null && !alreadyOwned) {
+            if (p != null && !alreadyOwned && !containsDMZ) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);
             } else {
                 FealtyUplinkService.resolveAddInf(player, p);

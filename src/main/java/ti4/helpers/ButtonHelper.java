@@ -1010,7 +1010,10 @@ public class ButtonHelper {
                 || "null".equalsIgnoreCase(player.getFaction())
                 || !player.isRealPlayer()
                 || "".equalsIgnoreCase(player.getFaction())) {
-            game.removePlayer(player.getUserID());
+            if (!game.isMuaatManiaMode()
+                    || !player.isEliminated()) { // Muaat mania is more likely to accidentally do this
+                game.removePlayer(player.getUserID());
+            }
         } else {
             if (!player.getPlanetsForScoring(true).isEmpty() && !game.isConventionsOfWarAbandonedMode()) {
                 String msg =
@@ -1115,7 +1118,22 @@ public class ButtonHelper {
                 Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
             }
             if (game.getRealPlayers().size() == 1) {
-                Helper.checkEndGame(game, game.getRealPlayers().getFirst());
+                if (Helper.checkEndGame(game, game.getRealPlayers().getFirst())) {
+                    List<Button> buttons = new ArrayList<>();
+                    if (!game.isFowMode()) {
+                        buttons.add(Buttons.green("gameEnd", "End Game"));
+                        buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+                    } else {
+                        buttons.add(Buttons.green("gameEndConfirmation", "End and Delete Game"));
+                    }
+                    buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            game.getMainGameChannel(),
+                            "# " + game.getPing() + " it appears as though "
+                                    + game.getRealPlayers().getFirst().getRepresentationNoPing()
+                                    + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                            buttons);
+                }
             }
         }
 
