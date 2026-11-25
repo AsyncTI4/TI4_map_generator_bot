@@ -414,12 +414,14 @@ let data = null, logJob = null, source = null, lines = [], selectedByUser = fals
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const pad = n => String(n).padStart(2, "0");
-function clock(ms) {
-  if (ms == null) return "?";
+function clock(ms, seconds = false) {
+  if (ms == null || isNaN(ms)) return "?";
   const d = new Date(ms), today = new Date();
-  const time = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: seconds ? "2-digit" : undefined, hour12: true });
   return d.toDateString() === today.toDateString() ? time : (d.getMonth() + 1) + "/" + d.getDate() + " " + time;
 }
+const ZONE = new Date().toLocaleTimeString([], { timeZoneName: "short" }).split(" ").pop();
+const localStamp = l => l.replace(/^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z)/, s => clock(Date.parse(s), true));
 function dur(ms) {
   if (ms == null || isNaN(ms)) return "?";
   const m = Math.round(Math.abs(ms) / 60000);
@@ -510,7 +512,7 @@ function render() {
     "<span>Runner: <b>" + (data.runner ? "pid " + data.runner.pid + " since " + clock(Date.parse(data.runner.startedAt)) : "idle") + "</b></span>" +
     "<span>CPU: <b>" + (data.cpu.percent ?? "?") + "%</b> of " + data.cpu.cores + " threads</span>" +
     "<span>Queue clears: <b>" + (running.length || queued.length ? clock(last) : "now") + "</b></span>" +
-    "<span>Updated " + clock(data.now) + ":" + pad(new Date(data.now).getSeconds()) + "</span>";
+    "<span>Updated " + clock(data.now, true) + " " + ZONE + "</span>";
   $("running").innerHTML = running.map(runningCard).join("") || '<div class="empty">Nothing running.</div>';
   $("queued").innerHTML = queued.map(queuedCard).join("") || '<div class="empty">Queue is empty.</div>';
   $("awaiting").innerHTML = awaiting.map(queuedCard).join("") || '<div class="empty">None.</div>';
@@ -544,7 +546,7 @@ function lineClass(l) {
   if (/^Game \d+\/\d+ finished/.test(l)) return "g";
   if (/^\[ERROR\]|BUILD FAILURE|^(Exception|Caused by)|^[\w.$]*(Exception|Error)(:|\s|$)|runner error/.test(l)) return "e";
   if (/^\[WARNING\]|^WARNING/.test(l)) return "w";
-  if (/^\[INFO\]|BUILD SUCCESS|^\d{4}-\d\d-\d\dT/.test(l)) return "i";
+  if (/^\[INFO\]|BUILD SUCCESS|^(\d+\/\d+ )?\d{1,2}:\d\d:\d\d\s?[AP]M/i.test(l)) return "i";
   return "";
 }
 
@@ -579,7 +581,7 @@ function openLog(id) {
   $("logJob").value = id;
   source = new EventSource("/api/log?id=" + encodeURIComponent(id));
   source.onmessage = e => {
-    const added = JSON.parse(e.data);
+    const added = JSON.parse(e.data).map(localStamp);
     if (!lines.length) $("log").textContent = "";
     lines.push(...added);
     if (lines.length > MAX_LINES) { lines = lines.slice(-MAX_LINES); redraw(); return; }
