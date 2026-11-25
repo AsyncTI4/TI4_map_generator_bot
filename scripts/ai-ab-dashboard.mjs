@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Live dashboard for the AI A/B queue (scripts/ai-ab-queue.mjs). Read-only: it never approves, cancels or starts jobs.
+// Live dashboard for the AI A/B queue (scripts/ai-ab-queue.mjs). Its only actions are postponing a queued job and
+// resuming a postponed one; it never approves, cancels or starts jobs.
 //
 //   node scripts/ai-ab-dashboard.mjs [--port 4377]      then open http://127.0.0.1:4377
 //
@@ -10,8 +11,10 @@ import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
+import { postpone, resume } from "./ai-ab-queue.mjs";
 
 const HOUR = 3_600_000;
+const ACTIONS = { "/api/postpone": postpone, "/api/resume": resume };
 const FINISHED = new Set(["done", "failed", "cancelled", "interrupted"]);
 const port = Number(process.argv[process.argv.indexOf("--port") + 1]) || Number(process.env.PORT) || 4377;
 
@@ -366,10 +369,43 @@ function logLines(id, after, backlogBytes, maxBytes = MAX_LOG_RESPONSE) {
   return { offset: start + end, lines: lines.map(l => l.replace(/\r$/, "")) };
 }
 
+// Actions need a JSON body and a custom header, which a page on another site cannot send without a CORS preflight
+// this server never answers, and an Origin (when sent) of this server.
+function fromThisPage(req) {
+  const origin = req.headers.origin;
+  const sameOrigin = !origin || origin === `http://127.0.0.1:${port}` || origin === `http://localhost:${port}`;
+  return sameOrigin && req.headers["x-ab-dashboard"] === "1" && /^application\/json/.test(req.headers["content-type"] ?? "");
+}
+
+function runAction(req, res, action) {
+  if (req.method !== "POST" || !fromThisPage(req)) {
+    res.writeHead(403).end("refused");
+    return;
+  }
+  let body = "";
+  req.on("data", chunk => {
+    body += chunk;
+    if (body.length > 10_000) req.destroy();
+  });
+  req.on("end", () => {
+    try {
+      const id = String(JSON.parse(body).id ?? "");
+      if (!readJobs().some(job => job.id === id)) throw new Error(`no job "${id}"`);
+      const job = action(QUEUE, id);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ id: job.id, status: job.status }));
+    } catch (error) {
+      res.writeHead(409, { "Content-Type": "text/plain" }).end(String(error.message ?? error));
+    }
+  });
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
   try {
-    if (url.pathname === "/") {
+    if (ACTIONS[url.pathname]) {
+      runAction(req, res, ACTIONS[url.pathname]);
+    } else if (url.pathname === "/") {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(PAGE);
     } else if (url.pathname === "/api/state") {
@@ -466,6 +502,13 @@ th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: upp
 td.win { color: var(--ok); font-weight: 700; }
 .tablewrap { overflow-x: auto; }
 tr.game-row { cursor: pointer; }
+.s-postponed { background: var(--warn-soft); color: var(--warn); }
+.card.postponed { opacity: .72; border-style: dashed; }
+button.act { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 12px; border-radius: 7px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
+button.act:hover { border-color: var(--accent); color: var(--accent); }
+button.act-resume { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.act-resume:hover { color: #fff; filter: brightness(1.1); }
+button.act:disabled { opacity: .5; cursor: progress; }
 tr.game-row:hover td { background: var(--accent-soft); }
 tr.game-row.selected td { background: var(--accent-soft); box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--accent); }
 tr.dim td { color: var(--muted); }
@@ -610,12 +653,34 @@ function argsBlock(j) {
 
 function queuedCard(j) {
   const when = j.status === "awaiting-approval" ? "needs the user's yes" :
+    j.status === "postponed" ? "postponed: skipped until resumed" :
     "starts ~" + clock(j.eta?.start) + ", finishes ~" + clock(j.eta?.finish);
-  return '<div class="card"><div class="queue-item"><div class="pos">' + (j.position ?? "?") + "</div><div>" +
+  const action = j.status === "queued" ? actionButton("postpone", j.id, "Postpone", "Skip this run; the next queued run goes first") :
+    j.status === "postponed" ? actionButton("resume", j.id, "Resume", "Put this run back in its place in the queue") : "";
+  return '<div class="card' + (j.status === "postponed" ? " postponed" : "") + '"><div class="queue-item"><div class="pos">' + (j.position ?? "–") + "</div><div>" +
     '<div class="row"><span class="title">' + esc(j.label) + "</span>" + pill(j.status) + (j.ab ? '<span class="pill s-queued">A/B ' + esc(j.ab) + "</span>" : "") + "</div>" +
     (j.question ? '<div class="question">' + esc(j.question) + "</div>" : "") +
     '<div class="small">' + when + " · est " + (j.estimateMs ? dur(j.estimateMs) : "?") + " · " + esc(j.by || "") + " · <code>" + esc(j.commit) + "</code> " + esc(j.branch) + "</div>" +
-    "</div><div></div></div></div>";
+    "</div><div>" + action + "</div></div></div>";
+}
+
+function actionButton(action, id, label, title) {
+  return '<button class="act act-' + action + '" data-action="' + action + '" data-action-job="' + esc(id) + '" title="' + esc(title) + '">' + label + "</button>";
+}
+
+async function runAction(button) {
+  button.disabled = true;
+  try {
+    const response = await fetch("/api/" + button.dataset.action, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-AB-Dashboard": "1" },
+      body: JSON.stringify({ id: button.dataset.actionJob }),
+    });
+    if (!response.ok) throw new Error(await response.text());
+  } catch (e) {
+    alert("Could not " + button.dataset.action + ": " + e.message);
+  }
+  await refresh();
 }
 
 function finishedCard(j) {
@@ -634,6 +699,8 @@ function render() {
   const jobs = data.jobs;
   const running = jobs.filter(j => j.status === "running");
   const queued = jobs.filter(j => j.status === "queued").sort((a, b) => a.position - b.position);
+  const queueList = jobs.filter(j => j.status === "queued" || j.status === "postponed")
+    .sort((a, b) => (a.approvedAt || "").localeCompare(b.approvedAt || ""));
   const awaiting = jobs.filter(j => j.status === "awaiting-approval");
   const finished = jobs.filter(j => ["done", "failed", "cancelled", "interrupted"].includes(j.status))
     .sort((a, b) => (b.finishedAt || "").localeCompare(a.finishedAt || "")).slice(0, 8);
@@ -644,7 +711,8 @@ function render() {
     "<span>Queue clears: <b>" + (running.length || queued.length ? clock(last) : "now") + "</b></span>" +
     "<span>Updated " + clock(data.now, true) + " " + ZONE + "</span>";
   $("running").innerHTML = running.map(runningCard).join("") || '<div class="empty">Nothing running.</div>';
-  $("queued").innerHTML = queued.map(queuedCard).join("") || '<div class="empty">Queue is empty.</div>';
+  $("queued").innerHTML = queueList.map(queuedCard).join("") || '<div class="empty">Queue is empty.</div>';
+  document.querySelectorAll("[data-action]").forEach(el => el.addEventListener("click", () => runAction(el)));
   $("awaiting").innerHTML = awaiting.map(queuedCard).join("") || '<div class="empty">None.</div>';
   $("finished").innerHTML = finished.map(finishedCard).join("") || '<div class="empty">None yet.</div>';
   document.querySelectorAll("[data-job]").forEach(el => el.addEventListener("click", e => {
