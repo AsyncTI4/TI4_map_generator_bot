@@ -1,0 +1,601 @@
+#!/usr/bin/env node
+// Live dashboard for the AI A/B queue (scripts/ai-ab-queue.mjs). Read-only: it never approves, cancels or starts jobs.
+//
+//   node scripts/ai-ab-dashboard.mjs [--port 4377]      then open http://127.0.0.1:4377
+//
+// It reads <repo>/.git/ai-ab-queue (or AI_AB_QUEUE_DIR): jobs/*.json for status and order, logs/<id>.log for the
+// build phase, "Game N/M finished" lines and the live log tail, and runner.lock for the runner.
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import http from "node:http";
+import os from "node:os";
+import path from "node:path";
+
+const HOUR = 3_600_000;
+const FINISHED = new Set(["done", "failed", "cancelled", "interrupted"]);
+const port = Number(process.argv[process.argv.indexOf("--port") + 1]) || Number(process.env.PORT) || 4377;
+
+function queueDir() {
+  if (process.env.AI_AB_QUEUE_DIR) return path.resolve(process.env.AI_AB_QUEUE_DIR);
+  const common = execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
+    encoding: "utf8",
+  }).trim();
+  return path.join(common, "ai-ab-queue");
+}
+
+const QUEUE = queueDir();
+
+function readJobs() {
+  const dir = path.join(QUEUE, "jobs");
+  if (!fs.existsSync(dir)) return [];
+  const jobs = [];
+  for (const name of fs.readdirSync(dir).filter(n => n.endsWith(".json"))) {
+    try {
+      jobs.push(JSON.parse(fs.readFileSync(path.join(dir, name), "utf8")));
+    } catch {}
+  }
+  return jobs.sort((a, b) => a.submittedAt.localeCompare(b.submittedAt));
+}
+
+function isAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+}
+
+function runner() {
+  try {
+    const holder = JSON.parse(fs.readFileSync(path.join(QUEUE, "runner.lock"), "utf8"));
+    return isAlive(holder.pid) ? holder : null;
+  } catch {
+    return null;
+  }
+}
+
+const logPath = id => path.join(QUEUE, "logs", `${path.basename(id)}.log`);
+const argValue = (job, key) => job.args?.find(a => a.startsWith(`-D${key}=`))?.split("=").slice(1).join("=");
+
+const GAME_LINE = /^Game (\d+)\/(\d+) finished: (\S+) in round (\d+), victory points \{([^}]*)\}, wall time (\d+)s(?:, game thread CPU (\d+)s)?/;
+
+// Incremental scan per log: only bytes appended since the last look are read.
+const scans = new Map();
+
+function scanLog(id) {
+  const file = logPath(id);
+  let stat;
+  try {
+    stat = fs.statSync(file);
+  } catch {
+    return null;
+  }
+  let scan = scans.get(id);
+  if (!scan || stat.size < scan.offset) {
+    scan = { offset: 0, carry: "", games: [], phase: "starting", playingSince: null, build: null, errors: 0, firstLine: null };
+    scans.set(id, scan);
+  }
+  if (stat.size > scan.offset) {
+    const fd = fs.openSync(file, "r");
+    const chunk = 8 * 1024 * 1024;
+    while (scan.offset < stat.size) {
+      const length = Math.min(chunk, stat.size - scan.offset);
+      const buffer = Buffer.alloc(length);
+      fs.readSync(fd, buffer, 0, length, scan.offset);
+      scan.offset += length;
+      const lines = (scan.carry + buffer.toString("utf8")).split("\n");
+      scan.carry = lines.pop();
+      for (const line of lines) readLine(scan, line.replace(/\r$/, ""));
+    }
+    fs.closeSync(fd);
+  }
+  scan.mtime = stat.mtimeMs;
+  scan.size = stat.size;
+  return scan;
+}
+
+function readLine(scan, line) {
+  if (scan.firstLine == null) scan.firstLine = line;
+  const game = GAME_LINE.exec(line);
+  if (game) {
+    const vp = Object.fromEntries(
+      game[5].split(",").map(p => p.trim().split("=")).filter(p => p.length === 2).map(([f, v]) => [f, Number(v)]),
+    );
+    scan.games.push({
+      index: Number(game[1]),
+      total: Number(game[2]),
+      end: game[3],
+      round: Number(game[4]),
+      vp,
+      wallSeconds: Number(game[6]),
+      cpuSeconds: game[7] ? Number(game[7]) : null,
+    });
+    return;
+  }
+  if (!line.startsWith("[")) return;
+  if (line.includes("--- compiler:") && line.includes("testCompile")) scan.phase = "compiling tests";
+  else if (line.includes("--- compiler:")) scan.phase = "compiling";
+  else if (line.includes("--- surefire:")) scan.phase = "starting tests";
+  else if (line.startsWith("[INFO] Running ")) {
+    scan.phase = "playing";
+    scan.playingSince ??= Date.now();
+  } else if (line.includes("BUILD SUCCESS")) scan.build = "success";
+  else if (line.includes("BUILD FAILURE")) scan.build = "failure";
+  else if (line.startsWith("[ERROR]")) scan.errors++;
+}
+
+function playingStart(job, scan) {
+  const stampMatch = scan?.firstLine?.match(/^(\d{4}-\d\d-\d\dT[\d:.]+Z)/);
+  return job.startedAt ? Date.parse(job.startedAt) : stampMatch ? Date.parse(stampMatch[1]) : null;
+}
+
+function signature(args = []) {
+  return args.filter(arg => !/^-Dai\.selfplay\.(seed|record\.label|record\.question)=/.test(arg)).join(" ");
+}
+
+function estimateMs(job, jobs) {
+  if (job.estimateHours) return job.estimateHours * HOUR;
+  const past = jobs
+    .filter(o => o.status === "done" && signature(o.args) === signature(job.args))
+    .map(o => Date.parse(o.finishedAt) - Date.parse(o.startedAt))
+    .sort((a, b) => a - b);
+  return past.length ? past[Math.floor(past.length / 2)] : null;
+}
+
+function progress(job, now) {
+  const scan = scanLog(job.id);
+  const total = Number(argValue(job, "ai.selfplay.games")) || scan?.games[0]?.total || null;
+  const games = scan?.games ?? [];
+  const started = playingStart(job, scan);
+  let projectedFinish = null;
+  if (job.status === "running" && total && games.length >= 1 && started) {
+    const perGame = (now - started) / games.length;
+    projectedFinish = now + perGame * (total - games.length);
+  }
+  return {
+    total,
+    finished: games.length,
+    games,
+    phase: scan ? (job.status === "running" ? scan.phase : scan.build ?? scan.phase) : null,
+    errors: scan?.errors ?? 0,
+    logBytes: scan?.size ?? 0,
+    lastOutputAt: scan?.mtime ?? null,
+    projectedFinish,
+  };
+}
+
+function state() {
+  const now = Date.now();
+  const jobs = readJobs();
+  const view = jobs.map(job => {
+    const estimate = estimateMs(job, jobs);
+    const base = {
+      id: job.id,
+      label: job.label,
+      question: job.question,
+      status: job.status,
+      by: job.submittedBy,
+      branch: job.branch,
+      commit: job.commit?.slice(0, 10),
+      commitSubject: job.commitSubject,
+      ab: argValue(job, "ai.selfplay.ab") ?? null,
+      seed: argValue(job, "ai.selfplay.seed") ?? null,
+      threads: argValue(job, "ai.selfplay.threads") ?? null,
+      args: job.mavenArguments ?? job.args,
+      estimateMs: estimate,
+      submittedAt: job.submittedAt,
+      approvedAt: job.approvedAt,
+      startedAt: job.startedAt ?? null,
+      finishedAt: job.finishedAt ?? null,
+      exitCode: job.exitCode ?? null,
+      cancelRequested: Boolean(job.cancelRequested),
+      records: job.records ?? [],
+      load: job.load ?? null,
+      hasLog: fs.existsSync(logPath(job.id)),
+    };
+    if (job.status === "running" || FINISHED.has(job.status)) base.progress = progress(job, now);
+    return base;
+  });
+  let cursor = now;
+  for (const job of view.filter(j => j.status === "running")) {
+    const byEstimate = job.estimateMs == null ? null : Date.parse(job.startedAt) + job.estimateMs;
+    const finish = job.progress?.projectedFinish ?? byEstimate;
+    job.eta = { start: Date.parse(job.startedAt), finish: finish == null ? null : Math.max(finish, now + 60_000), byEstimate };
+    cursor = job.eta.finish == null ? null : Math.max(cursor ?? 0, job.eta.finish);
+  }
+  const queued = view.filter(j => j.status === "queued").sort((a, b) => a.approvedAt.localeCompare(b.approvedAt));
+  queued.forEach((job, position) => {
+    const finish = cursor == null || job.estimateMs == null ? null : cursor + job.estimateMs;
+    job.eta = { start: cursor, finish };
+    job.position = position + 1;
+    cursor = finish;
+  });
+  return { now, queueDir: QUEUE, runner: runner(), cpu: cpuPercent(), jobs: view };
+}
+
+let lastCpu = os.cpus();
+let lastCpuPercent = null;
+function cpuPercent() {
+  const current = os.cpus();
+  let idle = 0;
+  let total = 0;
+  current.forEach((cpu, i) => {
+    const before = lastCpu[i]?.times;
+    if (!before) return;
+    for (const key of Object.keys(cpu.times)) total += cpu.times[key] - before[key];
+    idle += cpu.times.idle - before.idle;
+  });
+  if (total > 0) {
+    lastCpuPercent = Math.round(100 * (1 - idle / total));
+    lastCpu = current;
+  }
+  return { percent: lastCpuPercent, cores: current.length };
+}
+
+function streamLog(req, res, id, backlogBytes) {
+  const file = logPath(id);
+  res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+  let offset;
+  try {
+    offset = Math.max(0, fs.statSync(file).size - backlogBytes);
+  } catch {
+    res.write(`event: missing\ndata: no log yet\n\n`);
+    offset = 0;
+  }
+  let carry = "";
+  let first = offset > 0;
+  const send = () => {
+    let size;
+    try {
+      size = fs.statSync(file).size;
+    } catch {
+      return;
+    }
+    if (size < offset) offset = 0;
+    if (size === offset) return;
+    const length = Math.min(size - offset, 4 * 1024 * 1024);
+    const buffer = Buffer.alloc(length);
+    const fd = fs.openSync(file, "r");
+    fs.readSync(fd, buffer, 0, length, offset);
+    fs.closeSync(fd);
+    offset += length;
+    const lines = (carry + buffer.toString("utf8")).split("\n");
+    carry = lines.pop();
+    if (first) {
+      lines.shift();
+      first = false;
+    }
+    if (lines.length) res.write(`data: ${JSON.stringify(lines.map(l => l.replace(/\r$/, "")))}\n\n`);
+  };
+  send();
+  const timer = setInterval(send, 1000);
+  const keepAlive = setInterval(() => res.write(": ping\n\n"), 20_000);
+  req.on("close", () => {
+    clearInterval(timer);
+    clearInterval(keepAlive);
+  });
+}
+
+const server = http.createServer((req, res) => {
+  const url = new URL(req.url, "http://localhost");
+  try {
+    if (url.pathname === "/") {
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(PAGE);
+    } else if (url.pathname === "/api/state") {
+      res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
+      res.end(JSON.stringify(state()));
+    } else if (url.pathname === "/api/log") {
+      const id = url.searchParams.get("id") ?? "";
+      if (!readJobs().some(job => job.id === id)) {
+        res.writeHead(404).end("no such job");
+        return;
+      }
+      streamLog(req, res, id, Number(url.searchParams.get("backlog") ?? 262_144));
+    } else {
+      res.writeHead(404).end("not found");
+    }
+  } catch (error) {
+    res.writeHead(500).end(String(error.stack ?? error));
+  }
+});
+
+server.listen(port, "127.0.0.1", () => {
+  console.log(`AI A/B dashboard on http://127.0.0.1:${port} (queue ${QUEUE})`);
+});
+
+const PAGE = String.raw`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI A/B Queue</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --line: #e3e6eb; --text: #1c2230; --muted: #667085;
+  --accent: #3b6ee8; --accent-soft: #e6edfd; --ok: #1f8a4c; --ok-soft: #e3f4ea; --warn: #b7791f; --warn-soft: #fbf0dc;
+  --bad: #c2393b; --bad-soft: #fbe4e4; --idle: #8a93a5; --idle-soft: #eef0f4; --log-bg: #0f1420; --log-text: #d6dbe6;
+  --hl-game: #7ee2a8; --hl-err: #ff8c8c; --hl-info: #8fb3ff; --hl-warn: #f3c96b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --panel: #151b24; --line: #263040; --text: #e5e9f0; --muted: #8b95a7;
+    --accent: #6d97ff; --accent-soft: #1b2a4a; --ok: #4cc47e; --ok-soft: #15301f; --warn: #e0a84a; --warn-soft: #33270f;
+    --bad: #ff6b6d; --bad-soft: #3a1618; --idle: #7f899b; --idle-soft: #1d2430; --log-bg: #0a0e15;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: baseline; padding: 16px 20px 8px; }
+h1 { font-size: 18px; margin: 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 22px 0 8px; }
+.meta { color: var(--muted); font-size: 13px; display: flex; gap: 18px; flex-wrap: wrap; }
+.meta b { color: var(--text); font-weight: 600; }
+main { padding: 0 20px 24px; max-width: 1500px; margin: 0 auto; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
+@media (max-width: 1050px) { .grid { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+.card.selectable { cursor: pointer; }
+.card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.title { font-weight: 600; font-size: 15px; word-break: break-word; }
+.question { color: var(--muted); margin: 4px 0 8px; }
+.pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.s-running { background: var(--accent-soft); color: var(--accent); }
+.s-queued { background: var(--idle-soft); color: var(--text); }
+.s-awaiting-approval { background: var(--warn-soft); color: var(--warn); }
+.s-done { background: var(--ok-soft); color: var(--ok); }
+.s-failed, .s-interrupted { background: var(--bad-soft); color: var(--bad); }
+.s-cancelled { background: var(--idle-soft); color: var(--idle); }
+.kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 16px; margin-top: 10px; font-size: 13px; }
+.kv div span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.bar { height: 10px; background: var(--idle-soft); border-radius: 999px; overflow: hidden; margin: 10px 0 4px; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .6s; }
+.bar.est > i { background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 6px, var(--accent-soft) 6px, var(--accent-soft) 12px); }
+.small { font-size: 12px; color: var(--muted); }
+.stale { color: var(--warn); font-weight: 600; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+td.win { color: var(--ok); font-weight: 700; }
+.tablewrap { overflow-x: auto; }
+.queue-item { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; }
+.pos { width: 24px; height: 24px; border-radius: 50%; background: var(--idle-soft); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.log-card { position: sticky; top: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 24px); min-height: 420px; }
+.log-head { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.log-head select, .log-head input { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.log-head input[type=text] { flex: 1; min-width: 120px; }
+.log-head label { font-size: 12.5px; color: var(--muted); display: flex; gap: 4px; align-items: center; white-space: nowrap; }
+#log { flex: 1; overflow: auto; margin: 0; padding: 10px 14px; background: var(--log-bg); color: var(--log-text); font: 12px/1.45 ui-monospace, "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; word-break: break-all; }
+#log .g { color: var(--hl-game); font-weight: 700; }
+#log .e { color: var(--hl-err); }
+#log .i { color: var(--hl-info); }
+#log .w { color: var(--hl-warn); }
+.empty { color: var(--muted); font-style: italic; padding: 6px 0; }
+details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+code { font: 11.5px ui-monospace, Consolas, monospace; word-break: break-all; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AI A/B Queue</h1>
+  <div class="meta" id="meta"></div>
+</header>
+<main class="grid">
+  <section>
+    <h2>Running</h2><div id="running"></div>
+    <h2>Queued</h2><div id="queued"></div>
+    <h2>Awaiting approval</h2><div id="awaiting"></div>
+    <h2>Recently finished</h2><div id="finished"></div>
+  </section>
+  <section>
+    <div class="card log-card">
+      <div class="log-head">
+        <select id="logJob"></select>
+        <input type="text" id="filter" placeholder="Filter lines (regex)">
+        <label><input type="checkbox" id="highlights"> Highlights only</label>
+        <label><input type="checkbox" id="follow" checked> Follow</label>
+      </div>
+      <pre id="log"></pre>
+    </div>
+  </section>
+</main>
+<script>
+const MAX_LINES = 4000;
+let data = null, logJob = null, source = null, lines = [], selectedByUser = false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const pad = n => String(n).padStart(2, "0");
+function clock(ms) {
+  if (ms == null) return "?";
+  const d = new Date(ms), today = new Date();
+  const time = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  return d.toDateString() === today.toDateString() ? time : (d.getMonth() + 1) + "/" + d.getDate() + " " + time;
+}
+function dur(ms) {
+  if (ms == null || isNaN(ms)) return "?";
+  const m = Math.round(Math.abs(ms) / 60000);
+  return m < 60 ? m + " min" : Math.floor(m / 60) + " h " + pad(m % 60) + " m";
+}
+const pill = s => '<span class="pill s-' + s + '">' + s.replace("-", " ") + "</span>";
+
+function runningCard(j) {
+  const p = j.progress || {}, now = data.now;
+  const elapsed = now - Date.parse(j.startedAt);
+  const hasGames = p.total && p.finished > 0;
+  const pct = hasGames ? 100 * p.finished / p.total : j.estimateMs ? Math.min(99, 100 * elapsed / j.estimateMs) : 0;
+  const quiet = p.lastOutputAt ? now - p.lastOutputAt : null;
+  const games = p.games || [];
+  const avgRound = games.length ? (games.reduce((a, g) => a + g.round, 0) / games.length).toFixed(1) : "-";
+  const avgWall = games.length ? games.reduce((a, g) => a + g.wallSeconds, 0) / games.length * 1000 : null;
+  const leaderVp = games.length ? (games.reduce((a, g) => a + Math.max(...Object.values(g.vp)), 0) / games.length).toFixed(1) : "-";
+  return '<div class="card selectable' + (logJob === j.id ? " selected" : "") + '" data-job="' + esc(j.id) + '">' +
+    '<div class="row">' + pill(j.status) + (j.cancelRequested ? pill("cancelled") : "") +
+    '<span class="title">' + esc(j.label) + "</span>" + (j.ab ? '<span class="pill s-queued">A/B ' + esc(j.ab) + "</span>" : "") + "</div>" +
+    (j.question ? '<div class="question">' + esc(j.question) + "</div>" : "") +
+    '<div class="bar' + (hasGames ? "" : " est") + '"><i style="width:' + pct.toFixed(1) + '%"></i></div>' +
+    '<div class="row small"><b style="color:var(--text)">' + (hasGames ? p.finished + " / " + p.total + " games" : (p.total ? "0 / " + p.total + " games" : "") + " " + (p.phase || "")) +
+    "</b><span>" + pct.toFixed(0) + "%" + (hasGames ? "" : " of estimate") + "</span>" +
+    (quiet != null ? '<span class="' + (quiet > 20 * 60000 ? "stale" : "") + '">last output ' + dur(quiet) + " ago</span>" : "") + "</div>" +
+    '<div class="kv">' +
+    "<div><span>Started</span>" + clock(Date.parse(j.startedAt)) + " (" + dur(elapsed) + ")</div>" +
+    "<div><span>Finish (by pace)</span>" + (p.projectedFinish ? clock(j.eta.finish) + " (in " + dur(j.eta.finish - now) + ")" : "after first game") + "</div>" +
+    "<div><span>Finish (by estimate)</span>" + (j.eta?.byEstimate ? clock(j.eta.byEstimate) : "?") + "</div>" +
+    "<div><span>Phase</span>" + esc(p.phase || "?") + "</div>" +
+    "<div><span>Seeds / threads</span>" + esc(j.seed ?? "-") + " / " + esc(j.threads ?? "-") + "</div>" +
+    "<div><span>Avg round / leader VP</span>" + avgRound + " / " + leaderVp + "</div>" +
+    "<div><span>Avg game wall</span>" + (avgWall ? dur(avgWall) : "-") + "</div>" +
+    "<div><span>Commit</span><code>" + esc(j.commit) + "</code> " + esc(j.branch) + "</div>" +
+    "<div><span>By</span>" + esc(j.by || "-") + "</div>" +
+    (p.errors ? '<div><span>[ERROR] lines</span><b style="color:var(--bad)">' + p.errors + "</b></div>" : "") +
+    "</div>" + gamesTable(games) + argsBlock(j) + "</div>";
+}
+
+function gamesTable(games) {
+  if (!games.length) return "";
+  const factions = [...new Set(games.flatMap(g => Object.keys(g.vp)))];
+  const rows = [...games].sort((a, b) => a.index - b.index).map(g => {
+    const top = Math.max(...Object.values(g.vp));
+    return "<tr><td>" + g.index + "</td><td>" + g.round + "</td>" +
+      factions.map(f => '<td class="' + (g.vp[f] === top ? "win" : "") + '">' + (g.vp[f] ?? "") + "</td>").join("") +
+      "<td>" + dur(g.wallSeconds * 1000) + "</td><td>" + esc(g.end.replace("_", " ").toLowerCase()) + "</td></tr>";
+  }).join("");
+  return '<details' + (games.length <= 30 ? " open" : "") + '><summary>' + games.length + ' finished games</summary><div class="tablewrap"><table><tr><th>Game</th><th>Round</th>' +
+    factions.map(f => "<th>" + esc(f) + "</th>").join("") + "<th>Wall</th><th>End</th></tr>" + rows + "</table></div></details>";
+}
+
+function argsBlock(j) {
+  return '<details><summary>Maven arguments</summary><code>' + esc((j.args || []).join(" ")) + "</code></details>";
+}
+
+function queuedCard(j) {
+  const when = j.status === "awaiting-approval" ? "needs the user's yes" :
+    "starts ~" + clock(j.eta?.start) + ", finishes ~" + clock(j.eta?.finish);
+  return '<div class="card"><div class="queue-item"><div class="pos">' + (j.position ?? "?") + "</div><div>" +
+    '<div class="row"><span class="title">' + esc(j.label) + "</span>" + pill(j.status) + (j.ab ? '<span class="pill s-queued">A/B ' + esc(j.ab) + "</span>" : "") + "</div>" +
+    (j.question ? '<div class="question">' + esc(j.question) + "</div>" : "") +
+    '<div class="small">' + when + " · est " + (j.estimateMs ? dur(j.estimateMs) : "?") + " · " + esc(j.by || "") + " · <code>" + esc(j.commit) + "</code> " + esc(j.branch) + "</div>" +
+    "</div><div></div></div></div>";
+}
+
+function finishedCard(j) {
+  const p = j.progress || {};
+  const ran = j.startedAt && j.finishedAt ? dur(Date.parse(j.finishedAt) - Date.parse(j.startedAt)) : "-";
+  return '<div class="card selectable' + (logJob === j.id ? " selected" : "") + '" data-job="' + esc(j.id) + '">' +
+    '<div class="row">' + pill(j.status) + '<span class="title">' + esc(j.label) + "</span>" +
+    '<span class="small">' + clock(Date.parse(j.finishedAt)) + " · ran " + ran + (p.total ? " · " + p.finished + "/" + p.total + " games" : "") +
+    (j.exitCode != null ? " · exit " + j.exitCode : "") + "</span></div>" +
+    (j.question ? '<div class="question">' + esc(j.question) + "</div>" : "") +
+    (j.records?.length ? '<div class="small">Record: <code>' + j.records.map(esc).join("</code>, <code>") + "</code></div>" : "") +
+    "</div>";
+}
+
+function render() {
+  const jobs = data.jobs;
+  const running = jobs.filter(j => j.status === "running");
+  const queued = jobs.filter(j => j.status === "queued").sort((a, b) => a.position - b.position);
+  const awaiting = jobs.filter(j => j.status === "awaiting-approval");
+  const finished = jobs.filter(j => ["done", "failed", "cancelled", "interrupted"].includes(j.status))
+    .sort((a, b) => (b.finishedAt || "").localeCompare(a.finishedAt || "")).slice(0, 8);
+  const last = queued.length ? queued[queued.length - 1].eta?.finish : running[0]?.eta?.finish;
+  $("meta").innerHTML =
+    "<span>Runner: <b>" + (data.runner ? "pid " + data.runner.pid + " since " + clock(Date.parse(data.runner.startedAt)) : "idle") + "</b></span>" +
+    "<span>CPU: <b>" + (data.cpu.percent ?? "?") + "%</b> of " + data.cpu.cores + " threads</span>" +
+    "<span>Queue clears: <b>" + (running.length || queued.length ? clock(last) : "now") + "</b></span>" +
+    "<span>Updated " + clock(data.now) + ":" + pad(new Date(data.now).getSeconds()) + "</span>";
+  $("running").innerHTML = running.map(runningCard).join("") || '<div class="empty">Nothing running.</div>';
+  $("queued").innerHTML = queued.map(queuedCard).join("") || '<div class="empty">Queue is empty.</div>';
+  $("awaiting").innerHTML = awaiting.map(queuedCard).join("") || '<div class="empty">None.</div>';
+  $("finished").innerHTML = finished.map(finishedCard).join("") || '<div class="empty">None yet.</div>';
+  document.querySelectorAll("[data-job]").forEach(el => el.addEventListener("click", e => {
+    if (e.target.closest("details")) return;
+    selectedByUser = true;
+    openLog(el.dataset.job);
+  }));
+  const withLogs = jobs.filter(j => j.hasLog).sort((a, b) => (b.startedAt || "").localeCompare(a.startedAt || ""));
+  const select = $("logJob");
+  const options = withLogs.map(j => '<option value="' + esc(j.id) + '">' + esc(j.label) + " (" + j.status + ")</option>").join("");
+  if (select.dataset.options !== options) { select.innerHTML = options; select.dataset.options = options; }
+  if (!selectedByUser || !logJob) {
+    const pick = running[0]?.id || withLogs[0]?.id;
+    if (pick && pick !== logJob) openLog(pick);
+  }
+  if (logJob) select.value = logJob;
+}
+
+async function refresh() {
+  try {
+    data = await (await fetch("/api/state")).json();
+    render();
+  } catch (e) {
+    $("meta").innerHTML = '<span class="stale">Dashboard server unreachable</span>';
+  }
+}
+
+function lineClass(l) {
+  if (/^Game \d+\/\d+ finished/.test(l)) return "g";
+  if (/^\[ERROR\]|BUILD FAILURE|^(Exception|Caused by)|^[\w.$]*(Exception|Error)(:|\s|$)|runner error/.test(l)) return "e";
+  if (/^\[WARNING\]|^WARNING/.test(l)) return "w";
+  if (/^\[INFO\]|BUILD SUCCESS|^\d{4}-\d\d-\d\dT/.test(l)) return "i";
+  return "";
+}
+
+function filterRegex() {
+  const text = $("filter").value.trim();
+  if (!text) return null;
+  try { return new RegExp(text, "i"); } catch { return null; }
+}
+
+function visible(l, re) {
+  if ($("highlights").checked && !lineClass(l)) return false;
+  return !re || re.test(l);
+}
+
+function lineHtml(l) {
+  const c = lineClass(l);
+  return c ? '<span class="' + c + '">' + esc(l) + "</span>\n" : esc(l) + "\n";
+}
+
+function redraw() {
+  const re = filterRegex();
+  $("log").innerHTML = lines.filter(l => visible(l, re)).map(lineHtml).join("");
+  if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
+}
+
+function openLog(id) {
+  if (source) source.close();
+  logJob = id;
+  lines = [];
+  $("log").textContent = "";
+  document.querySelectorAll("[data-job]").forEach(el => el.classList.toggle("selected", el.dataset.job === id));
+  $("logJob").value = id;
+  source = new EventSource("/api/log?id=" + encodeURIComponent(id));
+  source.onmessage = e => {
+    const added = JSON.parse(e.data);
+    lines.push(...added);
+    if (lines.length > MAX_LINES) { lines = lines.slice(-MAX_LINES); redraw(); return; }
+    const re = filterRegex();
+    const html = added.filter(l => visible(l, re)).map(lineHtml).join("");
+    if (html) $("log").insertAdjacentHTML("beforeend", html);
+    if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
+  };
+}
+
+$("logJob").addEventListener("change", e => { selectedByUser = true; openLog(e.target.value); });
+$("filter").addEventListener("input", redraw);
+$("highlights").addEventListener("change", redraw);
+$("follow").addEventListener("change", redraw);
+let userScrollAt = 0;
+["wheel", "mousedown", "keydown", "touchmove"].forEach(type => $("log").addEventListener(type, () => (userScrollAt = Date.now()), { passive: true }));
+$("log").addEventListener("scroll", () => {
+  if (Date.now() - userScrollAt > 1500) return;
+  const el = $("log");
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+  if ($("follow").checked !== atBottom) $("follow").checked = atBottom;
+});
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>`;
