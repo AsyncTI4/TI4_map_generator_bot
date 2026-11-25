@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.attachmentupload.AttachmentUpload;
@@ -1101,6 +1102,35 @@ public final class LoreService {
         game.removeStoredValue(SYSTEM_LORE_KEY);
     }
 
+    public static void replaceLore(Game game, List<String> storedEntries) {
+        if (storedEntries.isEmpty()) {
+            game.removeStoredValue(SYSTEM_LORE_KEY);
+        } else {
+            game.setStoredValue(SYSTEM_LORE_KEY, String.join("|", storedEntries));
+        }
+        evictGameLore(game.getName());
+    }
+
+    @Nullable
+    public static String storedEntryProblem(String storedEntry) {
+        String[] fields = storedEntry.split(";", -1);
+        if (storedEntry.contains("|") || fields.length < 7) {
+            return "lore entry `" + storedEntry
+                    + "` needs `target;text;footer;RECEIVER;TRIGGER;PING;PERSISTANCE[;fromRound;tillRound]`.";
+        }
+        try {
+            RECEIVER.valueOf(fields[3]);
+            TRIGGER.valueOf(fields[4]);
+            PING.valueOf(fields[5]);
+            PERSISTANCE.valueOf(fields[6]);
+        } catch (IllegalArgumentException e) {
+            return "lore entry `" + storedEntry + "` has an unknown receiver, trigger, ping or persistance.";
+        }
+        return fields[0].isBlank() || fields[1].isBlank()
+                ? "lore entry `" + storedEntry + "` needs a target and text."
+                : null;
+    }
+
     private static final List<String> UNKNOWN_LORE_TARGETS = Arrays.asList(
             "from Deep Unknown",
             "from Silent Beyond",
@@ -1274,9 +1304,7 @@ public final class LoreService {
         if (!isLoreEnabled(game)) return;
         String prev = normalizePhase(game.getPhaseOfGame());
         if (prev == null || prev.equals(normalizePhase(phaseAboutToStart))) return;
-        for (LoreEntry entry : matchingEntries(game, prev, TRIGGER.PHASE_END)) {
-            showPhaseLoreEntry(game, entry);
-        }
+        showPhaseLoreEntries(game, matchingEntries(game, prev, TRIGGER.PHASE_END));
     }
 
     /** Fires PHASE_START lore for {@code phase}, at most once per phase per round (see below). */
@@ -1286,9 +1314,16 @@ public final class LoreService {
         if (next == null) return;
         List<LoreEntry> matches = matchingEntries(game, next, TRIGGER.PHASE_START);
         if (matches.isEmpty() || phaseStartAlreadyFiredThisRound(game, next)) return;
-        for (LoreEntry entry : matches) {
-            showPhaseLoreEntry(game, entry);
+        showPhaseLoreEntries(game, matches);
+    }
+
+    private static void showPhaseLoreEntries(Game game, List<LoreEntry> entries) {
+        if (entries.isEmpty()) return;
+        LoreReportBatch batch = new LoreReportBatch(game);
+        for (LoreEntry entry : entries) {
+            showPhaseLoreEntry(game, entry, batch);
         }
+        batch.send();
     }
 
     /**
@@ -1310,7 +1345,7 @@ public final class LoreService {
      * (audience only meaningful for RECEIVER.ALL — the placeholder "triggering player" argument is
      * ignored for that receiver); everything else delivers immediately.
      */
-    private static void showPhaseLoreEntry(Game game, LoreEntry loreEntry) {
+    private static void showPhaseLoreEntry(Game game, LoreEntry loreEntry, LoreReportBatch batch) {
         if ((loreEntry.isChoiceGated() || loreEntry.isRollGated()) && loreEntry.receiver == RECEIVER.ALL) {
             List<Player> audience =
                     game.getRealPlayers().stream().filter(p -> !p.isNpc()).toList();
@@ -1325,7 +1360,7 @@ public final class LoreService {
                 return;
             }
         }
-        deliverPhaseLore(game, loreEntry);
+        deliverPhaseLore(game, loreEntry, batch);
     }
 
     /**
@@ -1334,7 +1369,7 @@ public final class LoreService {
      * exactly once; player-stat lines fan out to every real player so per-player {@code ?conditions} gate
      * individually. GM receiver grants no player rewards, matching deliverLore's rule.
      */
-    static void deliverPhaseLore(Game game, LoreEntry loreEntry) {
+    static void deliverPhaseLore(Game game, LoreEntry loreEntry, LoreReportBatch batch) {
         String target = loreEntry.target;
 
         MessageChannel channel;
@@ -1350,7 +1385,7 @@ public final class LoreService {
 
         MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, true);
         if (channel != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(channel, ping + ", Lore was discovered.", embed);
+            batch.announce(channel, ping + ", Lore was discovered.", embed);
         }
 
         // Map effects need *a* player as context, but validation requires phase entries to spell out
@@ -1365,7 +1400,7 @@ public final class LoreService {
         if (contextPlayer != null) {
             LoreEffects.EffectResults mapResults =
                     LoreEffects.applyLoreEffectsMapOnly(contextPlayer, game, loreEntry, true, null);
-            reportEffectResults(contextPlayer, game, mapResults, target, channels);
+            reportEffectResults(batch, contextPlayer, game, mapResults, target, channels);
         }
 
         if (loreEntry.receiver != RECEIVER.GM) {
@@ -1373,11 +1408,12 @@ public final class LoreService {
                 LoreEffects.EffectResults results =
                         LoreEffects.applyLoreEffectsPlayerOnly(p, game, loreEntry, true, null);
                 MessageChannel playerChannel = p.getCorrectChannel();
-                reportEffectResults(p, game, results, target, playerChannel != null ? Set.of(playerChannel) : Set.of());
+                reportEffectResults(
+                        batch, p, game, results, target, playerChannel != null ? Set.of(playerChannel) : Set.of());
             }
         }
 
-        GMService.logActivity(game, "Phase lore fired for " + target, loreEntry.ping == PING.YES);
+        batch.loreFired(target, loreEntry.ping == PING.YES);
 
         // ONCE_PER_PLAYER has no meaning without a triggering player (validation warns) — treat as ONCE.
         if (loreEntry.persistance != PERSISTANCE.ALWAYS) {
@@ -1888,7 +1924,8 @@ public final class LoreService {
         }
 
         LoreEffects.EffectResults results = LoreEffects.applyLoreEffects(player, game, loreEntry, isSystemLore);
-        reportEffectResults(player, game, results, position, channels.keySet());
+        LoreReportBatch batch = new LoreReportBatch(game);
+        reportEffectResults(batch, player, game, results, position, channels.keySet());
 
         // ADJACENT/ALL notify multiple players, but the call above only ever rewards the triggering
         // player. Give every other recipient their own copy of the player-stat effects (map-mutating
@@ -1904,8 +1941,9 @@ public final class LoreService {
                     LoreEffects.applyLoreEffectsPlayerOnly(other, game, loreEntry, isSystemLore, null);
             MessageChannel otherChannel = other.getCorrectChannel();
             reportEffectResults(
-                    other, game, otherResults, position, otherChannel != null ? Set.of(otherChannel) : Set.of());
+                    batch, other, game, otherResults, position, otherChannel != null ? Set.of(otherChannel) : Set.of());
         }
+        batch.send();
 
         GMService.logPlayerActivity(
                 game,
@@ -1933,9 +1971,19 @@ public final class LoreService {
             LoreEffects.EffectResults results,
             String position,
             Set<MessageChannel> channels) {
-        // In FoW, ping the affected player exactly once — on the first change line they receive — rather
-        // than on every map/player change message.
-        boolean playerPinged = false;
+        LoreReportBatch batch = new LoreReportBatch(game);
+        reportEffectResults(batch, player, game, results, position, channels);
+        batch.send();
+    }
+
+    private static void reportEffectResults(
+            LoreReportBatch batch,
+            Player player,
+            Game game,
+            LoreEffects.EffectResults results,
+            String position,
+            Set<MessageChannel> channels) {
+        // In FoW the batch pings the affected player once, on the first change line they receive.
         if (!results.mapChanges().isEmpty()) {
             if (game.isFowMode()) {
                 // Each map change pings the system it affected so all players with visibility are notified.
@@ -1948,27 +1996,25 @@ public final class LoreService {
                 for (LoreEffects.EffectDescription desc : results.mapChanges()) {
                     String changeMsg = "**Map change from lore:** " + desc.text();
                     String pingPosition = desc.tilePosition() != null ? desc.tilePosition() : position;
-                    FoWHelper.pingSystem(game, pingPosition, changeMsg, false);
+                    batch.pingSystem(pingPosition, changeMsg);
                     boolean tellTriggeringPlayer =
                             desc.unitColor() == null || desc.unitColor().equalsIgnoreCase(player.getColor());
                     if (tellTriggeringPlayer && privateChannel != null) {
                         // pingSystem skips them (their color is in the message), so this private notice is
-                        // their heads-up that lore touched their board — ping only on the first one.
-                        String prefix = playerPinged ? "" : player.getRepresentationUnfogged() + " ";
-                        MessageHelper.sendMessageToChannel(privateChannel, prefix + changeMsg);
-                        playerPinged = true;
+                        // their heads-up that lore touched their board.
+                        batch.tellPlayer(player, privateChannel, changeMsg);
                     }
-                    GMService.postToActivityThread(game, changeMsg);
+                    batch.logForGm(changeMsg);
                 }
-                // Board changed — drop a fresh GM-view map into the activity thread.
-                GMService.refreshMapInActivityThread(game);
+                // Board changed — drop a fresh GM-view map into the activity thread, once per batch.
+                batch.mapChanged();
             } else {
                 String changeMsg = "**Map changes from lore:**\n"
                         + results.mapChanges().stream()
                                 .map(LoreEffects.EffectDescription::text)
                                 .collect(Collectors.joining("\n"));
                 for (MessageChannel channel : channels) {
-                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                    batch.post(channel, changeMsg);
                 }
             }
         }
@@ -1979,14 +2025,12 @@ public final class LoreService {
                 // (activity thread) see these. Ping the player so they notice their stats changed.
                 MessageChannel privateChannel = player.getPrivateChannel();
                 if (privateChannel != null) {
-                    String prefix = playerPinged ? "" : player.getRepresentationUnfogged() + " ";
-                    MessageHelper.sendMessageToChannel(privateChannel, prefix + changeMsg);
-                    playerPinged = true;
+                    batch.tellPlayer(player, privateChannel, changeMsg);
                 }
-                GMService.postToActivityThread(game, changeMsg);
+                batch.logForGm(changeMsg);
             } else {
                 for (MessageChannel channel : channels) {
-                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                    batch.post(channel, changeMsg);
                 }
             }
         }

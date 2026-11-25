@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,6 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -93,9 +96,10 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         assertFalse(positions(panels).contains("a101"));
     }
 
-    @Test
-    void packedPanelsNeverOverlapAndFitTheSizeCap() {
-        Layout layout = CompactOverviewGenerator.layout(CompactOverviewGenerator.gmPanels(game), "header");
+    @ParameterizedTest
+    @EnumSource(CompactOverviewGenerator.Style.class)
+    void packedPanelsNeverOverlapAndFitTheSizeCap(CompactOverviewGenerator.Style style) {
+        Layout layout = CompactOverviewGenerator.layout(CompactOverviewGenerator.gmPanels(game), "header", style);
 
         List<Placed> placed = layout.placed();
         for (int i = 0; i < placed.size(); i++) {
@@ -110,6 +114,35 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         }
         assertTrue(layout.canvasWidth() <= CompactOverviewGenerator.MAX_SIZE);
         assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.MAX_SIZE);
+    }
+
+    @Test
+    void boxesHoldTheirOwnHexesAndLabelAndNeverTouch() {
+        List<Placed> placed = CompactOverviewGenerator.layout(
+                        CompactOverviewGenerator.gmPanels(game), "header", CompactOverviewGenerator.Style.BOXES)
+                .placed();
+
+        for (int i = 0; i < placed.size(); i++) {
+            Rectangle frame = placed.get(i).frame();
+            assertTrue(frame.contains(placed.get(i).label()), "label outside its box");
+            placed.get(i)
+                    .centres()
+                    .values()
+                    .forEach(centre ->
+                            assertTrue(frame.contains(HexPacker.hexBox(centre)), "hex outside its box at " + centre));
+            for (int j = i + 1; j < placed.size(); j++) {
+                assertTrue(
+                        HexPacker.rectanglesClear(frame, placed.get(j).frame(), HexPacker.GUTTER - 1), "boxes touch");
+            }
+        }
+    }
+
+    @Test
+    void theOverviewLayoutFollowsTheViewersSeat() {
+        assertEquals(CompactOverviewGenerator.Style.HEXES, CompactOverviewGenerator.Style.of(player));
+        assertEquals(CompactOverviewGenerator.Style.HEXES, CompactOverviewGenerator.Style.of(null));
+        player.setFogOverviewBoxes(true);
+        assertEquals(CompactOverviewGenerator.Style.BOXES, CompactOverviewGenerator.Style.of(player));
     }
 
     @Test

@@ -24,7 +24,8 @@ public class TestBedScript {
             "stackAgenda",
             "removeToken",
             "setGameOption",
-            "placeTile");
+            "placeTile",
+            "setLore");
 
     private String name;
     private String description;

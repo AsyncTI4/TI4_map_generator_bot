@@ -1,6 +1,8 @@
 package ti4.image.map;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -42,6 +44,20 @@ public final class CompactOverviewGenerator {
     private static final List<String> CORNERS = List.of("tl", "tr", "bl", "br");
     private static final List<TileStep> STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
+    private static final int BOX_GAP = HexPacker.GUTTER;
+    private static final int BOX_PADDING = 24;
+    private static final int BOX_LABEL_GAP = 12;
+    private static final int BOX_ARC = 40;
+    private static final int BOX_STROKE = 8;
+
+    public enum Style {
+        HEXES,
+        BOXES;
+
+        public static Style of(@Nullable Player viewer) {
+            return viewer != null && viewer.isFogOverviewBoxes() ? BOXES : HEXES;
+        }
+    }
 
     record Panel(String title, Map<String, Point> centres, int colorIndex) {
 
@@ -50,7 +66,11 @@ public final class CompactOverviewGenerator {
         }
     }
 
-    record Placed(Panel panel, Map<String, Point> centres, Rectangle label) {
+    record Placed(
+            Panel panel,
+            Map<String, Point> centres,
+            Rectangle label,
+            @Nullable Rectangle frame) {
 
         Color color() {
             return OverviewStyle.color(panel.colorIndex());
@@ -79,7 +99,11 @@ public final class CompactOverviewGenerator {
     }
 
     public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay) {
-        return ImageUploads.createFileUpload(gmImage(game, overlay), game.getName() + "_overview", "webp");
+        return gmOverview(game, overlay, Style.HEXES);
+    }
+
+    public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay, Style style) {
+        return ImageUploads.createFileUpload(gmImage(game, overlay, style), game.getName() + "_overview", "webp");
     }
 
     public static FileUpload playerOverview(Game game, Player player) {
@@ -96,13 +120,18 @@ public final class CompactOverviewGenerator {
     }
 
     public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay) {
+        return gmImage(game, overlay, Style.HEXES);
+    }
+
+    public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay, Style style) {
         return render(
                 game,
                 gmPanels(game),
                 new HashMap<>(game.getTileMap()),
                 TileLayers.of(game, null, displayTypeFor(overlay)),
                 withOverlay(withDistances(game, STEPS), overlay),
-                header(game, "GM overview", overlay));
+                header(game, "GM overview", overlay),
+                style);
     }
 
     public static BufferedImage playerImage(Game game, Player player) {
@@ -120,7 +149,8 @@ public final class CompactOverviewGenerator {
                 tiles,
                 layers,
                 withOverlay(withDistances(game, STEPS), overlay),
-                header(game, player.getFaction() + " overview", overlay));
+                header(game, player.getFaction() + " overview", overlay),
+                Style.of(player));
     }
 
     private static DisplayType displayTypeFor(@Nullable DisplayType overlay) {
@@ -310,7 +340,11 @@ public final class CompactOverviewGenerator {
         return centred;
     }
 
-    static Layout layout(List<Panel> panels, String header) {
+    static Layout layout(List<Panel> panels, String header, Style style) {
+        return style == Style.BOXES ? boxLayout(panels, header) : hexLayout(panels, header);
+    }
+
+    private static Layout hexLayout(List<Panel> panels, String header) {
         List<Panel> bySize = new ArrayList<>(panels);
         bySize.sort(Comparator.comparingInt((Panel panel) -> -panel.centres().size())
                 .thenComparing(Panel::title));
@@ -330,12 +364,57 @@ public final class CompactOverviewGenerator {
                     .forEach((position, local) ->
                             centres.put(position, new Point(local.x + offset.x, local.y + offset.y)));
             placed.add(
-                    new Placed(bySize.get(index), centres, placements.get(index).label()));
+                    new Placed(bySize.get(index), centres, placements.get(index).label(), null));
         }
         Rectangle content = HexIslandStyle.contentBounds(
                 placed.stream().flatMap(box -> box.centres().values().stream()).toList(),
                 placed.stream().map(Placed::label).toList());
         return new Layout(placed, HexIslandStyle.Canvas.of(content, MAX_SIZE, header));
+    }
+
+    private static Layout boxLayout(List<Panel> panels, String header) {
+        List<BoxContent> contents =
+                new ArrayList<>(panels.stream().map(BoxContent::of).toList());
+        contents.sort(Comparator.comparingInt((BoxContent content) -> -content.size().height)
+                .thenComparingInt(content -> -content.size().width)
+                .thenComparing(content -> content.panel().title()));
+        BoxPacker.Packing packing =
+                BoxPacker.pack(contents.stream().map(BoxContent::size).toList(), BOX_GAP);
+        List<Placed> placed = new ArrayList<>();
+        Rectangle content = null;
+        for (int index = 0; index < contents.size(); index++) {
+            Placed box = contents.get(index).placedAt(packing.positions().get(index));
+            placed.add(box);
+            content = content == null ? new Rectangle(box.frame()) : content.union(box.frame());
+        }
+        Rectangle bounds = content == null ? new Rectangle(0, 0, 1, 1) : content;
+        return new Layout(placed, HexIslandStyle.Canvas.of(bounds, MAX_SIZE, header));
+    }
+
+    private record BoxContent(Panel panel, Rectangle hexes, Rectangle label, Dimension size) {
+
+        static BoxContent of(Panel panel) {
+            Rectangle hexes = HexIslandStyle.contentBounds(panel.centres().values(), List.of());
+            Rectangle label = HexIslandStyle.labelChoices(
+                            panel.title(), panel.centres().values())
+                    .getFirst();
+            int width = Math.max(hexes.width, label.width) + 2 * BOX_PADDING;
+            int height = label.height + BOX_LABEL_GAP + hexes.height + 2 * BOX_PADDING;
+            return new BoxContent(panel, hexes, label, new Dimension(width, height));
+        }
+
+        Placed placedAt(Point corner) {
+            Rectangle frame = new Rectangle(corner.x, corner.y, size.width, size.height);
+            int hexLeft = corner.x + (size.width - hexes.width) / 2;
+            int hexTop = corner.y + BOX_PADDING + label.height + BOX_LABEL_GAP;
+            Map<String, Point> centres = new LinkedHashMap<>();
+            panel.centres()
+                    .forEach((position, local) ->
+                            centres.put(position, new Point(local.x - hexes.x + hexLeft, local.y - hexes.y + hexTop)));
+            Rectangle placedLabel = new Rectangle(
+                    corner.x + (size.width - label.width) / 2, corner.y + BOX_PADDING, label.width, label.height);
+            return new Placed(panel, centres, placedLabel, frame);
+        }
     }
 
     private static BufferedImage render(
@@ -344,17 +423,16 @@ public final class CompactOverviewGenerator {
             Map<String, Tile> tiles,
             TileLayers tileLayers,
             List<TileStep> steps,
-            String header) {
-        Layout layout = layout(panels, header);
+            String header,
+            Style style) {
+        Layout layout = layout(panels, header, style);
         BufferedImage image = layout.canvas().newImage();
         Graphics2D graphics = OverviewStyle.smoothGraphics(image);
         try {
             OverviewStyle.drawHeader(graphics, header);
             layout.canvas().enter(graphics);
             drawTiles(game, graphics, layout, tiles, tileLayers, steps);
-            layout.placed()
-                    .forEach(box ->
-                            HexIslandStyle.drawOutline(graphics, box.centres().values(), box.color()));
+            layout.placed().forEach(box -> drawFrame(graphics, box));
             layout.placed()
                     .forEach(box -> HexIslandStyle.drawLabel(
                             graphics, box.label(), box.panel().title(), box.color()));
@@ -362,6 +440,17 @@ public final class CompactOverviewGenerator {
             graphics.dispose();
         }
         return image;
+    }
+
+    private static void drawFrame(Graphics2D graphics, Placed box) {
+        Rectangle frame = box.frame();
+        if (frame == null) {
+            HexIslandStyle.drawOutline(graphics, box.centres().values(), box.color());
+            return;
+        }
+        graphics.setColor(box.color());
+        graphics.setStroke(new BasicStroke(BOX_STROKE));
+        graphics.drawRoundRect(frame.x, frame.y, frame.width, frame.height, BOX_ARC, BOX_ARC);
     }
 
     private static void drawTiles(
