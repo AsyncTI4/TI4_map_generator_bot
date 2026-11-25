@@ -31,7 +31,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
-import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.card.BannerGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -726,34 +725,16 @@ public final class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         for (Player player : game.getRealPlayers()) {
-            boolean hasFrankenFirmParasite = game.isFrankenGame() && player.hasTech("parasite-firm_y");
-            boolean hasBaseFirmParasite = !game.isFrankenGame() && player.hasTech("parasite-firm");
-
-            if (hasFrankenFirmParasite || hasBaseFirmParasite) {
+            if (player.hasTech("parasite-firm")) {
                 Tile home = player.getHomeSystemTile();
                 if (home != null) {
                     List<Button> buttons = new ArrayList<>();
-                    String infantryAmount = hasFrankenFirmParasite ? "4gf" : "gf";
                     for (Planet planet : home.getPlanetUnitHolders()) {
-                        String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_" + infantryAmount + "_"
-                                + planet.getName();
+                        String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
                         String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
                         buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
                     }
-                    String parasiteAlias = hasFrankenFirmParasite ? "parasite-firm_y" : "parasite-firm";
-                    TechnologyModel parasiteModel = Mapper.getTech(parasiteAlias);
-                    String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
-                            + parasiteModel.getNameRepresentation() + ".";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
-                }
-            }
-
-            if (game.isFrankenGame()
-                    && player.hasTech("parasite-obs_y")
-                    && TeHelperTechs.playerHasInfantryOnMap(game, player)) {
-                List<Button> buttons = TeHelperTechs.neuralParasiteButtons(game, player);
-                if (!buttons.isEmpty()) {
-                    TechnologyModel parasiteModel = Mapper.getTech("parasite-obs_y");
+                    TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
                     String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
                             + parasiteModel.getNameRepresentation() + ".";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
