@@ -36,17 +36,6 @@ public class TourneyWinnerService {
         tournamentWinnerTitleService.revoke(userId, tourneyName);
     }
 
-    public int grantMissingWinnerTitles() {
-        if (DatabasePersistenceGate.isDisabled()) return 0;
-        int granted = 0;
-        for (TournamentWinner winner : tournamentWinnerRepository.findAll()) {
-            if (tournamentWinnerTitleService.grant(winner.getUserId(), winner.getUserName(), winner.getTourneyName())) {
-                granted++;
-            }
-        }
-        return granted;
-    }
-
     public String allWinnersToString() {
         if (DatabasePersistenceGate.isDisabled())
             return "Tournament winner data is temporarily unavailable while database maintenance is in progress.";

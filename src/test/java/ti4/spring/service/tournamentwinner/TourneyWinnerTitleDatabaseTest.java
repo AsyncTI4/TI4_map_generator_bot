@@ -79,31 +79,12 @@ class TourneyWinnerTitleDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
-    void backfillGrantsMissingTitlesOnce() {
-        winnerRepository.save(new TournamentWinner("1", "alice", "Fall Cup"));
-        winnerRepository.save(new TournamentWinner("2", "bob", "Fall Cup"));
+    void recordingTheSameWinTwiceKeepsOneTitle() {
+        service.add("1", "alice", "Fall Cup");
+        service.add("1", "alice", "Fall Cup");
 
-        assertThat(service.grantMissingWinnerTitles()).isEqualTo(2);
-        assertThat(service.grantMissingWinnerTitles()).isZero();
-        assertThat(standaloneTitleRepository.findEarnedTitlesByUserId("2"))
-                .containsExactly(new EarnedTitle("Fall Cup Winner", "Fall Cup", "LegendaryPlanet"));
-    }
-
-    @Test
-    void backfillMovesTheHandInsertedLazaxEmojiIntoTheColumn() {
-        // Mirrors the Lazax Season 1 title, which was added by hand with the emoji typed into the title text.
-        UserEntity alice = userRepository.save(new UserEntity("1", "alice"));
-        StandaloneTitleEntity handInserted = new StandaloneTitleEntity();
-        handInserted.setUser(alice);
-        handInserted.setTitle(":Lazax: Lazax Season 1 Winner :Lazax:");
-        handInserted.setSource("Tournament");
-        standaloneTitleRepository.save(handInserted);
-        winnerRepository.save(new TournamentWinner("1", "alice", "Lazax Season 1"));
-
-        assertThat(service.grantMissingWinnerTitles()).isEqualTo(1);
-        assertThat(service.grantMissingWinnerTitles()).isZero();
         assertThat(standaloneTitleRepository.findEarnedTitlesByUserId("1"))
-                .containsExactly(new EarnedTitle("Lazax Season 1 Winner", "Tournament", "Lazax"));
+                .containsExactly(new EarnedTitle("Fall Cup Winner", "Fall Cup", "LegendaryPlanet"));
     }
 
     @Test
