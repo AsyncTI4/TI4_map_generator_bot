@@ -233,48 +233,32 @@ function cpuPercent() {
   return { percent: lastCpuPercent, cores: current.length };
 }
 
-function streamLog(req, res, id, backlogBytes) {
+const NEWLINE = 0x0a;
+const MAX_LOG_RESPONSE = 2 * 1024 * 1024;
+
+function logLines(id, after, backlogBytes) {
   const file = logPath(id);
-  res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
-  let offset;
+  let size;
   try {
-    offset = Math.max(0, fs.statSync(file).size - backlogBytes);
+    size = fs.statSync(file).size;
   } catch {
-    res.write(`event: missing\ndata: no log yet\n\n`);
-    offset = 0;
+    return { offset: 0, lines: [], missing: true };
   }
-  let carry = "";
-  let first = offset > 0;
-  const send = () => {
-    let size;
-    try {
-      size = fs.statSync(file).size;
-    } catch {
-      return;
-    }
-    if (size < offset) offset = 0;
-    if (size === offset) return;
-    const length = Math.min(size - offset, 4 * 1024 * 1024);
-    const buffer = Buffer.alloc(length);
-    const fd = fs.openSync(file, "r");
-    fs.readSync(fd, buffer, 0, length, offset);
-    fs.closeSync(fd);
-    offset += length;
-    const lines = (carry + buffer.toString("utf8")).split("\n");
-    carry = lines.pop();
-    if (first) {
-      lines.shift();
-      first = false;
-    }
-    if (lines.length) res.write(`data: ${JSON.stringify(lines.map(l => l.replace(/\r$/, "")))}\n\n`);
-  };
-  send();
-  const timer = setInterval(send, 1000);
-  const keepAlive = setInterval(() => res.write(": ping\n\n"), 20_000);
-  req.on("close", () => {
-    clearInterval(timer);
-    clearInterval(keepAlive);
-  });
+  const fromTail = after < 0 || after > size;
+  let start = fromTail ? Math.max(0, size - backlogBytes) : after;
+  const length = Math.min(size - start, MAX_LOG_RESPONSE);
+  if (length <= 0) return { offset: start, lines: [] };
+  const buffer = Buffer.alloc(length);
+  const fd = fs.openSync(file, "r");
+  fs.readSync(fd, buffer, 0, length, start);
+  fs.closeSync(fd);
+  let from = 0;
+  if (fromTail && start > 0) from = buffer.indexOf(NEWLINE) + 1;
+  const end = buffer.lastIndexOf(NEWLINE) + 1;
+  if (end <= from) return { offset: start + from, lines: [] };
+  const lines = buffer.toString("utf8", from, end).split("\n");
+  lines.pop();
+  return { offset: start + end, lines: lines.map(l => l.replace(/\r$/, "")) };
 }
 
 const server = http.createServer((req, res) => {
@@ -292,7 +276,9 @@ const server = http.createServer((req, res) => {
         res.writeHead(404).end("no such job");
         return;
       }
-      streamLog(req, res, id, Number(url.searchParams.get("backlog") ?? 262_144));
+      const result = logLines(id, Number(url.searchParams.get("after") ?? -1), Number(url.searchParams.get("backlog") ?? 262_144));
+      res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
+      res.end(JSON.stringify(result));
     } else {
       res.writeHead(404).end("not found");
     }
@@ -403,6 +389,7 @@ code { font: 11.5px ui-monospace, Consolas, monospace; word-break: break-all; }
         <input type="text" id="filter" placeholder="Filter lines (regex)">
         <label><input type="checkbox" id="highlights"> Highlights only</label>
         <label><input type="checkbox" id="follow" checked> Follow</label>
+        <span id="logStatus" class="small"></span>
       </div>
       <pre id="log"></pre>
     </div>
@@ -410,7 +397,7 @@ code { font: 11.5px ui-monospace, Consolas, monospace; word-break: break-all; }
 </main>
 <script>
 const MAX_LINES = 4000;
-let data = null, logJob = null, source = null, lines = [], selectedByUser = false;
+let data = null, logJob = null, lines = [], selectedByUser = false;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const pad = n => String(n).padStart(2, "0");
@@ -572,24 +559,55 @@ function redraw() {
   if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
 }
 
+function setLogStatus(text, bad) {
+  const el = $("logStatus");
+  el.textContent = text;
+  el.className = "small" + (bad ? " stale" : "");
+}
+
+function appendLines(added) {
+  if (!lines.length) $("log").textContent = "";
+  lines.push(...added);
+  if (lines.length > MAX_LINES) { lines = lines.slice(-MAX_LINES); redraw(); return; }
+  const re = filterRegex();
+  const html = added.filter(l => visible(l, re)).map(lineHtml).join("");
+  if (html) $("log").insertAdjacentHTML("beforeend", html);
+  if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
+}
+
+async function pollLog(id, token) {
+  let offset = -1;
+  while (token === logToken) {
+    let more = false;
+    try {
+      const response = await fetch("/api/log?id=" + encodeURIComponent(id) + "&after=" + offset, { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const result = await response.json();
+      if (token !== logToken) return;
+      if (result.missing) {
+        setLogStatus("no log file yet", false);
+      } else {
+        more = result.offset > offset && result.lines.length > 2000;
+        offset = result.offset;
+        if (result.lines.length) appendLines(result.lines.map(localStamp));
+        else if (!lines.length) $("log").textContent = "The log is empty so far.";
+        setLogStatus("live · " + clock(Date.now(), true), false);
+      }
+    } catch (e) {
+      setLogStatus("can't reach the dashboard server, retrying…", true);
+    }
+    await new Promise(r => setTimeout(r, more ? 50 : 1000));
+  }
+}
+
+let logToken = 0;
 function openLog(id) {
-  if (source) source.close();
   logJob = id;
   lines = [];
-  $("log").textContent = "Waiting for log output…";
+  $("log").textContent = "Loading log…";
   document.querySelectorAll("[data-job]").forEach(el => el.classList.toggle("selected", el.dataset.job === id));
   $("logJob").value = id;
-  source = new EventSource("/api/log?id=" + encodeURIComponent(id));
-  source.onmessage = e => {
-    const added = JSON.parse(e.data).map(localStamp);
-    if (!lines.length) $("log").textContent = "";
-    lines.push(...added);
-    if (lines.length > MAX_LINES) { lines = lines.slice(-MAX_LINES); redraw(); return; }
-    const re = filterRegex();
-    const html = added.filter(l => visible(l, re)).map(lineHtml).join("");
-    if (html) $("log").insertAdjacentHTML("beforeend", html);
-    if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
-  };
+  pollLog(id, ++logToken);
 }
 
 $("logJob").addEventListener("change", e => { selectedByUser = true; openLog(e.target.value); });
