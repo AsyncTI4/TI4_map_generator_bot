@@ -203,11 +203,7 @@ public class PuppetSoftHeBladeService {
         List<String> outputs = new ArrayList<>();
         Map<String, String> techs = new HashMap<>();
         techs.put("planesplitter-firm", "planesplitter-obs");
-        if (player.getGame().isFrankenGame()) {
-            techs.put("parasite-firm_y", "parasite-obs_y");
-        } else {
-            techs.put("parasite-firm", "parasite-obs");
-        }
+        techs.put("parasite-firm", "parasite-obs");
         for (Entry<String, String> e : techs.entrySet()) {
             String oldTech = e.getKey();
             String newTech = e.getValue();

@@ -124,6 +124,7 @@ public enum FrankenBanList {
                                     "l4",
                                     "lgf",
                                     "parasite-firm_y",
+                                    "parasite-obs_y",
                                     "scc",
                                     "so",
                                     "tp")),

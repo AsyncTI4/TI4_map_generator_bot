@@ -54,6 +54,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -344,7 +346,7 @@ public class StartCombatService {
                     unitHolder.getName(),
                     true);
             if ((unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) < 1
-                            || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                            || !player2.hasAnyUnit("titans_pds", "titans_pds2", "jotunn_pds", "jotunn_pds2"))
                     && unitHolder.getUnitCount(Units.UnitType.Mech, player2.getColor()) < 1
                     && unitHolder.getUnitCount(Units.UnitType.Infantry, player2.getColor()) < 1
                     && (unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) > 0
@@ -761,6 +763,20 @@ public class StartCombatService {
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
                 }
+                if (player1.hasAbility("rime_shields")
+                        && JotunnAbilityHandler.hasJotunnStructure(player1, game, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _Rime Shields_ and this system contains one of their structures. As such, you cannot modify your unit's combat rolls.");
+                }
+                if (player2.hasAbility("rime_shields")
+                        && JotunnAbilityHandler.hasJotunnStructure(player2, game, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _Rime Shields_ and this system contains one of their structures. As such, you cannot modify your unit's combat rolls.");
+                }
             }
         }
 
@@ -1076,6 +1092,9 @@ public class StartCombatService {
                         .append("> ")
                         .append(playerWithPds.getRepresentation())
                         .append('\n');
+                if (JotunnLeadersHandler.hasDeepFrostCoverage(game, playerWithPds)) {
+                    pdsMessage.append("-# _Deep Frost_: they may fire only if ships were moved into this system.\n");
+                }
             }
         }
         ZephyrionAbilityHandler.offerMercenaryShipCount(game, playersWithPds2);

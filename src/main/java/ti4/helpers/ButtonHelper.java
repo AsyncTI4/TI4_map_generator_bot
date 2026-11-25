@@ -69,6 +69,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -1010,7 +1012,10 @@ public class ButtonHelper {
                 || "null".equalsIgnoreCase(player.getFaction())
                 || !player.isRealPlayer()
                 || "".equalsIgnoreCase(player.getFaction())) {
-            game.removePlayer(player.getUserID());
+            if (!game.isMuaatManiaMode()
+                    || !player.isEliminated()) { // Muaat mania is more likely to accidentally do this
+                game.removePlayer(player.getUserID());
+            }
         } else {
             if (!player.getPlanetsForScoring(true).isEmpty() && !game.isConventionsOfWarAbandonedMode()) {
                 String msg =
@@ -1115,7 +1120,22 @@ public class ButtonHelper {
                 Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
             }
             if (game.getRealPlayers().size() == 1) {
-                Helper.checkEndGame(game, game.getRealPlayers().getFirst());
+                if (Helper.checkEndGame(game, game.getRealPlayers().getFirst())) {
+                    List<Button> buttons = new ArrayList<>();
+                    if (!game.isFowMode()) {
+                        buttons.add(Buttons.green("gameEnd", "End Game"));
+                        buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+                    } else {
+                        buttons.add(Buttons.green("gameEndConfirmation", "End and Delete Game"));
+                    }
+                    buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            game.getMainGameChannel(),
+                            "# " + game.getPing() + " it appears as though "
+                                    + game.getRealPlayers().getFirst().getRepresentationNoPing()
+                                    + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                            buttons);
+                }
             }
         }
 
@@ -2696,7 +2716,7 @@ public class ButtonHelper {
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
-                || !game.getStoredValue("phantomEnergy").isEmpty()
+                || !player.getStoredValue("phantomEnergy").isEmpty()
                 || player.hasTech("fsd")) {
             return true;
         }
@@ -5911,7 +5931,7 @@ public class ButtonHelper {
         String factionChecker = player.factionButtonChecker();
         List<Button> ringButtons = new ArrayList<>();
         Set<String> visibleFOWPositions =
-                FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
+                FOWPlusService.blindActivationActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Tile centerTile = game.getTileByPosition("000");
         if (game.getStoredValue("borrowedAuthorityColor").isEmpty()
                 && centerTile != null
@@ -5941,14 +5961,14 @@ public class ButtonHelper {
         if (game.getTileByPosition("frac1") != null) cornerStr += " & Fracture";
         Button corners = Buttons.green(factionChecker + "ring_corners", cornerStr);
         ringButtons.add(corners);
-        if (FOWPlusService.isActive(game)) {
+        if (FOWPlusService.blindActivationActive(game)) {
             FOWPlusService.filterRingButtons(ringButtons, player, game, visibleFOWPositions);
         }
         if (smartPicker) {
             SystemPickerService.dropUnknownSystems(ringButtons, player, game);
             SystemPickerService.addFirstStep(ringButtons, player, game);
         }
-        if (FOWPlusService.isActive(game) || SystemPickerService.isSegmented(game)) {
+        if (FOWPlusService.blindActivationActive(game) || SystemPickerService.isSegmented(game)) {
             ringButtons.add(Buttons.red(factionChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
@@ -7242,7 +7262,7 @@ public class ButtonHelper {
                         }
                     }
                 }
-                if (player.hasUnit("titans_pds") || player.hasTech("ht2")) {
+                if (player.hasAnyUnit("titans_pds", "jotunn_pds") || player.hasTech("ht2")) {
                     if (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                         if (uH instanceof Planet) {
                             buttons.add(Buttons.green(
@@ -8838,6 +8858,34 @@ public class ButtonHelper {
                 }
             } else {
                 playersWithPds2.add(hiveEchoPlayer);
+            }
+        }
+        for (Player jotunnPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(jotunnPlayer)
+                    || !JotunnAbilityHandler.hasWardstoneDoctrineCoverage(game, jotunnPlayer, activeTile)) {
+                continue;
+            }
+            if (jotunnPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(jotunnPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
+                    playersWithPds2.add(jotunnPlayer);
+                }
+            } else {
+                playersWithPds2.add(jotunnPlayer);
+            }
+        }
+        for (Player jotunnPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(jotunnPlayer)
+                    || !JotunnLeadersHandler.hasDeepFrostCoverage(game, jotunnPlayer)) {
+                continue;
+            }
+            if (jotunnPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(jotunnPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
+                    playersWithPds2.add(jotunnPlayer);
+                }
+            } else {
+                playersWithPds2.add(jotunnPlayer);
             }
         }
         return playersWithPds2;

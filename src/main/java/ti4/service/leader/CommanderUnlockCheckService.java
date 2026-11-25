@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -248,7 +249,7 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) >= 6
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) >= 6);
             case "lanefir" -> shouldBeUnlocked = (game.getNumberOfPurgedFragments() >= 7);
-            case "lizho" -> shouldBeUnlocked = (player.getTrapCardsPlanets().size() >= 3);
+            case "lizho" -> shouldBeUnlocked = (player.getTrapCardsPlanets().size() > 3);
             case "mirveda" -> shouldBeUnlocked = (ButtonHelper.getNumberOfUnitUpgrades(player) >= 2);
             case "mortheus" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfSystemsWithShipsNotAdjacentToHS(player, game) >= 3);
@@ -432,6 +433,9 @@ public class CommanderUnlockCheckService {
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
 
             case "xyrix" -> shouldBeUnlocked = true;
+            case "jotunn" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                        .anyMatch(tile -> JotunnAbilityHandler.getJotunnStructureCount(player, tile) >= 3);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

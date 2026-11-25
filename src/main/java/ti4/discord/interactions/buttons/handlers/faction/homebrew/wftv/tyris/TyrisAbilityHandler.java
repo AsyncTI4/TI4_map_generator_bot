@@ -1,7 +1,9 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -33,6 +35,7 @@ public class TyrisAbilityHandler {
                     "resolvePhantomEnergy_" + asyncID,
                     StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
         }
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " choose the ship type to use **Phantom Energy** on.",
@@ -42,35 +45,48 @@ public class TyrisAbilityHandler {
     @ButtonHandler("resolvePhantomEnergy_")
     public static void resolvePhantomEnergy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String asyncID = buttonID.split("_")[1];
-        game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
+        player.setStoredValue("phantomEnergy", player.getStoredValue("phantomEnergy") + asyncID);
+        String shipType = Mapper.getUnitBaseTypeFromAsyncID(asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " has used **Phantom Energy** on the "
-                        + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
+                player.getRepresentationNoPing() + " placed a control token on their "
+                        + StringUtils.capitalize(shipType) + " unit space with **Phantom Energy**. Their " + shipType
+                        + " ships may move out of systems that contain their command tokens, and transport units"
+                        + " that started in that ship's system.");
         ButtonHelper.deleteMessage(event);
     }
 
     public static void cleanupPhantomEnergy(Game game, Player player) {
-        if (game.getStoredValue("phantomEnergy").isEmpty()) {
+        if (player.getStoredValue("phantomEnergy").isEmpty()) {
             return;
         }
+        Set<String> removedShipTypes = new LinkedHashSet<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.hasPlayerCC(player)) {
                 for (String asyncID : tile.getSpaceUnitHolder()
                         .getUnitAsyncIdsOnHolder(player.getColorID())
                         .keySet()) {
-                    game.setStoredValue(
-                            "phantomEnergy",
-                            game.getStoredValue("phantomEnergy").replace(asyncID, ""));
+                    String marks = player.getStoredValue("phantomEnergy");
+                    if (marks.contains(asyncID)) {
+                        player.setStoredValue("phantomEnergy", marks.replace(asyncID, ""));
+                        removedShipTypes.add(StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID)));
+                    }
                 }
             }
+        }
+        if (!removedShipTypes.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " removed the **Phantom Energy** control token from their "
+                            + String.join(", ", removedShipTypes) + " unit space"
+                            + (removedShipTypes.size() > 1 ? "s" : "") + ".");
         }
     }
 
     public static void checkFlagshipPhantomEnergy(Game game, Player player) {
         if (player.hasUnit("tyris_flagship")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {
-            game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + "fs");
+            player.setStoredValue("phantomEnergy", player.getStoredValue("phantomEnergy") + "fs");
         }
     }
 

@@ -84,10 +84,15 @@ public final class FOWPlusService {
             Pair.of(FOWOption.HIDE_STATS_VIA_MAHACT_CC, true),
             Pair.of(FOWOption.HIDE_EXPLORES, true),
             Pair.of(FOWOption.HIDE_MAP, true),
-            Pair.of(FOWOption.HIDE_PLAYER_INFOS, true));
+            Pair.of(FOWOption.HIDE_PLAYER_INFOS, true),
+            Pair.of(FOWOption.BLIND_ACTIVATION, true));
 
     public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.FOW_PLUS);
+    }
+
+    public static boolean blindActivationActive(Game game) {
+        return isActive(game) || game.getFowOption(FOWOption.BLIND_ACTIVATION);
     }
 
     public static final String FOWPLUS_PLAY_CHANGES = """
@@ -145,7 +150,7 @@ public final class FOWPlusService {
     }
 
     public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
-        if (!isActive(game) || game.isWarfareAction()) return true;
+        if (!blindActivationActive(game) || game.isWarfareAction()) return true;
         if (visiblePositions != null) return visiblePositions.contains(position);
         return FoWHelper.getTilePositionsToShow(game, player).contains(position);
     }
@@ -158,7 +163,7 @@ public final class FOWPlusService {
     }
 
     public static boolean isVoid(Game game, String position) {
-        return isActive(game) && game.getTileByPosition(position) == null;
+        return blindActivationActive(game) && game.getTileByPosition(position) == null;
     }
 
     public static Tile voidTile(String position) {
@@ -191,7 +196,7 @@ public final class FOWPlusService {
 
         String targetPosition = position;
         Tile tile = game.getTileByPosition(targetPosition);
-        if (!isActive(game) && !ButtonHelper.canActivateTile(game, player, tile)) {
+        if (!blindActivationActive(game) && !ButtonHelper.canActivateTile(game, player, tile)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You cannot activate position " + position + ".");
             return;
@@ -286,7 +291,8 @@ public final class FOWPlusService {
 
     // Can only remove CCs from tiles that can be seen
     public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
-        return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
+        return blindActivationActive(game)
+                && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
     }
 
     // Hide explore and relic decks

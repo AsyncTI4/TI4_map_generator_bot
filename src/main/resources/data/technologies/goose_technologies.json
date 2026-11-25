@@ -39,10 +39,10 @@
         "types": [
             "WARFARE"
         ],
-        "requirements": "RRR",
+        "requirements": "RR",
         "faction": "brynfolk",
         "source": "goose",
-        "text": "At the start of combat, you may exhaust this card and choose one ship. That ship gains BOMBARDMENT 7 (x CAPACITY)."
+        "text": "Before you would roll for your unit's BOMBARDMENT, you may exhaust this card. Planets in the active system lose PLANETARY SHIELD until the end of this tactical action."
     },
     {
         "alias": "aovaettirys",
