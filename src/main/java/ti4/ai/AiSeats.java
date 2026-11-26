@@ -71,7 +71,8 @@ public class AiSeats {
 
     private static long randomNumber() {
         long number = 0;
-        for (int i = 0; i < RANDOM_DIGITS; i++) number = number * 10 + RandomHelper.current().nextInt(10);
+        for (int i = 0; i < RANDOM_DIGITS; i++)
+            number = number * 10 + RandomHelper.current().nextInt(10);
         return number;
     }
 
