@@ -4,6 +4,8 @@
 
 **Verdict:** Inconclusive. The batch was interrupted by a PC restart after 43 of 48 games; 20 complete pairs give +0.16 ± 0.21 VP, within noise.
 
+Decision (2026-11-25): kept as final at 20 pairs; no second batch. POOLED_BOOST_RESPLIT stays on, as it is neutral-to-slightly-positive and follows the rules.
+
 ## Code
 
 - Commit: b2ff2c28e2 (merge of claude/ai-agenda-expert into claude/ai-styx-take)
