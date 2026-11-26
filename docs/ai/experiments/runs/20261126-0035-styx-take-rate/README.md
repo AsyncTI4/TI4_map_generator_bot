@@ -4,7 +4,7 @@
 
 **Question:** Styx take rate with the Fracture in every game, after the movement model, Styx gathering and pooled boost re-split work plus the AI PR perf fixes (target 80%+, humans 87%; seed 9700 games 1-16 were 5/16 = 31% before)
 
-**Verdict:** Better, still short of the target. Styx was taken in 18 of 32 games (56%) against the 80% target and the human 87%. On the same first 16 seeds it went from 5/16 to 8/16. The first take comes late, in round 4.9 on average (range 3 to 8), with the Fracture in by round 1 or 2. 10 of the 14 games without a take ended in round 5, so they were over before the usual take round; in games that reached round 6 the rate was 15 of 22 (68%). Styx was attacked in 20 games and taken in 18. The takes came from Letnev 11, Sardakk 7, Sol 2, Hacan 1 and Nekro 2 (counting changes of hands); Xxcha never took it. Follow-up: find out why the strike waits until round 4-5.
+**Verdict:** Better, still short of the target. Styx was taken in 18 of 32 games (56%) against the 80% target and the human 87%. On the same first 16 seeds it went from 5/16 to 8/16. The first take comes late, in round 4.9 on average (range 3 to 8), with the Fracture in by round 1 or 2. 10 of the 14 games without a take ended in round 5, so they were over before the usual take round; in games that reached round 6 the rate was 15 of 22 (68%). Styx was attacked in 20 games and taken in 18. The takes came from Letnev 11, Sardakk 6, Sol 2, Hacan 1 and Nekro 2 (counting changes of hands); Xxcha never took it. Follow-up: find out why the strike waits until round 4-5.
 
 ## Code
 
