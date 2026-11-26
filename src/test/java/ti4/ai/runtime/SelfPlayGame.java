@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiMemory;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.secrets.SecretPhase;
 import ti4.ai.selfplay.SelfPlaySetup;
 import ti4.game.Game;
@@ -494,23 +495,30 @@ final class SelfPlayGame {
                 }
                 HarnessTiming.Mark mark = HarnessTiming.Mark.now();
                 long observeStart = mark.wall();
-                recordVictoryPoints(game);
-                recordPlayRounds(game);
-                mark = harness.add("track.rounds", mark);
-                env.promissory.observe(game);
-                mark = harness.add("track.promissory", mark);
-                objectives.observe(game);
-                mark = harness.add("track.objectives", mark);
-                agendas.observe(game, now);
-                mark = harness.add("track.agendas", mark);
-                relics.observe(game);
-                mark = harness.add("track.relics", mark);
-                env.leaders.observe(game);
-                mark = harness.add("track.leaders", mark);
-                env.factionComponents.observe(game, env.discord);
-                mark = harness.add("track.factionComponents", mark);
-                env.spending.observe(game);
-                mark = harness.add("track.spending", mark);
+                // The trackers probe the AI (objective plans, agenda forecasts) on the harness's reloaded copy, outside
+                // any decision. An isolated memo keeps what they work out out of the caches the AI shares across
+                // decisions: unscoped, an imagined rival turn inside them became the outermost scope and wrote
+                // masked-hand tactical rankings into SaveMemo, where the next real decision on the same save could read
+                // them.
+                try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+                    recordVictoryPoints(game);
+                    recordPlayRounds(game);
+                    mark = harness.add("track.rounds", mark);
+                    env.promissory.observe(game);
+                    mark = harness.add("track.promissory", mark);
+                    objectives.observe(game);
+                    mark = harness.add("track.objectives", mark);
+                    agendas.observe(game, now);
+                    mark = harness.add("track.agendas", mark);
+                    relics.observe(game);
+                    mark = harness.add("track.relics", mark);
+                    env.leaders.observe(game);
+                    mark = harness.add("track.leaders", mark);
+                    env.factionComponents.observe(game, env.discord);
+                    mark = harness.add("track.factionComponents", mark);
+                    env.spending.observe(game);
+                    mark = harness.add("track.spending", mark);
+                }
                 boolean forced = false;
                 if (fracture.due(game)) {
                     force(game, fracture::enter);
@@ -524,16 +532,18 @@ final class SelfPlayGame {
                 // What the harness itself changed is not a seat spending: the spending diffs start again after it.
                 if (forced) env.spending.rebase(game);
                 mark = harness.add("harness.saves", mark);
-                fracture.observe(game);
-                mark = harness.add("track.fracture", mark);
-                probeStyx(game);
-                logFleets(game);
-                logResearchPlans(game);
-                mark = harness.add("track.logs", mark);
-                closeOverrulePicks(game, false);
-                mark = harness.add("track.overrule", mark);
-                turnDurations.observe(game, now);
-                mark = harness.add("track.turns", mark);
+                try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+                    fracture.observe(game);
+                    mark = harness.add("track.fracture", mark);
+                    probeStyx(game);
+                    logFleets(game);
+                    logResearchPlans(game);
+                    mark = harness.add("track.logs", mark);
+                    closeOverrulePicks(game, false);
+                    mark = harness.add("track.overrule", mark);
+                    turnDurations.observe(game, now);
+                    mark = harness.add("track.turns", mark);
+                }
                 ti4.ai.trace.TimingReport.recordOutside("harness.observe", mark.wall() - observeStart);
                 if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
                 if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);

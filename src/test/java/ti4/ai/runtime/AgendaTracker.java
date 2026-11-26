@@ -12,6 +12,7 @@ import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.agenda.AgendaUtilityProbe;
 import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.RiderPayoff;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -177,7 +178,17 @@ final class AgendaTracker {
         else open.fallbackTieBreaks++;
     }
 
+    // The probes below run the AI's own agenda forecasts between ticks, outside any decision. An isolated memo lets one
+    // observation reuse their repeated parts as a decision would (one agenda bounty alone took 154 s of a step without
+    // it), while keeping what they work out on the harness's reloaded copy of the game out of the caches the AI shares
+    // across decisions and games.
     synchronized void observe(Game game, long now) {
+        try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+            observeAgenda(game, now);
+        }
+    }
+
+    private void observeAgenda(Game game, long now) {
         if (finished != null) return;
         String phase = game.getPhaseOfGame();
         boolean inAgenda = phase != null && phase.toLowerCase(Locale.ROOT).startsWith(AGENDA_PHASE_PREFIX);

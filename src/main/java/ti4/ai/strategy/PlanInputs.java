@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.Threats;
@@ -34,6 +35,7 @@ record PlanInputs(
         boolean planless) {
 
     private static final int MAX_CACHED = 32;
+    private static final String DECISION_MEMO = "strategy.planInputs";
     private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
     private static final ThreadLocal<Boolean> RANKING_FREED = ThreadLocal.withInitial(() -> false);
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
@@ -53,21 +55,34 @@ record PlanInputs(
     static PlanInputs of(Game game, Player seat, PlanMoment moment) {
         String key = game.getName() + "|" + seat.getUserID() + "|" + moment + viewerKey(game, seat)
                 + ImaginedTurn.cacheMark(seat);
+        if (COMPUTING.get().contains(key)) return withoutPlans(game, seat, moment);
+        return DecisionMemo.remember(
+                () -> cachedOrComputed(game, seat, moment, key), DECISION_MEMO, game, game.getLastModifiedDate(), key);
+    }
+
+    private static PlanInputs cachedOrComputed(Game game, Player seat, PlanMoment moment, String key) {
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        if (!COMPUTING.get().add(key)) return withoutPlans(game, seat, moment);
+        COMPUTING.get().add(key);
         PlanInputs inputs;
         try {
             inputs = compute(game, seat, moment);
         } finally {
             COMPUTING.get().remove(key);
         }
+        if (DecisionMemo.isolated()) return inputs;
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
         return inputs;
+    }
+
+    static void clearShared() {
+        synchronized (CACHE) {
+            CACHE.clear();
+        }
     }
 
     private static String viewerKey(Game game, Player seat) {
