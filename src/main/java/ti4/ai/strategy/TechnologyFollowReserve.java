@@ -13,7 +13,8 @@ public class TechnologyFollowReserve {
     private static final String ACTION_PHASE = "action";
 
     public static SpendCost of(Game game, Player seat) {
-        return DecisionMemo.remember(() -> measured(game, seat), "technology.follow.reserve", game, seat);
+        return DecisionMemo.remember(
+                () -> measured(game, seat), "technology.follow.reserve", game, seat, TokenPurchase.estimatingPlans());
     }
 
     private static SpendCost measured(Game game, Player seat) {

@@ -93,6 +93,10 @@ public class TokenPurchase {
         return Optional.empty();
     }
 
+    static boolean estimatingPlans() {
+        return ESTIMATING_PLANS.get();
+    }
+
     static SpendCost technologyFollowToKeep(Game game, Player seat, Wallet wallet) {
         if (!AiExperiments.enabled(seat, AiExperiments.Experiment.TECH_FOLLOW_KEEP)) return SpendCost.NONE;
         if (ESTIMATING_PLANS.get()) return SpendCost.NONE;

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ExpectedReadying;
@@ -200,6 +201,35 @@ class XxekirGromRulesTest extends BaseTi4Test {
         // The seat still holds its agent, which readies one planet on its own.
         assertThat(ExpectedReadying.readiesBeforeStatus(test.game, xxcha))
                 .isEqualTo(ExpectedReadying.XXCHA_AGENT_READIES);
+    }
+
+    // A rival imagining Xxcha's turn cannot see its secrets, so it plans on no hero readies; that answer must not be
+    // served to Xxcha's own decision later in the same save, nor Xxcha's answer to the rival.
+    @Test
+    void anImaginedTurnAndTheSeatsOwnTurnKeepTheirOwnReadies() {
+        mechanizeTheMilitaryInRoundThree();
+        xxcha.setTacticalCC(0);
+
+        int imaginedFirst = ImaginedTurn.of(xxcha, () -> XxekirGromPlan.readiesThisRound(test.game, xxcha));
+        int own = XxekirGromPlan.readiesThisRound(test.game, xxcha);
+        int imaginedAfter = ImaginedTurn.of(xxcha, () -> XxekirGromPlan.readiesThisRound(test.game, xxcha));
+
+        assertThat(own).isPositive();
+        assertThat(imaginedFirst).isZero();
+        assertThat(imaginedAfter).isZero();
+    }
+
+    // Four PDS from the hero complete Build Defenses, but only Xxcha knows it holds that secret.
+    @Test
+    void anImaginedTurnDoesNotSeeAStructureSecret() {
+        test.game.setRound(3);
+        xxcha.setSecret("build_defenses");
+        xxcha.setTacticalCC(0);
+
+        int imagined = ImaginedTurn.of(xxcha, () -> XxekirGromPlan.readiesThisRound(test.game, xxcha));
+
+        assertThat(imagined).isZero();
+        assertThat(XxekirGromPlan.readiesThisRound(test.game, xxcha)).isPositive();
     }
 
     // Played for Amass Wealth, the hero readies the two exhausted planets (Archon Ren and Abyz), not a flat four.

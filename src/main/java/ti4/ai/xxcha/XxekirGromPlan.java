@@ -19,6 +19,7 @@ import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.SearchMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.Threats;
 import ti4.ai.explore.ExploreSite;
 import ti4.ai.scoring.Footprint;
@@ -128,7 +129,7 @@ public class XxekirGromPlan {
 
     public static int readiesThisRound(Game game, Player seat) {
         if (!seat.hasLeaderUnlocked(XxekirGromRules.HERO) || seat.isPassed() || PLANNING.get()) return 0;
-        String key = game.getName() + "|" + seat.getUserID();
+        String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
         List<Object> state = state(game, seat);
         Cached cached = CACHE.get(key);
         if (cached != null && cached.isFor(game, state)) return cached.readies();
@@ -439,7 +440,7 @@ public class XxekirGromPlan {
                         .ifPresent(targets::add);
             }
         }
-        for (String id : seat.getSecretsUnscored().keySet()) {
+        for (String id : ImaginedTurn.unscoredSecrets(seat).keySet()) {
             if (isStructureObjective(id)) structureTarget(game, seat, id, 1).ifPresent(targets::add);
         }
         return targets;
