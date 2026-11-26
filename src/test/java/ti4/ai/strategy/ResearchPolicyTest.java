@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.model.Mapper;
@@ -174,5 +175,24 @@ class ResearchPolicyTest extends BaseTi4Test {
 
         assertThat(ResearchPolicy.frontierTapValue(test.game, test.nekro, "det"))
                 .isLessThan(early);
+    }
+
+    // Instinct Training and Nullification Field are valued at a flat 2.0 and 2.5 TG (the user's decision), with no
+    // human research prior on top and no decay as the game shortens. The Xxcha seat owns three technologies of each
+    // colour, so neither one is a stepping stone or needs a prerequisite skip; no objective is in play.
+    @Test
+    void valuesInstinctTrainingAndNullificationFieldFlatForXxcha() {
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        for (String tech : new String[] {"nm", "bs", "ps", "amd", "gd", "fl", "sdn", "pi", "aida", "sar", "pa"}) {
+            xxcha.addTech(tech);
+        }
+
+        assertThat(ResearchPolicy.researchValue(test.game, xxcha, "it")).isEqualTo(2.0);
+        assertThat(ResearchPolicy.researchValue(test.game, xxcha, "nf")).isEqualTo(2.5);
+
+        test.points(test.nekro, 6);
+
+        assertThat(ResearchPolicy.researchValue(test.game, xxcha, "it")).isEqualTo(2.0);
+        assertThat(ResearchPolicy.researchValue(test.game, xxcha, "nf")).isEqualTo(2.5);
     }
 }

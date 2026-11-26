@@ -17,6 +17,7 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -32,6 +33,10 @@ import ti4.testUtils.discord.FakeMessage;
 // - state: the game state changed in a way only a use explains (a leader exhausted, a technology exhausted, a note
 //   in someone else's hand or play area, a flagship or mech placed);
 // - message: a bot message without such a button names it (often the bot resolving something on its own).
+// Research presses and menus for a faction technology are kept apart from its use, note give menus apart from its
+// offers, and a component that only works passively (a commander, an ability with no timing window) is marked passive,
+// since no press or state change can show it being used. A component in FOLLOW_THROUGH also counts how often its use
+// was followed by the press that finishes it (Ggrocuto Rinn exhausting, then readying a planet).
 final class FactionComponentTracker {
 
     // Every finished game's summary, read once at the end of a batch.
@@ -42,9 +47,28 @@ final class FactionComponentTracker {
     private static final int MIN_NAME = 5;
     private static final int REASONS_KEPT = 6;
 
-    record Component(String faction, String kind, String id, String name) {
+    // Handlers that never contain the component's id, by component id (lower case, matched as a whole id token).
+    private static final Map<String, Set<String>> HANDLER_ALIASES = Map.of("naalubt", Set.of("mindsievefollow"));
+    // The press that completes a use, by component id. It only counts while that component's use is open: the shared
+    // khraskHeroStep4Ready_ handler is also posted by Reparations and other readying effects.
+    private static final Map<String, String> FOLLOW_THROUGH = Map.of("xxchaagent", "khraskherostep4ready_");
+    private static final List<String> RESEARCH_HANDLERS = List.of("gettech_", "entropicscar_", "acquireatech");
+    private static final List<String> GIVE_MENUS = List.of("naaluherosend_", "send_pns_");
+
+    record Component(String faction, String kind, String id, String name, boolean passive) {
+        Component(String faction, String kind, String id, String name) {
+            this(faction, kind, id, name, false);
+        }
+
         String key() {
             return faction + "|" + kind + "|" + id;
+        }
+
+        // "Sh'val, Harbinger" is "Sh'val" in most of the AI's reasons.
+        String shortName() {
+            if (name == null) return "";
+            int comma = name.indexOf(',');
+            return comma < 0 ? name : name.substring(0, comma).trim();
         }
     }
 
@@ -55,6 +79,10 @@ final class FactionComponentTracker {
         int decided;
         int state;
         int messages;
+        int researched;
+        int researchOffers;
+        int giveMenus;
+        int followThrough;
         int firstUse = -1;
         final Set<Integer> rounds = new TreeSet<>();
         final List<String> reasons = new ArrayList<>();
@@ -79,6 +107,7 @@ final class FactionComponentTracker {
     private final Map<String, Usage> usages = new LinkedHashMap<>();
     private final Map<String, List<Component>> byFaction = new HashMap<>();
     private final Map<String, String> states = new HashMap<>();
+    private final Set<String> openUses = new java.util.HashSet<>();
     private final Map<Long, Integer> seenMessages = new HashMap<>();
     private final Map<Long, Set<String>> offeredOnMessage = new HashMap<>();
     private final List<String> lines = new ArrayList<>();
@@ -96,9 +125,17 @@ final class FactionComponentTracker {
 
     synchronized void pressed(int round, String faction, String customId, String outcome) {
         if (!"PRESSED".equals(outcome)) return;
+        String lower = customId.toLowerCase(Locale.ROOT);
         for (Component component : byFaction.getOrDefault(faction, List.of())) {
+            followedThrough(round, component, lower, customId);
             if (!matchesId(component, customId)) continue;
             Usage usage = usage(component);
+            if (isResearch(component, lower)) {
+                usage.researched++;
+                lines.add(String.format(
+                        "r%d %s %s:%s researched %s", round, faction, component.kind(), component.id(), customId));
+                continue;
+            }
             usage.pressed++;
             usage.use(round);
             lines.add(String.format(
@@ -110,11 +147,20 @@ final class FactionComponentTracker {
         if (reason == null || reason.isBlank()) return;
         String lower = reason.toLowerCase(Locale.ROOT);
         for (Component component : byFaction.getOrDefault(faction, List.of())) {
-            if (!mentions(component, lower)) continue;
+            if (!mentions(component, lower) && !mentionsShortName(component, lower)) continue;
             Usage usage = usage(component);
             usage.decided++;
             if (usage.reasons.size() < REASONS_KEPT) usage.reasons.add("r" + round + ": " + reason);
         }
+    }
+
+    private void followedThrough(int round, Component component, String lowerId, String customId) {
+        String trigger = FOLLOW_THROUGH.get(component.id());
+        if (trigger == null || !lowerId.contains(trigger) || !openUses.remove(component.key())) return;
+        usage(component).followThrough++;
+        lines.add(String.format(
+                "r%d %s %s:%s followed through with %s",
+                round, component.faction(), component.kind(), component.id(), customId));
     }
 
     synchronized Summary summary(String game) {
@@ -127,12 +173,16 @@ final class FactionComponentTracker {
         FactionModel model = Mapper.getFaction(faction);
         for (String id : seat.getAbilities()) {
             var ability = Mapper.getAbility(id);
-            components.add(new Component(faction, "ability", id, ability == null ? id : ability.getName()));
+            boolean passive = ability != null
+                    && ability.getWindow().isEmpty()
+                    && ability.getPermanentEffect().isPresent();
+            components.add(new Component(faction, "ability", id, ability == null ? id : ability.getName(), passive));
         }
         for (String id : seat.getLeaderIDs()) {
             var leader = Mapper.getLeader(id);
-            components.add(new Component(
-                    faction, leader == null ? "leader" : leader.getType(), id, leader == null ? id : leader.getName()));
+            String type = leader == null ? "leader" : leader.getType();
+            components.add(
+                    new Component(faction, type, id, leader == null ? id : leader.getName(), "commander".equals(type)));
         }
         for (String id : seat.getFactionTechs()) {
             var tech = Mapper.getTech(id);
@@ -181,11 +231,23 @@ final class FactionComponentTracker {
                         ? "locked"
                         : seat.isBreakthroughExhausted(component.id()) ? "exhausted" : "ready";
             case "note" -> noteState(game, seat, component.id());
-            case "unit:flagship", "unit:mech" ->
-                String.valueOf(ButtonHelper.getNumberOfUnitsOnTheBoard(
-                        game, seat, component.kind().substring(5)));
-            default -> null;
+            default -> component.kind().startsWith("unit:") ? unitsOnBoard(game, seat, component.id()) : null;
         };
+    }
+
+    private static String unitsOnBoard(Game game, Player seat, String unitId) {
+        UnitModel unit = Mapper.getUnit(unitId);
+        if (unit == null || unit.getUnitType() == null) return null;
+        return String.valueOf(
+                ButtonHelper.getNumberOfUnitsOnTheBoard(game, Units.getUnitKey(unit.getUnitType(), seat.getColor())));
+    }
+
+    // Flagships and mechs get a line per change; other faction units (infantry, fighters, carriers) change so often
+    // that only their counts are kept.
+    private static boolean logsEveryChange(Component component) {
+        return !component.kind().startsWith("unit:")
+                || "unit:flagship".equals(component.kind())
+                || "unit:mech".equals(component.kind());
     }
 
     private static String leaderState(Player seat, String id) {
@@ -219,7 +281,10 @@ final class FactionComponentTracker {
         if (use) {
             usage.state++;
             usage.use(round);
+            if (FOLLOW_THROUGH.containsKey(component.id())) openUses.add(component.key());
         }
+        if ("ready".equals(now)) openUses.remove(component.key());
+        if (!logsEveryChange(component)) return;
         lines.add(String.format(
                 "r%d %s %s:%s %s%s",
                 round, component.faction(), component.kind(), component.id(), event, use ? " [use]" : ""));
@@ -262,7 +327,7 @@ final class FactionComponentTracker {
             for (Component component : components) {
                 boolean button = buttons.stream().anyMatch(candidate -> offers(component, candidate));
                 if (button) {
-                    if (offered.add(component.key())) usage(component).offered++;
+                    if (offered.add(component.key())) countOffer(component, buttons);
                     continue;
                 }
                 if (buttons.isEmpty() && mentions(component, content)) usage(component).messages++;
@@ -270,7 +335,31 @@ final class FactionComponentTracker {
         }
     }
 
-    private static boolean offers(Component component, Button button) {
+    private void countOffer(Component component, List<Button> buttons) {
+        Usage usage = usage(component);
+        List<String> ids = buttons.stream()
+                .filter(button -> offers(component, button))
+                .map(Button::getCustomId)
+                .map(id -> id == null ? "" : id.toLowerCase(Locale.ROOT))
+                .toList();
+        if (ids.stream().allMatch(id -> isResearch(component, id))) {
+            usage.researchOffers++;
+        } else if (ids.stream().allMatch(id -> isGiveMenu(component, id))) {
+            usage.giveMenus++;
+        } else {
+            usage.offered++;
+        }
+    }
+
+    static boolean isResearch(Component component, String lowerId) {
+        return "tech".equals(component.kind()) && RESEARCH_HANDLERS.stream().anyMatch(lowerId::contains);
+    }
+
+    static boolean isGiveMenu(Component component, String lowerId) {
+        return "note".equals(component.kind()) && GIVE_MENUS.stream().anyMatch(lowerId::contains);
+    }
+
+    static boolean offers(Component component, Button button) {
         String id = button.getCustomId();
         if (id != null && id.startsWith("FFCC_") && !id.startsWith("FFCC_" + component.faction() + "_")) return false;
         if (id != null && matchesId(component, id)) return true;
@@ -278,18 +367,28 @@ final class FactionComponentTracker {
         return label != null && mentions(component, label.toLowerCase(Locale.ROOT));
     }
 
-    private static boolean matchesId(Component component, String customId) {
+    // A whole id token also matches the component id with its underscores removed (peaceAccords_ for peace_accords,
+    // orbitalDrop for orbital_drop) or one of its handler aliases. Only whole tokens count, so a short squeezed id
+    // cannot match inside an unrelated handler name.
+    static boolean matchesId(Component component, String customId) {
         String id = component.id().toLowerCase(Locale.ROOT);
+        String compact = id.replace("_", "");
         String lower = customId.toLowerCase(Locale.ROOT);
         if (id.length() >= MIN_CONTAINED_ID && lower.contains(id)) return true;
+        Set<String> aliases = HANDLER_ALIASES.getOrDefault(id, Set.of());
         for (String token : TOKEN_SPLIT.split(lower)) {
-            if (token.equals(id)) return true;
+            if (token.equals(id) || token.equals(compact) || aliases.contains(token)) return true;
         }
         return false;
     }
 
     private static boolean mentions(Component component, String lowerText) {
         String name = component.name() == null ? "" : component.name().toLowerCase(Locale.ROOT);
+        return name.length() >= MIN_NAME && lowerText.contains(name);
+    }
+
+    private static boolean mentionsShortName(Component component, String lowerText) {
+        String name = component.shortName().toLowerCase(Locale.ROOT);
         return name.length() >= MIN_NAME && lowerText.contains(name);
     }
 
@@ -336,6 +435,12 @@ final class FactionComponentTracker {
         int decisions = games.stream().mapToInt(usage -> usage.decided).sum();
         int stateUses = games.stream().mapToInt(usage -> usage.state).sum();
         int messages = games.stream().mapToInt(usage -> usage.messages).sum();
+        int researched = games.stream().mapToInt(usage -> usage.researched).sum();
+        int researchOffers =
+                games.stream().mapToInt(usage -> usage.researchOffers).sum();
+        int giveMenus = games.stream().mapToInt(usage -> usage.giveMenus).sum();
+        int followThrough =
+                games.stream().mapToInt(usage -> usage.followThrough).sum();
         double firstUse = games.stream()
                 .filter(usage -> usage.firstUse >= 0)
                 .mapToInt(usage -> usage.firstUse)
@@ -347,7 +452,8 @@ final class FactionComponentTracker {
         games.forEach(usage -> usage.rounds.forEach(round -> rounds.merge(round, 1, Integer::sum)));
         System.out.printf(
                 "FACTIONCOMP   %s %-14s %-34s used in %d/%d games, offered in %d (%d offers), AI presses %d, AI reasons %d,"
-                        + " state uses %d, bot mentions %d, first use r%s, rounds used %s, state events %s%n",
+                        + " state uses %d, bot mentions %d, first use r%s, rounds used %s, state events %s, researched %d"
+                        + " (research menus %d), give menus %d, follow-through %s, passive %s%n",
                 component.faction(),
                 component.kind(),
                 component.name() + " (" + component.id() + ")",
@@ -361,7 +467,12 @@ final class FactionComponentTracker {
                 messages,
                 Double.isNaN(firstUse) ? "-" : String.format("%.1f", firstUse),
                 rounds,
-                events);
+                events,
+                researched,
+                researchOffers,
+                giveMenus,
+                FOLLOW_THROUGH.containsKey(component.id()) ? followThrough + " of " + stateUses + " uses" : "-",
+                component.passive() ? "yes" : "no");
         games.stream()
                 .flatMap(usage -> usage.reasons.stream())
                 .limit(REASONS_KEPT)

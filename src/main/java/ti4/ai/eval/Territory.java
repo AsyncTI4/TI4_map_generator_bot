@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -26,6 +27,7 @@ public final class Territory {
     private static final int RADIUS = 12;
     private static final String OFF_MAP = "x";
     private static final long UNREACHED = Long.MAX_VALUE;
+    private static final Map<String, Map<String, Integer>> DISTANCES = new ConcurrentHashMap<>();
 
     private final String homePosition;
     private final String mecatolPosition;
@@ -89,8 +91,17 @@ public final class Territory {
     }
 
     private static Map<String, Integer> distancesFrom(@Nullable String start) {
+        if (start == null) return Map.of();
+        return DISTANCES.computeIfAbsent(start, Territory::measuredDistancesFrom);
+    }
+
+    static int cachedStarts() {
+        return DISTANCES.size();
+    }
+
+    private static Map<String, Integer> measuredDistancesFrom(String start) {
         Map<String, Integer> distances = new HashMap<>();
-        if (start == null || MapPositionMapper.getAdjacentTilePositions(start).isEmpty()) return distances;
+        if (MapPositionMapper.getAdjacentTilePositions(start).isEmpty()) return Map.of();
         distances.put(start, 0);
         ArrayDeque<String> queue = new ArrayDeque<>();
         queue.add(start);
@@ -104,6 +115,6 @@ public final class Territory {
                 queue.addLast(next);
             }
         }
-        return distances;
+        return Map.copyOf(distances);
     }
 }

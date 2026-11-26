@@ -103,6 +103,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final PromissoryTracker promissory = new PromissoryTracker();
     final LeaderTracker leaders = new LeaderTracker();
     final FactionComponentTracker factionComponents = new FactionComponentTracker();
+    final SpendingTracker spending = new SpendingTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -404,6 +405,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     target.customId(),
                     outcome.outcome().name());
             factionComponents.pressed(
+                    currentRound(),
+                    seat.faction(),
+                    target.customId(),
+                    outcome.outcome().name());
+            spending.pressed(
                     currentRound(),
                     seat.faction(),
                     target.customId(),

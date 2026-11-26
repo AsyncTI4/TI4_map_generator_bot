@@ -68,14 +68,16 @@ class XxchaAgentRulesTest extends BaseTi4Test {
                 "users", PromptSource.PUBLIC, NOW, "exhaustAgent_xxchaagent_xxcha", "exhaustAgent_xxchaagent_sol");
     }
 
+    // XxchaAgent.resolve posts the planet buttons owned by the Xxcha (AgentModule.ownedStepId), into its Cards Info
+    // thread, which the AI reads as its own thread.
     private static AiPrompt planetChoice() {
         return prompt(
                 "planets",
-                PromptSource.PUBLIC,
+                PromptSource.AI_THREAD,
                 NOW,
-                "khraskHeroStep4Ready_xxcha_abyz",
-                "khraskHeroStep4Ready_xxcha_fria",
-                "khraskHeroStep4Ready_sol_jord");
+                "FFCC_xxcha_khraskHeroStep4Ready_xxcha_abyz",
+                "FFCC_xxcha_khraskHeroStep4Ready_xxcha_fria",
+                "FFCC_xxcha_khraskHeroStep4Ready_sol_jord");
     }
 
     private static String pressed(Optional<AiDecision> decision) {
@@ -96,8 +98,34 @@ class XxchaAgentRulesTest extends BaseTi4Test {
         assertThat(pressed(XxchaAgentRules.next(context(componentMenu()))))
                 .isEqualTo("FFCC_xxcha_componentActionRes_leader_xxchaagent");
         assertThat(pressed(XxchaAgentRules.next(context(userChoice())))).isEqualTo("exhaustAgent_xxchaagent_xxcha");
-        assertThat(pressed(XxchaAgentRules.next(context(planetChoice())))).isEqualTo("khraskHeroStep4Ready_xxcha_abyz");
+        assertThat(pressed(XxchaAgentRules.next(context(planetChoice()))))
+                .isEqualTo("FFCC_xxcha_khraskHeroStep4Ready_xxcha_abyz");
         assertThat(XxchaAgentRules.next(context(planetChoice()))).isEmpty();
+    }
+
+    // Regression: the rules used to match only unowned planet buttons, so against the owned ids the engine really
+    // posts the agent was exhausted, the bot waited out the step and readied nothing.
+    @Test
+    void pressesTheOwnedPlanetButtonTheEnginePosts() {
+        beforePassing();
+        XxchaAgentRules.next(context(componentMenu()));
+        XxchaAgentRules.next(context(userChoice()));
+
+        Optional<AiDecision> decision = XxchaAgentRules.next(context(planetChoice()));
+
+        assertThat(decision).containsInstanceOf(AiDecision.Press.class);
+        assertThat(pressed(decision)).isEqualTo("FFCC_xxcha_khraskHeroStep4Ready_xxcha_abyz");
+    }
+
+    // A planet button owned by another seat is not the Xxcha's to press.
+    @Test
+    void ignoresAPlanetButtonOwnedByAnotherSeat() {
+        beforePassing();
+        XxchaAgentRules.next(context(componentMenu()));
+        XxchaAgentRules.next(context(userChoice()));
+        AiPrompt foreign = prompt("planets", PromptSource.PUBLIC, NOW, "FFCC_sol_khraskHeroStep4Ready_xxcha_abyz");
+
+        assertThat(XxchaAgentRules.next(context(foreign))).containsInstanceOf(AiDecision.Wait.class);
     }
 
     // While the agent is mid-way through the button chain the turn must not end, so the bot waits for the next prompt.
@@ -157,14 +185,15 @@ class XxchaAgentRulesTest extends BaseTi4Test {
         assertThat(pressed(beforePassing())).isEqualTo("FFCC_xxcha_componentAction");
         AiPrompt planets = prompt(
                 "planets",
-                PromptSource.PUBLIC,
+                PromptSource.AI_THREAD,
                 NOW,
-                "khraskHeroStep4Ready_xxcha_archontau",
-                "khraskHeroStep4Ready_xxcha_archonren");
+                "FFCC_xxcha_khraskHeroStep4Ready_xxcha_archontau",
+                "FFCC_xxcha_khraskHeroStep4Ready_xxcha_archonren");
         assertThat(pressed(XxchaAgentRules.next(context(componentMenu()))))
                 .isEqualTo("FFCC_xxcha_componentActionRes_leader_xxchaagent");
         assertThat(pressed(XxchaAgentRules.next(context(userChoice())))).isEqualTo("exhaustAgent_xxchaagent_xxcha");
-        assertThat(pressed(XxchaAgentRules.next(context(planets)))).isEqualTo("khraskHeroStep4Ready_xxcha_archonren");
+        assertThat(pressed(XxchaAgentRules.next(context(planets))))
+                .isEqualTo("FFCC_xxcha_khraskHeroStep4Ready_xxcha_archonren");
     }
 
     // Someone is still acting, so an action that spends no token is worth something even when the planet it readies

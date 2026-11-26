@@ -1,6 +1,7 @@
 package ti4.ai.strategy;
 
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.SpendCost;
 import ti4.game.Game;
@@ -12,6 +13,10 @@ public class TechnologyFollowReserve {
     private static final String ACTION_PHASE = "action";
 
     public static SpendCost of(Game game, Player seat) {
+        return DecisionMemo.remember(() -> measured(game, seat), "technology.follow.reserve", game, seat);
+    }
+
+    private static SpendCost measured(Game game, Player seat) {
         return pending(game, seat) ? SpendCost.resources(StrategyCardRules.FOLLOW_TECH_COST) : SpendCost.NONE;
     }
 

@@ -3,6 +3,7 @@ package ti4.ai.expedition;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.naalu.MindsieveFollow;
 import ti4.ai.yin.YinAscendant;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,7 +20,7 @@ public class BreakthroughValue {
     static final double FULL_VALUE_ROUNDS = 4;
     public static final double PRIORITY_FLOOR = 8.0;
     private static final Map<String, Double> PRIORITY_FLOORS =
-            Map.of("hacan", PRIORITY_FLOOR, "letnev", PRIORITY_FLOOR);
+            Map.of("hacan", PRIORITY_FLOOR, "letnev", PRIORITY_FLOOR, "naalu", PRIORITY_FLOOR);
 
     public static boolean isLocked(Player seat) {
         return !seat.getBreakthroughIDs().isEmpty()
@@ -34,9 +35,8 @@ public class BreakthroughValue {
         if (!isLocked(seat)) return 0;
         double lift = ExpeditionStats.breakthroughLiftPoints(seat.getFaction());
         double floor = PRIORITY_FLOORS.getOrDefault(seat.getFaction(), 0.0);
-        return Math.max(
-                YinAscendant.value(game, seat),
-                Math.max(floor, Math.max(LEAST, BASE + PER_WIN_POINT * lift)) * timing(game));
+        double ownValue = Math.max(YinAscendant.value(game, seat), MindsieveFollow.breakthroughValue(game, seat));
+        return Math.max(ownValue, Math.max(floor, Math.max(LEAST, BASE + PER_WIN_POINT * lift)) * timing(game));
     }
 
     public static double fractureRoll(Game game, Player seat) {

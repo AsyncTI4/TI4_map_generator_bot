@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.trace.ShareCensus;
@@ -21,6 +22,8 @@ public class CombatOdds {
     private static final int ATTACKER_COST_IF_WIN = 2;
     private static final int ATTACKER_UNIT = 3;
     private static final int DEFENDER_UNIT = 4;
+    static final int MAX_CACHED = 65_536;
+    private static final Map<List<Object>, Detailed> CACHE = new ConcurrentHashMap<>();
 
     public record Combatant(
             int hitsOn,
@@ -74,6 +77,10 @@ public class CombatOdds {
             boolean weaves,
             int rerollRounds,
             boolean detonates) {
+
+        public Force {
+            units = List.copyOf(units);
+        }
 
         public Force(List<Combatant> units, int hitMultiplier, boolean repairs, @Nullable Force afterOpponentLoss) {
             this(units, hitMultiplier, repairs, afterOpponentLoss, false, 0, false);
@@ -157,6 +164,25 @@ public class CombatOdds {
     }
 
     public static Detailed resolveDetailed(
+            Force attacker, Force defender, Force firstAttacker, Force firstDefender, int absorbedA, int absorbedD) {
+        List<Object> key = List.of(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD);
+        Detailed found = CACHE.get(key);
+        if (found != null) return found;
+        Detailed detailed = counted(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD);
+        if (CACHE.size() >= MAX_CACHED) CACHE.clear();
+        CACHE.put(key, detailed);
+        return detailed;
+    }
+
+    static int cachedCount() {
+        return CACHE.size();
+    }
+
+    static void forget() {
+        CACHE.clear();
+    }
+
+    private static Detailed counted(
             Force attacker, Force defender, Force firstAttacker, Force firstDefender, int absorbedA, int absorbedD) {
         if (!ShareCensus.enabled()) {
             return computeDetailed(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD);

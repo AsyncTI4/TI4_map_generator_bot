@@ -485,11 +485,19 @@ final class SelfPlayGame {
             relics.observe(game);
             env.leaders.observe(game);
             env.factionComponents.observe(game, env.discord);
-            if (fracture.due(game)) force(game, fracture::enter);
+            env.spending.observe(game);
+            boolean forced = false;
+            if (fracture.due(game)) {
+                force(game, fracture::enter);
+                forced = true;
+            }
             if (relicsDue(game)) {
                 relicsHandedOut = true;
                 force(game, this::handOutRelics);
+                forced = true;
             }
+            // What the harness itself changed is not a seat spending: the spending diffs start again after it.
+            if (forced) env.spending.rebase(game);
             fracture.observe(game);
             probeStyx(game);
             logFleets(game);

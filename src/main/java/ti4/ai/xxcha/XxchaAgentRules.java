@@ -169,7 +169,7 @@ public class XxchaAgentRules {
 
     private static Optional<AiDecision> chooseUser(AiTurnContext context, List<AiPrompt> fresh, Flow flow) {
         String handler = USER_PREFIX + flow.faction();
-        Optional<Match> user = Prompts.unowned(fresh, handler::equals)
+        Optional<Match> user = forSeat(context, fresh, handler)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (user.isEmpty()) return Optional.empty();
         remember(context, flow.at(Stage.USER, context.now()));
@@ -178,11 +178,18 @@ public class XxchaAgentRules {
 
     private static Optional<AiDecision> chooseExhaustedPlanet(AiTurnContext context, List<AiPrompt> fresh, Flow flow) {
         String handler = READY_PREFIX + flow.faction() + "_" + flow.planet();
-        Optional<Match> ready = Prompts.unowned(fresh, handler::equals)
+        Optional<Match> ready = forSeat(context, fresh, handler)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (ready.isEmpty()) return Optional.empty();
         remember(context, flow.at(Stage.DONE, context.now()));
         return Optional.of(ready.get().press("ready " + flow.planet() + " with Ggrocuto Rinn"));
+    }
+
+    private static Optional<Match> forSeat(AiTurnContext context, List<AiPrompt> fresh, String handler) {
+        return Prompts.first(
+                fresh,
+                button -> (button.isUnowned() || button.isOwnedBy(context.faction()))
+                        && handler.equals(button.handlerId()));
     }
 
     private static List<String> exhaustedPlanets(Player seat) {

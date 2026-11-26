@@ -511,7 +511,8 @@ sequenceDiagram
 - **Role:** decides. Space combat only; needs ability `munitions`, ≥ 2 TG, and the stored value `munitionsReserves` not
   already set to the seat's faction (a previous payment awaiting its roll). Once per (position, round): presses the owned
   `munitionsReserves` button when `CombatForecast.rerollGain` has win chance ≥ 0.1 and gain ≥ `requiredGain` =
-  2 × 1.0 × 1.25 = 2.5, plus 8 when paying 2 TG breaks a scoring reserve (`ScoringReserve.planAfterReserve` empty).
+  2 × 1.0 × 1.25 = 2.5, plus 8 when paying 2 TG breaks a scoring reserve: the wallet can pay `ScoringReserve.of` now and
+  `ScoringReserve.planAfterReserve` is empty after the spend (a reserve already out of reach adds nothing).
 - **Tested:** [MunitionsReservesRulesTest](/src/test/java/ti4/ai/letnev/MunitionsReservesRulesTest.java).
 
 #### DunlainReaperRules (mech)
@@ -643,11 +644,11 @@ sequenceDiagram
 - **Role:** evaluates (`planTacticalAction`, before the tactical action) and decides (`next`, during it).
 - `planTacticalAction` (once per turn): computes the best plan with `SkippedSpaceCombat.assuming` (space combat skipped,
   ships lost). If it is an ATTACK with landings and `heroPlanWorthIt(withHero, without)` = withHero ≥ 8 and
-  withHero − max(0, without) ≥ 4, it remembers that plan as the tactical plan and stores its target.
+  withHero − max(0, without) ≥ keep, where keep = `keepValue` = max(0, 4 − round), it remembers that plan as the tactical plan and stores its target.
 - `next`: during the tactical action in the active system, when the owned `purgeSardakkHero` button is up and a space
   outlook exists. For each planet the seat does not own (or that is contested): committable ground forces = all ground
   forces in space + one per `CommanderReach.pulls` (not on custodians); `Case(spaceWin, fleetCost, ourLoss,
-  landingWin, stake)`; best by net = (1 − spaceWin) × landingWin × stake − (fleetCost − fightLoss) − 4. Plays when the
+  landingWin, stake, keep)`; best by net = (1 − spaceWin) × landingWin × stake − (fleetCost − fightLoss) − keep. Plays when the
   system was planned for it, or `worthPlaying`: stake ≥ 8, landingWin ≥ 0.65, spaceWin ≤ 0.6 and the net > 0. Stake =
   own objective gain + denial (clamp 0..8) + Mecatol (`MecatolStake.holdValue`, +8 with payable custodians) + 8 +
   planet value for another player's home system. It then remembers a one-planet landing plan with all committed forces.
@@ -746,8 +747,11 @@ sequenceDiagram
   is not Trade and whose primary player is another player, finds hidden unowned `mindsieveFollow_<initiative>_<note>`
   buttons, prices each giveable note (held, not in play area, not withheld, not Support for the Throne/Alliance) with
   `TradeRules.noteGiveCost`, and returns the cheapest whose cost ≤ the strategy token value. `covers` lets the follow
-  proceed without a spare token; `giveNoteFirst` presses the gift before the follow. Tested by
-  [MindsieveFollowTest](/src/test/java/ti4/ai/naalu/MindsieveFollowTest.java).
+  proceed without a spare token; `giveNoteFirst` presses the gift before the follow. `breakthroughValue` (while
+  locked) = 1.2 follows a round × (held token 2.4 − note 1.0) × rounds left, taken by `BreakthroughValue.of`, which
+  also gives Naalu the priority floor of 8. Tested by
+  [MindsieveFollowTest](/src/test/java/ti4/ai/naalu/MindsieveFollowTest.java) and
+  [MindsieveValueTest](/src/test/java/ti4/ai/naalu/MindsieveValueTest.java).
 - **GiftOfPrescience** (informs): `giveCost() = 8.0`, read by `NotesForTrade`. Tested by
   [GiftOfPrescienceTest](/src/test/java/ti4/ai/naalu/GiftOfPrescienceTest.java).
 

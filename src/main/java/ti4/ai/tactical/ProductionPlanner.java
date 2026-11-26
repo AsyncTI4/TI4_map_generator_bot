@@ -55,8 +55,8 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class ProductionPlanner {
 
-    static final int MIN_UNITS = 4;
-    static final double MIN_BUILD_RESOURCES = 6;
+    public static final int MIN_UNITS = 4;
+    public static final double MIN_BUILD_RESOURCES = 6;
     private static final Set<String> UNCAPPED_UNITS = Set.of("ff", "gf");
     private static final int OPENING_ROUND = 1;
     private static final int DEFENSE_FIELD = 7;

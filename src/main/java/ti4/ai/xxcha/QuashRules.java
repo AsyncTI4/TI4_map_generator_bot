@@ -11,16 +11,20 @@ import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
+import ti4.ai.eval.RelicValue;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.strategy.CardFacade;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.AgendaWhensAftersHelper;
 
 @UtilityClass
 public class QuashRules {
 
     private static final String ABILITY = "quash";
+    private static final String SCEPTER = "emelpar";
+    private static final int SCEPTER_VALUE_HORIZON = 6;
     private static final String QUEUE_QUASH = "queueWhen_ability_quash";
     private static final String OPEN_WHENS = "queueAWhen";
     private static final double EXPERT_QUASH_MARGIN = 1.0;
@@ -34,12 +38,26 @@ public class QuashRules {
             return Optional.empty();
         }
         if (!worthQuashing(game, seat)) return Optional.empty();
-        return pressHidden(context, QUEUE_QUASH, "queue Quash to discard a bad agenda")
+        String paid = paysWithScepter(seat) ? ", paid with the Scepter of Emelpar" : "";
+        return pressHidden(context, QUEUE_QUASH, "queue Quash to discard a bad agenda" + paid)
                 .or(() -> pressHidden(context, OPEN_WHENS, "open its when options to Quash"));
     }
 
     public static boolean canQuash(Player seat) {
-        return seat.hasAbility(ABILITY) && seat.getStrategicCC() > 0;
+        return seat.hasAbility(ABILITY)
+                && (seat.getStrategicCC() > 0 || paysWithScepter(seat))
+                && !AgendaWhensAftersHelper.silencedByPoliticalSecret(seat);
+    }
+
+    public static boolean paysWithScepter(Player seat) {
+        return seat.getStrategicCC() <= 0 && seat.hasRelicReady(SCEPTER);
+    }
+
+    static double paymentCost(Player seat) {
+        if (!paysWithScepter(seat)) return CardFacade.strategyToken();
+        Game game = seat.getGame();
+        double roundsCovered = Math.max(1, SCEPTER_VALUE_HORIZON - game.getRound());
+        return Math.min(CardFacade.strategyToken(), RelicValue.of(game, seat, SCEPTER) / roundsCovered);
     }
 
     public static boolean worthQuashing(Game game, Player seat) {
@@ -60,7 +78,7 @@ public class QuashRules {
     }
 
     private static double threshold(Player seat) {
-        return CardFacade.strategyToken() + quashMargin(seat);
+        return paymentCost(seat) + quashMargin(seat);
     }
 
     public static Optional<AiDecision> awaitBounty(AiTurnContext context) {

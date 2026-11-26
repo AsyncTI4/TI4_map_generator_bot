@@ -164,6 +164,21 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   inside an imagined turn (hand hidden) was reused when that seat really decided, and the reverse: which one a seat
   got depended on what was computed first. They now add `ImaginedTurn.cacheMark`; on trade seed 2894249192 the
   new caches without it changed the game (failed `TradeFlowSelfPlayTest`), with it they replay the old game.
+- 2026-11-24: census after those caches (2 games, 7 rounds each, queue job 20261124-184311): about 539 CPU-s per
+  round against about 602 before (two games a side, rough). win.odds fell from 1,298 to 635 s (same-tick repeats
+  881 to 167 s), secret.readiness from 851 to 554 s. Left: secret.readiness 498 s repeated (329 s same seat, same
+  tick), combat.odds 340 of 343 s, enemy.intent 528 of 3,170 s (mostly later ticks). Acted on: `SecretOdds` keeps a
+  rival's per-secret readiness in `TickMemo` for every seat (round-one verify: 183,184 shared, 0 differed), and
+  `CombatOdds` keeps answers across saves.
+- 2026-11-25: census after those (2 games, rounds 6 and 8, queue job 20261124-211125): about 505 CPU-s per round
+  (539 before, 602 at the first census; two games a side, rough). combat.odds fell from 343 to 6 s, secret.readiness
+  from 554 to 140 s. Left: enemy.intent 3,185 s (443 s repeated, mostly later ticks), win.odds 534 s (385 s repeated,
+  221 s same seat, same tick: mostly other viewers, whose answers can differ through the Custodians race and
+  Mecatol take, so left alone).
+- 2026-11-25: a JFR profile of a two-round game put 19% of all CPU in `Territory.distancesFrom`, rebuilt for every
+  seat on each `Hostility.observe` (15%), and 8% in `TechnologyFollowReserve.of` from production planning. Hex
+  distances now stay cached per start position for good, and the follow reserve is kept per decision. The
+  `tactical.for.attack` time in the census is mostly this work, reached through enemy.intent.
 
 ## Unknowns
 
