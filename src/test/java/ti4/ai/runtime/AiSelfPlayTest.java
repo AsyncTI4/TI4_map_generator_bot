@@ -62,7 +62,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         SpendingTracker.BATCH.clear();
         ProduceTracker.BATCH.clear();
         long batchStart = System.nanoTime();
-        List<SelfPlayGame.Outcome> played = playAll(games, threads);
+        List<SelfPlayGame.Outcome> played;
+        try (FlightRecording ignored = FlightRecording.startIfAsked()) {
+            played = playAll(games, threads);
+        }
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
         List<SelfPlayGame.Outcome> unfinished = new ArrayList<>();
         List<String> summary = new ArrayList<>();
