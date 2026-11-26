@@ -22,6 +22,11 @@ public class DecisionMemo {
         return scope;
     }
 
+    public static boolean outermost() {
+        Scope scope = CURRENT.get();
+        return scope != null && scope.previous == null;
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T remember(Supplier<T> compute, Object... key) {
         Scope scope = CURRENT.get();

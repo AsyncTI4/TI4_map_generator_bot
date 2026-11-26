@@ -23,10 +23,12 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.SaveMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
@@ -374,7 +376,19 @@ public class TacticalPlanner {
 
     private static List<TacticalPlan> sharedRanking(Context context, Predicate<Tile> activatable) {
         return DecisionMemo.remember(
-                () -> rankedCandidates(context, activatable),
+                () -> SaveMemo.remember(
+                        context.game,
+                        unsavedState(context.game),
+                        () -> List.copyOf(rankedCandidates(context, activatable)),
+                        "tactical.ranking",
+                        context.seat.getFaction(),
+                        DecidingSeat.currentUserId(),
+                        context.freed,
+                        context.hints,
+                        context.tokenFree,
+                        FleetLimit.ships(context.seat),
+                        MoveBoost.extra(context.seat),
+                        SkippedSpaceCombat.assumedFaction()),
                 "tactical.ranking",
                 context.seat,
                 context.freed,
@@ -383,6 +397,13 @@ public class TacticalPlanner {
                 FleetLimit.ships(context.seat),
                 MoveBoost.extra(context.seat),
                 SkippedSpaceCombat.assumedFaction());
+    }
+
+    private static List<Object> unsavedState(Game game) {
+        return List.of(
+                AttackLedger.snapshot(game.getName()),
+                SlayIntent.snapshot(game.getName()),
+                FractureMarch.snapshot(game.getName()));
     }
 
     private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {
