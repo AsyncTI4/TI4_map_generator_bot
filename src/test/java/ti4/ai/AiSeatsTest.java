@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.service.testbed.TestBedService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -74,5 +75,33 @@ class AiSeatsTest extends BaseTi4Test {
         empty.addPlayer(SPECTATOR_ID, "Spectator");
 
         assertThat(AiSeats.isSelfPlay(empty)).isFalse();
+    }
+
+    // The two games of an A/B pair share a seed, so they draw the same digits. The game name keeps their seats apart,
+    // and an id that is already taken steps to the next number instead of drawing again: drawing again would move the
+    // game's random stream, so a game replayed on its own would deal different card ids than it did beside its pair.
+    @Test
+    void aTakenSeatIdStepsWithoutDrawingAgainAndTheGameNameKeepsPairsApart() {
+        Game first = new Game();
+        first.setName("aiab9506a");
+        Game second = new Game();
+        second.setName("aiab9506b");
+        try {
+            RandomHelper.seedThisThread(9506);
+            String seat = AiSeats.newSeatId(first);
+            int nextDraw = RandomHelper.current().nextInt();
+
+            RandomHelper.seedThisThread(9506);
+            first.addPlayer(seat, "Taken");
+            String stepped = AiSeats.newSeatId(first);
+
+            assertThat(Long.parseLong(stepped)).isEqualTo(Long.parseLong(seat) + 1);
+            assertThat(RandomHelper.current().nextInt()).isEqualTo(nextDraw);
+
+            RandomHelper.seedThisThread(9506);
+            assertThat(AiSeats.newSeatId(second)).isNotEqualTo(seat);
+        } finally {
+            RandomHelper.unseedThisThread();
+        }
     }
 }

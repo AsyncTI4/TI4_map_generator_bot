@@ -3,6 +3,7 @@ package ti4.ai;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -15,6 +16,9 @@ public class AiSeats {
     public static final String ID_PREFIX = "7100000";
     private static final int ID_LENGTH = 16;
     private static final int RANDOM_DIGITS = ID_LENGTH - ID_PREFIX.length();
+    private static final long ID_SPAN = (long) Math.pow(10, RANDOM_DIGITS);
+    private static final long GAME_SALT = 1_000_003L;
+    private static final int MAX_ATTEMPTS = 1000;
 
     public static boolean isAiSeatId(@Nullable String userId) {
         return userId != null
@@ -55,8 +59,9 @@ public class AiSeats {
     }
 
     public static String newSeatId(Game game) {
-        for (int attempt = 0; attempt < 1000; attempt++) {
-            String candidate = ID_PREFIX + randomDigits();
+        long first = Math.floorMod(randomNumber() + GAME_SALT * game.getName().hashCode(), ID_SPAN);
+        for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+            String candidate = ID_PREFIX + digits(Math.floorMod(first + attempt, ID_SPAN));
             if (game.getPlayer(candidate) == null && GameManager.getManagedPlayer(candidate) == null) {
                 return candidate;
             }
@@ -64,10 +69,13 @@ public class AiSeats {
         throw new IllegalStateException("Could not generate a unique AI seat id");
     }
 
-    private static String randomDigits() {
-        StringBuilder digits = new StringBuilder(RANDOM_DIGITS);
-        for (int i = 0; i < RANDOM_DIGITS; i++)
-            digits.append(RandomHelper.current().nextInt(10));
-        return digits.toString();
+    private static long randomNumber() {
+        long number = 0;
+        for (int i = 0; i < RANDOM_DIGITS; i++) number = number * 10 + RandomHelper.current().nextInt(10);
+        return number;
+    }
+
+    private static String digits(long number) {
+        return StringUtils.leftPad(Long.toString(number), RANDOM_DIGITS, "0");
     }
 }

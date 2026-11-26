@@ -1421,7 +1421,7 @@ from `profile.seed()` in `SabotageRules`).
 
 ### Randomness
 
-- **In the core:** none in decisions. `AiSeats.newSeatId` draws 9 digits from `RandomHelper.current()`. The seat's
+- **In the core:** none in decisions. `AiSeats.newSeatId` draws 9 digits from `RandomHelper.current()` once (salted with the game name, stepped on collision). The seat's
   profile (aggression level and a `seed`) is drawn once at seat creation in `AiProfile.createHidden`, outside this scope.
 - **Seeded behaviour outside the core:** timing delays XOR a hash with `profile.seed()`: `SabotageRules`
   (`prompt.messageId().hashCode()`), `ShenanigansRules` (`(messageId + handlerId).hashCode()`) and `ReadyForDice`
