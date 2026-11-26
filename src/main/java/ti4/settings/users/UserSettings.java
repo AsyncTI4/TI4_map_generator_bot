@@ -46,6 +46,11 @@ public class UserSettings {
     private boolean activityTracking = true;
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
+    private String fogFilter = FogViewSettings.DEFAULT_FILTER;
+    private boolean fogGhostHexes = true;
+    private boolean fogOverviewBoxes = true;
+    private int fogOverviewReach = FogViewSettings.DEFAULT_REACH;
+    private boolean fogOverviewCodes = true;
     private Boolean prefersWrongButtonEphemeral;
     private int autoNoSaboInterval;
     private String whisperPref = "No Preference";

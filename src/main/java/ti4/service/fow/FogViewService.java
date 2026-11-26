@@ -38,7 +38,7 @@ public class FogViewService {
     private static final String LABELS = "labels";
     private static final String ISLANDS = "islands";
     private static final String GHOSTS = "ghosts";
-    private static final String HEADER = "### Your fog view\n-# Only for you, only in this game.";
+    private static final String HEADER = "### Your fog view\n-# Only for you; applies to all your fog games.";
     private static final Map<String, String> SUFFIX_BY_LABEL = filtersByLabel();
     private static final Map<Integer, String> REACH_LABELS = reachLabels();
 

@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.PlayerProperties;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -34,6 +33,7 @@ import ti4.logging.BotLogger;
 import ti4.model.BoardPosition;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
+import ti4.settings.users.FogViewSettings;
 
 public final class CompactOverviewGenerator {
 
@@ -59,7 +59,7 @@ public final class CompactOverviewGenerator {
     public record Options(Style style, int reach, boolean codes) {
 
         public static final int UNLIMITED_REACH = 0;
-        public static final int DEFAULT_REACH = PlayerProperties.FOG_OVERVIEW_DEFAULT_REACH;
+        public static final int DEFAULT_REACH = FogViewSettings.DEFAULT_REACH;
         public static final int MAX_REACH = 4;
         public static final Options DEFAULT = new Options(Style.HEXES, DEFAULT_REACH, false);
 

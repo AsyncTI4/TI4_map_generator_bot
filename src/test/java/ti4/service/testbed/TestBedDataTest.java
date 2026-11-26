@@ -320,7 +320,7 @@ class TestBedDataTest extends BaseTi4Test {
 
     @Test
     void aFogViewStepChangesOnlyThatSetting() {
-        Player seat = new Player("seat-id", "seat", new Game());
+        Player seat = new Player("seat-" + java.util.UUID.randomUUID(), "seat", new Game());
         TestBedComponentService.setFogView(seat, "islands", "unlimited");
         TestBedComponentService.setFogView(seat, "labels", "names");
 

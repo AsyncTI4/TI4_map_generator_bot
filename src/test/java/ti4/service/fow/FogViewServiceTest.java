@@ -16,7 +16,7 @@ class FogViewServiceTest extends BaseTi4Test {
         Game game = new Game();
         game.newGameSetup();
         game.setFowMode(true);
-        Player player = game.addPlayer("player-id", "sol");
+        Player player = game.addPlayer("fog-view-" + java.util.UUID.randomUUID(), "sol");
         player.setFaction("sol");
 
         assertThat(ComponentPanel.fits(FogViewService.components(player, "Changed: ghost hexes.")))
@@ -29,7 +29,7 @@ class FogViewServiceTest extends BaseTi4Test {
 
     @Test
     void choiceButtonsSetTheirSetting() {
-        Player player = new Player("player-id", "player", new Game());
+        Player player = new Player("fog-view-" + java.util.UUID.randomUUID(), "player", new Game());
 
         FogViewService.apply(player, "layout", "hexes");
         FogViewService.apply(player, "labels", "names");

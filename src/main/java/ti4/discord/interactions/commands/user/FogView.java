@@ -28,7 +28,7 @@ class FogView extends GameStateSubcommand {
     public FogView() {
         super(
                 Constants.FOG_VIEW,
-                "Your fog view settings for this game: ghost hexes, overview layout and labels, tile colour.",
+                "Your fog view settings for all your fog games: layout, labels, islands, ghost hexes, colour.",
                 true,
                 true);
         addOptions(

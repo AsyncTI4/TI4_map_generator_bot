@@ -12,8 +12,6 @@ import lombok.Data;
 
 @Data
 public class PlayerProperties {
-
-    public static final int FOG_OVERVIEW_DEFAULT_REACH = 2;
     // Basic information
     private String userID;
     private String userName;
@@ -29,11 +27,6 @@ public class PlayerProperties {
     private String displayName;
     private String decalSet;
     private String notes = "";
-    private String fogFilter;
-    private boolean fogGhostHexes = true;
-    private boolean fogOverviewBoxes = true;
-    private int fogOverviewReach = FOG_OVERVIEW_DEFAULT_REACH;
-    private boolean fogOverviewCodes = true;
 
     // Channels & IDs
     private @Nullable String roleIDForCommunity;

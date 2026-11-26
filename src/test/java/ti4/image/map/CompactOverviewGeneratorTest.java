@@ -46,7 +46,7 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         game.newGameSetup();
         game.setName("compact-overview-test");
         game.setFowMode(true);
-        player = game.addPlayer("player-id", "sol");
+        player = game.addPlayer("overview-" + java.util.UUID.randomUUID(), "sol");
         player.setFaction("sol");
         player.setColor("blue");
 

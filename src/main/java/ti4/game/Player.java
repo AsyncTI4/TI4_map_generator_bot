@@ -138,6 +138,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.service.user.AFKService;
+import ti4.settings.users.FogViewSettings;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -3317,9 +3318,44 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return !isRealPlayer() && !isDummy() && !isNpc();
     }
 
-    @Override
     public String getFogFilter() {
-        return super.getFogFilter() == null ? "default" : super.getFogFilter();
+        return FogViewSettings.of(getUserID()).filter();
+    }
+
+    public void setFogFilter(String filter) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withFilter(filter));
+    }
+
+    public boolean isFogGhostHexes() {
+        return FogViewSettings.of(getUserID()).ghostHexes();
+    }
+
+    public void setFogGhostHexes(boolean ghostHexes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withGhostHexes(ghostHexes));
+    }
+
+    public boolean isFogOverviewBoxes() {
+        return FogViewSettings.of(getUserID()).boxes();
+    }
+
+    public void setFogOverviewBoxes(boolean boxes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withBoxes(boxes));
+    }
+
+    public int getFogOverviewReach() {
+        return FogViewSettings.of(getUserID()).reach();
+    }
+
+    public void setFogOverviewReach(int reach) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withReach(reach));
+    }
+
+    public boolean isFogOverviewCodes() {
+        return FogViewSettings.of(getUserID()).codes();
+    }
+
+    public void setFogOverviewCodes(boolean codes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withCodes(codes));
     }
 
     public void updateTurnStats(long turnTime) {
