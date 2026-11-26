@@ -68,6 +68,7 @@ public class TestBedPreset {
         private List<String> scoredObjectives;
         private List<String> fragments;
         private String breakthrough;
+        private List<String> fogMemory;
         private boolean teamMateYou;
         private boolean botAccount;
 

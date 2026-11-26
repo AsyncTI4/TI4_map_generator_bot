@@ -1232,13 +1232,15 @@ class GameLoadService {
 
                 case Constants.NUMBER_OF_TURNS -> player.setNumberOfTurns(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
-                case Constants.FOG_FILTER -> {
-                    String filter = tokenizer.nextToken();
-                    player.setFogFilter(filter);
+                case Constants.FOG_FILTER,
+                        Constants.FOG_GHOST_HEXES,
+                        Constants.FOG_OVERVIEW_BOXES,
+                        Constants.FOG_OVERVIEW_REACH,
+                        Constants.FOG_OVERVIEW_CODES -> {
+                    if (tokenizer.hasMoreTokens()) {
+                        tokenizer.nextToken();
+                    }
                 }
-                case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.FOG_OVERVIEW_BOXES ->
-                    player.setFogOverviewBoxes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));

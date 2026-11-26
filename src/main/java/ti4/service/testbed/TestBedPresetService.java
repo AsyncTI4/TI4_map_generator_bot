@@ -169,6 +169,7 @@ public class TestBedPresetService {
         merged.setScoredObjectives(firstNonNull(seat.getScoredObjectives(), defaults.getScoredObjectives()));
         merged.setFragments(firstNonNull(seat.getFragments(), defaults.getFragments()));
         merged.setBreakthrough(firstNonNull(seat.getBreakthrough(), defaults.getBreakthrough()));
+        merged.setFogMemory(firstNonNull(seat.getFogMemory(), defaults.getFogMemory()));
         return merged;
     }
 
@@ -306,6 +307,12 @@ public class TestBedPresetService {
         validateIds(seat.getPns(), TestBedPresetService::isPromissoryNoteEntry, label, "promissory note", errors);
         validateIds(seat.getScoredObjectives(), Mapper::isValidPublicObjective, label, "public objective", errors);
         validateIds(seat.getFragments(), Mapper::isValidExplore, label, "relic fragment", errors);
+        validateIds(
+                seat.getFogMemory(),
+                position -> MapPositionMapper.isTilePositionValid(position.toLowerCase()),
+                label,
+                "fog memory position",
+                errors);
         if (seat.getBreakthrough() != null && !BREAKTHROUGH_STATES.contains(seat.getBreakthrough())) {
             errors.add(label + ": `breakthrough` must be one of " + BREAKTHROUGH_STATES + ".");
         }
@@ -393,6 +400,11 @@ public class TestBedPresetService {
                 .anyMatch(position -> BoardPosition.isBoardPosition(position.toLowerCase()));
         if (placesExtraMaps && !Boolean.TRUE.equals(preset.getFog())) {
             errors.add("preset: `tiles` on maps A-G (`a000`-`g848`) need `\"fog\": true`; extra maps are fog-only.");
+        }
+        boolean remembersFog = preset.allSeats().stream().anyMatch(seat -> seat.getFogMemory() != null)
+                || (preset.getDefaults() != null && preset.getDefaults().getFogMemory() != null);
+        if (remembersFog && !Boolean.TRUE.equals(preset.getFog())) {
+            errors.add("preset: `fogMemory` needs `\"fog\": true`.");
         }
         if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
             errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");

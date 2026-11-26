@@ -24,7 +24,6 @@ final class HexPacker {
     private static final Comparator<Point> TOP_FIRST =
             Comparator.comparingInt((Point point) -> point.y).thenComparingInt(point -> point.x);
     private static final List<Double> EDGE_FRACTIONS = List.of(0.0, 0.25, 0.5, 0.75);
-    private static final List<Point> CONTACT_POINTS = contactPoints();
     static final List<Point> NEIGHBOUR_OFFSETS = List.of(
             new Point(0, -2 * HEX_HALF_HEIGHT),
             new Point(FocusIslands.COLUMN_STEP, -FocusIslands.HALF_ROW_STEP),
@@ -101,6 +100,8 @@ final class HexPacker {
         }
     }
 
+    private final int gutter;
+    private final List<Point> contactPoints;
     private final Map<Long, List<Point>> placedHexes = new HashMap<>();
     private final List<Point> placedBoundary = new ArrayList<>();
     private final List<Rectangle> placedLabels = new ArrayList<>();
@@ -110,10 +111,17 @@ final class HexPacker {
     private int centreCount;
     private Point anchor;
 
-    private HexPacker() {}
+    private HexPacker(int gutter) {
+        this.gutter = gutter;
+        this.contactPoints = contactPoints(gutter);
+    }
 
     static List<Placement> pack(List<Shape> shapes) {
-        HexPacker packer = new HexPacker();
+        return pack(shapes, GUTTER);
+    }
+
+    static List<Placement> pack(List<Shape> shapes, int gutter) {
+        HexPacker packer = new HexPacker(gutter);
         List<Placement> placements = new ArrayList<>();
         for (Shape shape : shapes) {
             Placement placement = packer.placedBounds == null ? packer.first(shape) : packer.best(shape);
@@ -151,11 +159,21 @@ final class HexPacker {
         Point packedCentre = new Point((int) (centreSumX / centreCount), (int) (centreSumY / centreCount));
         Point wanted = new Point(localCentre.x - anchor.x, localCentre.y - anchor.y);
         List<Point> ownBoundary = shape.boundaryCentres();
+        List<Rectangle> localBounds = new ArrayList<>();
+        for (int label = 0; label < shape.labelChoices(); label++) {
+            localBounds.add(shape.bounds(shape.label(label)));
+        }
         Set<Point> tried = new HashSet<>();
         Map<Point, Boolean> hexesFit = new HashMap<>();
+        Set<Point> enclosed = new HashSet<>();
         Candidate best = null;
         for (Point placed : placedBoundary) {
-            for (Point contact : CONTACT_POINTS) {
+            boolean open = false;
+            for (Point contact : contactPoints) {
+                if (!clearOfPlacedHexes(new Point(placed.x + contact.x, placed.y + contact.y))) {
+                    continue;
+                }
+                open = true;
                 for (Point own : ownBoundary) {
                     Point offset = new Point(placed.x + contact.x - own.x, placed.y + contact.y - own.y);
                     if (!tried.add(offset)) {
@@ -163,25 +181,27 @@ final class HexPacker {
                     }
                     double spread = packedCentre.distance(localCentre.x + offset.x, localCentre.y + offset.y);
                     double direction = directionPenalty(wanted, new Point(wanted.x + offset.x, wanted.y + offset.y));
-                    for (int label = 0; label < shape.labelChoices(); label++) {
-                        Rectangle moved = shape.bounds(shape.label(label));
-                        moved.translate(offset.x, offset.y);
-                        Candidate candidate =
-                                new Candidate(offset, label, score(placedBounds.union(moved)) * direction, spread);
+                    for (int label = 0; label < localBounds.size(); label++) {
+                        Candidate candidate = new Candidate(
+                                offset, label, unionScore(localBounds.get(label), offset) * direction, spread);
                         if (candidate.beats(best) && fits(shape, offset, label, hexesFit)) {
                             best = candidate;
                         }
                     }
                 }
             }
+            if (!open) {
+                enclosed.add(placed);
+            }
         }
+        placedBoundary.removeAll(enclosed);
         if (best != null) {
             return placement(shape, best.offset(), best.label());
         }
-        Rectangle localBounds = shape.bounds(shape.label(0));
+        Rectangle fallback = localBounds.getFirst();
         return placement(
                 shape,
-                new Point(placedBounds.x + placedBounds.width + GUTTER - localBounds.x, placedBounds.y - localBounds.y),
+                new Point(placedBounds.x + placedBounds.width + gutter - fallback.x, placedBounds.y - fallback.y),
                 0);
     }
 
@@ -205,8 +225,8 @@ final class HexPacker {
         return 1 + DIRECTION_WEIGHT * (1 - cos) / 2;
     }
 
-    private static List<Point> contactPoints() {
-        double reach = (2 * HEX_HALF_HEIGHT + GUTTER + 1) / COS_30;
+    private static List<Point> contactPoints(int gutter) {
+        double reach = (2 * HEX_HALF_HEIGHT + gutter + 1) / COS_30;
         List<Point> points = new ArrayList<>();
         for (int corner = 0; corner < 6; corner++) {
             double fromAngle = Math.toRadians(60 * corner);
@@ -220,9 +240,17 @@ final class HexPacker {
         return List.copyOf(points);
     }
 
-    private static double score(Rectangle bounds) {
-        double ratio = (bounds.width / (double) Math.max(1, bounds.height)) / TARGET_ASPECT;
-        return (double) bounds.width * bounds.height * Math.sqrt(Math.max(ratio, 1 / ratio));
+    private double unionScore(Rectangle local, Point offset) {
+        int left = Math.min(placedBounds.x, local.x + offset.x);
+        int top = Math.min(placedBounds.y, local.y + offset.y);
+        int right = Math.max(placedBounds.x + placedBounds.width, local.x + offset.x + local.width);
+        int bottom = Math.max(placedBounds.y + placedBounds.height, local.y + offset.y + local.height);
+        return score(right - left, bottom - top);
+    }
+
+    private static double score(int width, int height) {
+        double ratio = (width / (double) Math.max(1, height)) / TARGET_ASPECT;
+        return (double) width * height * Math.sqrt(Math.max(ratio, 1 / ratio));
     }
 
     private boolean fits(Shape shape, Point offset, int labelIndex, Map<Point, Boolean> hexesFit) {
@@ -249,7 +277,7 @@ final class HexPacker {
         for (int x = bucketX - 1; x <= bucketX + 1; x++) {
             for (int y = bucketY - 1; y <= bucketY + 1; y++) {
                 for (Point placed : placedHexes.getOrDefault(key(x, y), List.of())) {
-                    if (!hexesClear(placed, centre, GUTTER)) {
+                    if (!hexesClear(placed, centre, gutter)) {
                         return false;
                     }
                 }
@@ -266,7 +294,7 @@ final class HexPacker {
         for (int x = fromX; x <= toX; x++) {
             for (int y = fromY; y <= toY; y++) {
                 for (Point placed : placedHexes.getOrDefault(key(x, y), List.of())) {
-                    if (!rectanglesClear(label, hexBox(placed), GUTTER)) {
+                    if (!rectanglesClear(label, hexBox(placed), gutter)) {
                         return false;
                     }
                 }
@@ -276,7 +304,7 @@ final class HexPacker {
     }
 
     private boolean clearOfPlacedLabels(Rectangle box) {
-        return placedLabels.stream().allMatch(label -> rectanglesClear(label, box, GUTTER));
+        return placedLabels.stream().allMatch(label -> rectanglesClear(label, box, gutter));
     }
 
     private void place(Shape shape, Placement placement) {

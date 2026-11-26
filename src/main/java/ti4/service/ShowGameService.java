@@ -235,7 +235,7 @@ public class ShowGameService {
                         game,
                         viewer,
                         feature,
-                        MapOverviewService.gmStyle(game, event),
+                        MapOverviewService.gmOptions(game, event),
                         fileUpload -> sendWithMapButtons(game, event, sendMessage(game, event), fileUpload));
                 return;
             }

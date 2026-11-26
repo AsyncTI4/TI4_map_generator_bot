@@ -840,20 +840,6 @@ class GameSaveService {
             writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + player.getPrivateChannelID());
             writer.write(System.lineSeparator());
 
-            String fogColor = player.getFogFilter() == null ? "" : player.getFogFilter();
-            writer.write(Constants.FOG_FILTER + " " + fogColor);
-            writer.write(System.lineSeparator());
-
-            if (!player.isFogGhostHexes()) {
-                writer.write(Constants.FOG_GHOST_HEXES + " false");
-                writer.write(System.lineSeparator());
-            }
-
-            if (player.isFogOverviewBoxes()) {
-                writer.write(Constants.FOG_OVERVIEW_BOXES + " true");
-                writer.write(System.lineSeparator());
-            }
-
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 

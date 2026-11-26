@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedScript;
@@ -294,6 +295,38 @@ class TestBedDataTest extends BaseTi4Test {
                   ] }"""));
         assertContains(scriptErrors, "unknown receiver, trigger, ping or persistance", "needs `value`");
         assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
+    // Fog overview scripts remember scattered tiles and switch a seat's overview settings mid-run.
+    @Test
+    void fogMemoryAndFogViewAreValidated() {
+        List<String> presetErrors = TestBedPresetService.validate(TestBedPresetService.parse("""
+                { "you": { "faction": "sol", "fogMemory": ["201", "nowhere"] } }"""));
+        assertContains(presetErrors, "fog memory position", "`fogMemory` needs `\"fog\": true`");
+        assertEquals(2, presetErrors.size(), String.join("\n", presetErrors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "fog-galaxies-2p",
+                  "steps": [
+                    { "do": "fogView", "as": "you", "key": "islands", "value": "unlimited" },
+                    { "do": "fogView", "as": "seat1", "key": "labels", "value": "codes" },
+                    { "do": "fogView", "as": "you", "key": "islands", "value": "7" },
+                    { "do": "fogView", "as": "you", "key": "zoom", "value": "1" },
+                    { "do": "fogView", "key": "overview", "value": "boxes" }
+                  ] }"""));
+        assertContains(scriptErrors, "takes `[1-4]|unlimited`", "unknown fog view setting `zoom`", "needs `as`");
+        assertEquals(3, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
+    @Test
+    void aFogViewStepChangesOnlyThatSetting() {
+        Player seat = new Player("seat-" + java.util.UUID.randomUUID(), "seat", new Game());
+        TestBedComponentService.setFogView(seat, "islands", "unlimited");
+        TestBedComponentService.setFogView(seat, "labels", "names");
+
+        assertEquals(0, seat.getFogOverviewReach());
+        assertFalse(seat.isFogOverviewCodes());
+        assertTrue(seat.isFogOverviewBoxes());
     }
 
     // Neutral units need a real tile position.

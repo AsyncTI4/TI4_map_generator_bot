@@ -3,14 +3,17 @@ package ti4.image.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,9 +24,12 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Units;
+import ti4.image.map.CompactOverviewGenerator.Group;
 import ti4.image.map.CompactOverviewGenerator.Layout;
-import ti4.image.map.CompactOverviewGenerator.Panel;
+import ti4.image.map.CompactOverviewGenerator.Options;
 import ti4.image.map.CompactOverviewGenerator.Placed;
+import ti4.image.map.CompactOverviewGenerator.Style;
 import ti4.model.GalaxyNames;
 import ti4.testUtils.BaseTi4Test;
 
@@ -31,6 +37,8 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
     private Game game;
     private Player player;
+    private String main;
+    private String galaxyA;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +46,7 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         game.newGameSetup();
         game.setName("compact-overview-test");
         game.setFowMode(true);
-        player = game.addPlayer("player-id", "sol");
+        player = game.addPlayer("overview-" + java.util.UUID.randomUUID(), "sol");
         player.setFaction("sol");
         player.setColor("blue");
 
@@ -51,64 +59,140 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         MapSegment.put(game, new MapSegment("core", "000", 1));
         MapSegment.put(game, new MapSegment("south", "1237", 1));
         MapSegment.put(game, new MapSegment("outpost", "a000", 1));
+        main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        galaxyA = GalaxyNames.name(game, "a");
     }
 
-    private static Set<String> titles(List<Panel> panels) {
-        return panels.stream().map(Panel::title).collect(Collectors.toSet());
+    private void giveSolACarrierAtTheCore() {
+        game.getTileByPosition("000")
+                .addUnit("space", Units.getUnitKey(Units.UnitType.Carrier, player.getColorID()), 1);
     }
 
-    private static Set<String> positions(List<Panel> panels) {
-        return panels.stream()
-                .flatMap(panel -> panel.centres().keySet().stream())
+    private static Set<String> titles(List<Group> groups) {
+        return groups.stream().map(Group::title).collect(Collectors.toSet());
+    }
+
+    private static Set<String> positions(List<Group> groups) {
+        return groups.stream()
+                .flatMap(group -> group.islands().stream())
+                .flatMap(island -> island.keySet().stream())
                 .collect(Collectors.toSet());
     }
 
+    private static Group group(List<Group> groups, String title) {
+        return groups.stream()
+                .filter(group -> group.title().equals(title))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no group " + title + " in " + titles(groups)));
+    }
+
     @Test
-    void theGmSeesOnePanelPerSectorPlusTheLeftoversAndCorners() {
-        List<Panel> panels = CompactOverviewGenerator.gmPanels(game);
-        String galaxyA = GalaxyNames.name(game, "a");
-        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+    void theGmSeesOneGroupPerSectorPlusTheLeftoversAndCorners() {
+        List<Group> groups = CompactOverviewGenerator.gmGroups(game, Options.DEFAULT_REACH);
 
         assertEquals(
                 Set.of(main + " / core", main + " / south", galaxyA + " / outpost", galaxyA, "corners"),
-                titles(panels));
-        assertEquals(new HashSet<>(game.getTileMap().keySet()), positions(panels), "every placed tile is shown");
+                titles(groups));
+        assertEquals(new HashSet<>(game.getTileMap().keySet()), positions(groups), "every placed tile is shown");
     }
 
     @Test
-    void aPlayerOnlyGetsPanelsAndHexesTheyKnow() {
+    void groupsGetShortCodesFromTheirBoard() {
+        Map<String, String> codes = new HashMap<>();
+        CompactOverviewGenerator.gmGroups(game, Options.DEFAULT_REACH)
+                .forEach(group -> codes.put(group.title(), group.code()));
+
+        assertEquals("M1", codes.get(main + " / core"));
+        assertEquals("M2", codes.get(main + " / south"));
+        assertEquals("A1", codes.get(galaxyA + " / outpost"));
+        // Whole boards and the corners get a bare letter.
+        assertEquals("A", codes.get(galaxyA));
+        assertEquals("X", codes.get("corners"));
+    }
+
+    @Test
+    void aPlayerOnlyGetsGroupsAndHexesTheyKnow() {
         // The player knows the core and one hex of the outpost; south, map A's rest and the corner are unknown.
         Set<String> known = new HashSet<>(MapFrame.positionsWithin("000", 1));
         known.add("a000");
-        game.getTileByPosition("000")
-                .addUnit(
-                        "space",
-                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
-                        1);
+        giveSolACarrierAtTheCore();
         player.addFogTile("21", "a000", "Rnd 1");
 
-        List<Panel> panels = CompactOverviewGenerator.playerPanels(game, player, known);
+        List<Group> groups = CompactOverviewGenerator.playerGroups(game, player, known, Options.DEFAULT_REACH);
 
-        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
-        String galaxyA = GalaxyNames.name(game, "a");
-        assertEquals(Set.of(main + " / core", galaxyA + " / outpost"), titles(panels));
-        assertEquals(known, positions(panels), "no unknown hex of a known sector is drawn");
-        assertFalse(positions(panels).contains("a101"));
+        assertEquals(Set.of(main + " / core", galaxyA + " / outpost"), titles(groups));
+        assertEquals(known, positions(groups), "no unknown hex of a known sector is drawn");
+    }
+
+    @Test
+    void knownHexesOneEmptyHexApartStayOneIslandByDefault() {
+        // 101 and 104 sit on opposite sides of 000, two steps apart.
+        Set<String> known = Set.of("101", "104");
+        giveSolACarrierAtTheCore();
+        String core = main + " / core";
+
+        Group joined = group(CompactOverviewGenerator.playerGroups(game, player, known, 2), core);
+        Group touchingOnly = group(CompactOverviewGenerator.playerGroups(game, player, known, 1), core);
+        Group whole = group(CompactOverviewGenerator.playerGroups(game, player, known, Integer.MAX_VALUE), core);
+
+        assertEquals(1, joined.islands().size());
+        assertEquals(1, whole.islands().size());
+        assertEquals(2, touchingOnly.islands().size());
+        // Split islands are centred on themselves, so neither keeps where it lies relative to the other.
+        for (Map<String, Point> island : touchingOnly.islands()) {
+            assertEquals(new Point(0, 0), island.values().iterator().next());
+        }
+    }
+
+    @Test
+    void theGmSeesFarApartPiecesThatKeepTheirRealDirection() {
+        // Map A's rest becomes a301 and a310, on opposite sides of the outpost sector.
+        game.setTile(new Tile("24", "a310"));
+
+        Group rest = group(CompactOverviewGenerator.gmGroups(game, Options.DEFAULT_REACH), galaxyA);
+
+        assertEquals(2, rest.islands().size());
+        Point first = rest.islands().get(0).values().iterator().next();
+        Point second = rest.islands().get(1).values().iterator().next();
+        assertTrue(first.distance(second) > 4 * FocusIslands.COLUMN_STEP, "pieces keep their real distance");
+    }
+
+    @Test
+    void optionsFollowTheViewersSeat() {
+        assertEquals(Options.DEFAULT, Options.of(null));
+        // Players start on boxes, one empty hex and codes; a GM without a seat keeps hexes and names.
+        assertEquals(new Options(Style.BOXES, 2, true), Options.of(player));
+
+        player.setFogOverviewBoxes(false);
+        player.setFogOverviewReach(Options.UNLIMITED_REACH);
+        player.setFogOverviewCodes(false);
+        Options options = Options.of(player);
+
+        assertEquals(Style.HEXES, options.style());
+        assertTrue(options.unlimitedReach());
+        assertFalse(options.codes());
+        assertEquals(Options.MAX_REACH, new Options(Style.HEXES, 9, false).reach());
     }
 
     @ParameterizedTest
-    @EnumSource(CompactOverviewGenerator.Style.class)
-    void packedPanelsNeverOverlapAndFitTheSizeCap(CompactOverviewGenerator.Style style) {
-        Layout layout = CompactOverviewGenerator.layout(CompactOverviewGenerator.gmPanels(game), "header", style);
+    @EnumSource(Style.class)
+    void packedGroupsNeverOverlapAndFitTheSizeCap(Style style) {
+        game.setTile(new Tile("24", "a310"));
+        Layout layout = CompactOverviewGenerator.layout(
+                CompactOverviewGenerator.gmGroups(game, 1), "header", new Options(style, 1, true));
 
         List<Placed> placed = layout.placed();
+        List<Point> hexes =
+                placed.stream().flatMap(box -> box.centres().values().stream()).toList();
+        for (int i = 0; i < hexes.size(); i++) {
+            for (int j = i + 1; j < hexes.size(); j++) {
+                if (!adjacent(hexes.get(i), hexes.get(j))) {
+                    assertTrue(HexPacker.hexesClear(hexes.get(i), hexes.get(j), HexPacker.GUTTER - 1), "hexes overlap");
+                }
+            }
+        }
         for (int i = 0; i < placed.size(); i++) {
             for (int j = i + 1; j < placed.size(); j++) {
-                for (Point p : placed.get(i).centres().values()) {
-                    for (Point q : placed.get(j).centres().values()) {
-                        assertTrue(HexPacker.hexesClear(p, q, HexPacker.GUTTER - 1), "panels overlap");
-                    }
-                }
                 assertFalse(placed.get(i).label().intersects(placed.get(j).label()), "labels overlap");
             }
         }
@@ -116,10 +200,35 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.MAX_SIZE);
     }
 
+    private static boolean adjacent(Point a, Point b) {
+        return HexPacker.NEIGHBOUR_OFFSETS.contains(new Point(b.x - a.x, b.y - a.y));
+    }
+
+    @Test
+    void aGroupsIslandsArePackedNextToEachOther() {
+        // Touching only: the two leftover hexes of map A are two islands of one group.
+        game.setTile(new Tile("24", "a310"));
+        Layout layout = CompactOverviewGenerator.layout(
+                CompactOverviewGenerator.gmGroups(game, 1), "header", new Options(Style.HEXES, 1, false));
+
+        Placed rest = layout.placed().stream()
+                .filter(box -> box.group().title().equals(galaxyA))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(2, rest.islands().size());
+        Point first = rest.islands().get(0).values().iterator().next();
+        Point second = rest.islands().get(1).values().iterator().next();
+        assertTrue(
+                first.distance(second) < 2 * FocusIslands.COLUMN_STEP + HexPacker.GUTTER,
+                "islands of one group are packed together");
+    }
+
     @Test
     void boxesHoldTheirOwnHexesAndLabelAndNeverTouch() {
         List<Placed> placed = CompactOverviewGenerator.layout(
-                        CompactOverviewGenerator.gmPanels(game), "header", CompactOverviewGenerator.Style.BOXES)
+                        CompactOverviewGenerator.gmGroups(game, Options.DEFAULT_REACH),
+                        "header",
+                        new Options(Style.BOXES, Options.DEFAULT_REACH, false))
                 .placed();
 
         for (int i = 0; i < placed.size(); i++) {
@@ -138,57 +247,23 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
     }
 
     @Test
-    void theOverviewLayoutFollowsTheViewersSeat() {
-        assertEquals(CompactOverviewGenerator.Style.HEXES, CompactOverviewGenerator.Style.of(player));
-        assertEquals(CompactOverviewGenerator.Style.HEXES, CompactOverviewGenerator.Style.of(null));
-        player.setFogOverviewBoxes(true);
-        assertEquals(CompactOverviewGenerator.Style.BOXES, CompactOverviewGenerator.Style.of(player));
-    }
+    void codesComeWithALegendBesideTheMap() {
+        List<Group> groups = CompactOverviewGenerator.gmGroups(game, Options.DEFAULT_REACH);
+        Layout withNames = CompactOverviewGenerator.layout(groups, "header", Options.DEFAULT);
+        Layout withCodes = CompactOverviewGenerator.layout(
+                groups, "header", new Options(Style.HEXES, Options.DEFAULT_REACH, true));
 
-    @Test
-    void aPlayerSeesSeparatePiecesOfASectorAsLooseIslandsButTheGmSeesOnePanel() {
-        // Two known hexes of the core that do not touch: 101 and 104 sit on opposite sides of 000.
-        Set<String> known = Set.of("101", "104");
-        game.getTileByPosition("000")
-                .addUnit(
-                        "space",
-                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
-                        1);
-        String core = GalaxyNames.name(game, GalaxyNames.MAIN_ID) + " / core";
-
-        List<Panel> panels = CompactOverviewGenerator.playerPanels(game, player, known);
-
-        assertEquals(Set.of(core + " - 1", core + " - 2"), titles(panels));
-        // Each island is centred on itself, so neither keeps where it lies relative to the other.
-        for (Panel panel : panels) {
-            assertEquals(new Point(0, 0), panel.centres().values().iterator().next());
+        assertNull(withNames.legend());
+        OverviewLegend legend = withCodes.legend();
+        assertNotNull(legend);
+        assertEquals(groups.size(), legend.rows().size());
+        for (Placed box : withCodes.placed()) {
+            assertFalse(legend.bounds().intersects(box.label()), "legend covers a label");
+            box.centres()
+                    .values()
+                    .forEach(centre ->
+                            assertFalse(legend.bounds().intersects(HexPacker.hexBox(centre)), "legend covers a hex"));
         }
-        assertTrue(titles(CompactOverviewGenerator.gmPanels(game)).contains(core));
-    }
-
-    @Test
-    void theGmSeesADisconnectedPanelAsPartsThatKeepTheirRealDirection() {
-        // Map A's rest becomes a301 and a310, on opposite sides of the outpost sector.
-        game.setTile(new Tile("24", "a310"));
-        String galaxyA = GalaxyNames.name(game, "a");
-
-        List<Panel> panels = CompactOverviewGenerator.gmPanels(game);
-
-        Point first = onlyCentre(panels, galaxyA + " - 1");
-        Point second = onlyCentre(panels, galaxyA + " - 2");
-        assertFalse(titles(panels).contains(galaxyA));
-        assertTrue(first.distance(second) > 4 * FocusIslands.COLUMN_STEP, "parts keep their real distance");
-    }
-
-    private static Point onlyCentre(List<Panel> panels, String title) {
-        return panels.stream()
-                .filter(panel -> panel.title().equals(title))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("no panel " + title + " in " + titles(panels)))
-                .centres()
-                .values()
-                .iterator()
-                .next();
     }
 
     @Test
@@ -213,11 +288,8 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
     @Test
     void overlayOverviewsRenderForTheGmAndAPlayer() {
-        game.getTileByPosition("000")
-                .addUnit(
-                        "space",
-                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
-                        1);
+        giveSolACarrierAtTheCore();
+        player.setFogOverviewCodes(true);
 
         assertNotNull(CompactOverviewGenerator.gmImage(game, DisplayType.spacecannon));
         assertNotNull(CompactOverviewGenerator.playerImage(game, player, DisplayType.wormholes));
@@ -225,11 +297,7 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
     @Test
     void aPlayerOverviewDrawsBordersOfSystemsTheySee() {
-        game.getTileByPosition("000")
-                .addUnit(
-                        "space",
-                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
-                        1);
+        giveSolACarrierAtTheCore();
         BufferedImage withoutBorder = CompactOverviewGenerator.playerImage(game, player);
         game.addBorderAnomaly("000", 0, "spatial_tear");
 

@@ -25,7 +25,8 @@ public class TestBedScript {
             "removeToken",
             "setGameOption",
             "placeTile",
-            "setLore");
+            "setLore",
+            "fogView");
 
     private String name;
     private String description;

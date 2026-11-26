@@ -7,17 +7,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
@@ -33,18 +30,22 @@ import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.image.tile.UnexploredBridges;
 import ti4.logging.BotLogger;
+import ti4.model.BoardPosition;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
+import ti4.settings.users.FogViewSettings;
 
 public final class CompactOverviewGenerator {
 
     static final int MAX_SIZE = 4000;
     private static final String CORNERS_TITLE = "corners";
-    private static final String PART_SEPARATOR = " - ";
+    private static final char CORNERS_LETTER = 'X';
+    private static final char MAIN_LETTER = 'M';
     private static final List<String> CORNERS = List.of("tl", "tr", "bl", "br");
     private static final List<TileStep> STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
     private static final int BOX_GAP = HexPacker.GUTTER;
+    private static final int GROUP_GUTTER = 3 * HexPacker.GUTTER;
     private static final int BOX_PADDING = 24;
     private static final int BOX_LABEL_GAP = 12;
     private static final int BOX_ARC = 40;
@@ -52,32 +53,81 @@ public final class CompactOverviewGenerator {
 
     public enum Style {
         HEXES,
-        BOXES;
+        BOXES
+    }
 
-        public static Style of(@Nullable Player viewer) {
-            return viewer != null && viewer.isFogOverviewBoxes() ? BOXES : HEXES;
+    public record Options(Style style, int reach, boolean codes) {
+
+        public static final int UNLIMITED_REACH = 0;
+        public static final int DEFAULT_REACH = FogViewSettings.DEFAULT_REACH;
+        public static final int MAX_REACH = 4;
+        public static final Options DEFAULT = new Options(Style.HEXES, DEFAULT_REACH, false);
+
+        public Options {
+            reach = reach <= UNLIMITED_REACH || reach == Integer.MAX_VALUE
+                    ? Integer.MAX_VALUE
+                    : Math.min(reach, MAX_REACH);
+        }
+
+        public boolean unlimitedReach() {
+            return reach == Integer.MAX_VALUE;
+        }
+
+        public static Options of(@Nullable Player viewer) {
+            if (viewer == null) {
+                return DEFAULT;
+            }
+            return new Options(
+                    viewer.isFogOverviewBoxes() ? Style.BOXES : Style.HEXES,
+                    viewer.getFogOverviewReach(),
+                    viewer.isFogOverviewCodes());
         }
     }
 
-    record Panel(String title, Map<String, Point> centres, int colorIndex) {
+    record Panel(String title, Map<String, Point> centres, int colorIndex, boolean wholeBoard) {
 
         Panel {
             centres = Collections.unmodifiableMap(new LinkedHashMap<>(centres));
         }
     }
 
-    record Placed(
-            Panel panel,
-            Map<String, Point> centres,
-            Rectangle label,
-            @Nullable Rectangle frame) {
+    record Group(Panel panel, String code, List<Map<String, Point>> islands) {
+
+        Group {
+            islands = List.copyOf(islands);
+        }
+
+        String title() {
+            return panel.title();
+        }
+
+        String label(Options options) {
+            return options.codes() ? code : panel.title();
+        }
 
         Color color() {
             return OverviewStyle.color(panel.colorIndex());
         }
     }
 
-    record Layout(List<Placed> placed, HexIslandStyle.Canvas canvas) {
+    record Placed(
+            Group group,
+            List<Map<String, Point>> islands,
+            Rectangle label,
+            @Nullable Rectangle frame) {
+
+        Map<String, Point> centres() {
+            Map<String, Point> centres = new LinkedHashMap<>();
+            islands.forEach(centres::putAll);
+            return centres;
+        }
+
+        Color color() {
+            return group.color();
+        }
+    }
+
+    record Layout(List<Placed> placed, @Nullable OverviewLegend legend, HexIslandStyle.Canvas canvas) {
 
         int canvasWidth() {
             return canvas.width();
@@ -85,6 +135,28 @@ public final class CompactOverviewGenerator {
 
         int canvasHeight() {
             return canvas.height();
+        }
+    }
+
+    private record Cluster(Group group, List<Map<String, Point>> islands, List<Point> footprint) {
+
+        static Cluster of(Group group, int reach) {
+            List<HexPacker.Shape> shapes = group.islands().stream()
+                    .map(island -> islandShape(island, reach))
+                    .toList();
+            List<HexPacker.Placement> placements = HexPacker.pack(shapes);
+            List<Map<String, Point>> islands = new ArrayList<>();
+            List<Point> footprint = new ArrayList<>();
+            for (int index = 0; index < shapes.size(); index++) {
+                Point offset = placements.get(index).offset();
+                islands.add(moved(group.islands().get(index), offset));
+                shapes.get(index).footprint().forEach(local -> footprint.add(translated(local, offset)));
+            }
+            return new Cluster(group, islands, footprint);
+        }
+
+        List<Point> centres() {
+            return islands.stream().flatMap(island -> island.values().stream()).toList();
         }
     }
 
@@ -99,11 +171,11 @@ public final class CompactOverviewGenerator {
     }
 
     public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay) {
-        return gmOverview(game, overlay, Style.HEXES);
+        return gmOverview(game, overlay, Options.DEFAULT);
     }
 
-    public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay, Style style) {
-        return ImageUploads.createFileUpload(gmImage(game, overlay, style), game.getName() + "_overview", "webp");
+    public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay, Options options) {
+        return ImageUploads.createFileUpload(gmImage(game, overlay, options), game.getName() + "_overview", "webp");
     }
 
     public static FileUpload playerOverview(Game game, Player player) {
@@ -120,18 +192,18 @@ public final class CompactOverviewGenerator {
     }
 
     public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay) {
-        return gmImage(game, overlay, Style.HEXES);
+        return gmImage(game, overlay, Options.DEFAULT);
     }
 
-    public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay, Style style) {
+    public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay, Options options) {
         return render(
                 game,
-                gmPanels(game),
+                gmGroups(game, options.reach()),
                 new HashMap<>(game.getTileMap()),
                 TileLayers.of(game, null, displayTypeFor(overlay)),
                 withOverlay(withDistances(game, STEPS), overlay),
                 header(game, "GM overview", overlay),
-                style);
+                options);
     }
 
     public static BufferedImage playerImage(Game game, Player player) {
@@ -143,14 +215,15 @@ public final class CompactOverviewGenerator {
         TileLayers layers =
                 TileLayers.forPreparedViewer(game, new FogViewer(game, true, player), displayTypeFor(overlay));
         Map<String, Tile> tiles = knownTiles(game, player, layers);
+        Options options = Options.of(player);
         return render(
                 game,
-                playerPanels(game, player, tiles.keySet()),
+                playerGroups(game, player, tiles.keySet(), options.reach()),
                 tiles,
                 layers,
                 withOverlay(withDistances(game, STEPS), overlay),
                 header(game, player.getFaction() + " overview", overlay),
-                Style.of(player));
+                options);
     }
 
     private static DisplayType displayTypeFor(@Nullable DisplayType overlay) {
@@ -184,28 +257,52 @@ public final class CompactOverviewGenerator {
         return header + " - " + StringUtils.capitalize(overlay.getValue().replace('_', ' '));
     }
 
-    static List<Panel> gmPanels(Game game) {
-        return splitIntoTouchingParts(
-                panels(game, MapSegment.all(game), true, game.getTileMap().keySet()), UnaryOperator.identity());
+    static List<Group> gmGroups(Game game, int reach) {
+        return groups(
+                panels(game, MapSegment.all(game), true, game.getTileMap().keySet()), reach, UnaryOperator.identity());
     }
 
-    static List<Panel> playerPanels(Game game, Player player, Set<String> known) {
-        return splitIntoTouchingParts(
+    static List<Group> playerGroups(Game game, Player player, Set<String> known, int reach) {
+        return groups(
                 panels(game, MapSegment.visibleTo(game, player), MapSegment.mainMapVisibleTo(game, player), known),
+                reach,
                 CompactOverviewGenerator::centredOnItself);
     }
 
-    private static List<Panel> splitIntoTouchingParts(
-            List<Panel> panels, UnaryOperator<Map<String, Point>> partPlacement) {
-        List<Panel> islands = new ArrayList<>();
+    private static List<Group> groups(
+            List<Panel> panels, int reach, UnaryOperator<Map<String, Point>> islandPlacement) {
+        List<String> codes = codes(panels);
+        List<Group> groups = new ArrayList<>();
+        for (int index = 0; index < panels.size(); index++) {
+            Panel panel = panels.get(index);
+            List<Map<String, Point>> islands = HexReach.parts(panel.centres(), reach).stream()
+                    .map(islandPlacement)
+                    .toList();
+            groups.add(new Group(panel, codes.get(index), islands));
+        }
+        return groups;
+    }
+
+    static List<String> codes(List<Panel> panels) {
+        Map<Character, Integer> sectorsPerLetter = new HashMap<>();
+        List<String> codes = new ArrayList<>();
         for (Panel panel : panels) {
-            List<Map<String, Point>> parts = touchingParts(panel.centres());
-            for (int index = 0; index < parts.size(); index++) {
-                String title = parts.size() == 1 ? panel.title() : panel.title() + PART_SEPARATOR + (index + 1);
-                islands.add(new Panel(title, partPlacement.apply(parts.get(index)), panel.colorIndex()));
+            char letter = letterOf(panel);
+            if (panel.wholeBoard()) {
+                codes.add(String.valueOf(letter));
+            } else {
+                codes.add(letter + String.valueOf(sectorsPerLetter.merge(letter, 1, Integer::sum)));
             }
         }
-        return islands;
+        return codes;
+    }
+
+    private static char letterOf(Panel panel) {
+        if (CORNERS_TITLE.equals(panel.title())) {
+            return CORNERS_LETTER;
+        }
+        char board = BoardPosition.boardOf(panel.centres().keySet().iterator().next());
+        return board == BoardPosition.MAIN_BOARD ? MAIN_LETTER : Character.toUpperCase(board);
     }
 
     static Map<String, Tile> knownTiles(Game game, Player player, TileLayers layers) {
@@ -239,11 +336,19 @@ public final class CompactOverviewGenerator {
                     game,
                     MapSegment.mainDisplayName(game),
                     MapSegment.uncoveredMainPositions(game),
+                    true,
                     allowed,
                     fractureYbump);
         }
         for (MapSegment segment : segments) {
-            addPanel(panels, game, segment.displayName(game), segment.positions(), allowed, fractureYbump);
+            addPanel(
+                    panels,
+                    game,
+                    segment.displayName(game),
+                    segment.positions(),
+                    segment.kind() == MapSegment.Kind.BOARD,
+                    allowed,
+                    fractureYbump);
         }
         Map<String, Point> corners = new LinkedHashMap<>();
         for (String corner : CORNERS) {
@@ -254,7 +359,7 @@ public final class CompactOverviewGenerator {
             }
         }
         if (!corners.isEmpty()) {
-            panels.add(new Panel(CORNERS_TITLE, corners, panels.size()));
+            panels.add(new Panel(CORNERS_TITLE, corners, panels.size(), true));
         }
         return panels;
     }
@@ -264,6 +369,7 @@ public final class CompactOverviewGenerator {
             Game game,
             String title,
             Set<String> positions,
+            boolean wholeBoard,
             Set<String> allowed,
             int fractureYbump) {
         Map<String, Point> centres = new LinkedHashMap<>();
@@ -283,7 +389,7 @@ public final class CompactOverviewGenerator {
             centres.put(position, onLattice(centre, origin));
         }
         if (!centres.isEmpty()) {
-            panels.add(new Panel(title, centres, panels.size()));
+            panels.add(new Panel(title, centres, panels.size(), wholeBoard));
         }
     }
 
@@ -296,35 +402,6 @@ public final class CompactOverviewGenerator {
         return new Point(origin.x + column * FocusIslands.COLUMN_STEP, origin.y + row * FocusIslands.HALF_ROW_STEP);
     }
 
-    static List<Map<String, Point>> touchingParts(Map<String, Point> centres) {
-        Map<Point, String> positionAt = new HashMap<>();
-        centres.forEach((position, centre) -> positionAt.put(centre, position));
-        Set<String> seen = new HashSet<>();
-        List<Map<String, Point>> parts = new ArrayList<>();
-        for (String start : centres.keySet()) {
-            if (!seen.add(start)) {
-                continue;
-            }
-            Map<String, Point> part = new TreeMap<>(MapFrame.POSITION_ORDER);
-            ArrayDeque<String> queue = new ArrayDeque<>(List.of(start));
-            while (!queue.isEmpty()) {
-                String position = queue.poll();
-                Point centre = centres.get(position);
-                part.put(position, centre);
-                for (Point step : HexPacker.NEIGHBOUR_OFFSETS) {
-                    String next = positionAt.get(new Point(centre.x + step.x, centre.y + step.y));
-                    if (next != null && seen.add(next)) {
-                        queue.add(next);
-                    }
-                }
-            }
-            parts.add(part);
-        }
-        parts.sort(Comparator.comparingInt((Map<String, Point> part) -> -part.size())
-                .thenComparing(part -> part.keySet().iterator().next(), MapFrame.POSITION_ORDER));
-        return parts;
-    }
-
     private static Map<String, Point> centredOnItself(Map<String, Point> centres) {
         long sumX = 0;
         long sumY = 0;
@@ -333,99 +410,137 @@ public final class CompactOverviewGenerator {
             sumY += centre.y;
         }
         int count = Math.max(1, centres.size());
-        int shiftX = (int) (sumX / count);
-        int shiftY = (int) (sumY / count);
-        Map<String, Point> centred = new LinkedHashMap<>();
-        centres.forEach((position, centre) -> centred.put(position, new Point(centre.x - shiftX, centre.y - shiftY)));
-        return centred;
+        return moved(centres, new Point((int) (-sumX / count), (int) (-sumY / count)));
     }
 
-    static Layout layout(List<Panel> panels, String header, Style style) {
-        return style == Style.BOXES ? boxLayout(panels, header) : hexLayout(panels, header);
+    private static Map<String, Point> moved(Map<String, Point> centres, Point offset) {
+        Map<String, Point> moved = new LinkedHashMap<>();
+        centres.forEach((position, centre) -> moved.put(position, translated(centre, offset)));
+        return moved;
     }
 
-    private static Layout hexLayout(List<Panel> panels, String header) {
-        List<Panel> bySize = new ArrayList<>(panels);
-        bySize.sort(Comparator.comparingInt((Panel panel) -> -panel.centres().size())
-                .thenComparing(Panel::title));
-        List<HexPacker.Shape> shapes = bySize.stream()
-                .map(panel -> new HexPacker.Shape(
-                        List.copyOf(panel.centres().values()),
-                        HexIslandStyle.labelChoices(
-                                panel.title(), panel.centres().values())))
-                .toList();
-        List<HexPacker.Placement> placements = HexPacker.pack(shapes);
-        List<Placed> placed = new ArrayList<>();
-        for (int index = 0; index < bySize.size(); index++) {
-            Point offset = placements.get(index).offset();
-            Map<String, Point> centres = new LinkedHashMap<>();
-            bySize.get(index)
-                    .centres()
-                    .forEach((position, local) ->
-                            centres.put(position, new Point(local.x + offset.x, local.y + offset.y)));
-            placed.add(
-                    new Placed(bySize.get(index), centres, placements.get(index).label(), null));
+    private static Point translated(Point point, Point offset) {
+        return new Point(point.x + offset.x, point.y + offset.y);
+    }
+
+    private static HexPacker.Shape islandShape(Map<String, Point> island, int reach) {
+        List<Point> centres = List.copyOf(island.values());
+        return new HexPacker.Shape(
+                centres, List.of(), HexPacker.withEnclosedHoles(HexReach.withBridges(centres, reach)));
+    }
+
+    static Layout layout(List<Group> groups, String header, Options options) {
+        List<Cluster> clusters =
+                groups.stream().map(group -> Cluster.of(group, options.reach())).toList();
+        List<Placed> placed =
+                options.style() == Style.BOXES ? boxLayout(clusters, options) : hexLayout(clusters, options);
+        Rectangle content = contentBounds(placed);
+        OverviewLegend legend =
+                options.codes() && !groups.isEmpty() ? OverviewLegend.beside(content, legendEntries(groups)) : null;
+        if (legend != null) {
+            content = content.union(legend.bounds());
         }
-        Rectangle content = HexIslandStyle.contentBounds(
+        return new Layout(placed, legend, HexIslandStyle.Canvas.of(content, MAX_SIZE, header));
+    }
+
+    private static List<OverviewLegend.Entry> legendEntries(List<Group> groups) {
+        return groups.stream()
+                .map(group -> new OverviewLegend.Entry(group.code(), group.title(), group.color()))
+                .toList();
+    }
+
+    private static Rectangle contentBounds(List<Placed> placed) {
+        Rectangle bounds = HexIslandStyle.contentBounds(
                 placed.stream().flatMap(box -> box.centres().values().stream()).toList(),
                 placed.stream().map(Placed::label).toList());
-        return new Layout(placed, HexIslandStyle.Canvas.of(content, MAX_SIZE, header));
+        for (Placed box : placed) {
+            if (box.frame() != null) {
+                bounds = bounds.union(box.frame());
+            }
+        }
+        return bounds;
     }
 
-    private static Layout boxLayout(List<Panel> panels, String header) {
-        List<BoxContent> contents =
-                new ArrayList<>(panels.stream().map(BoxContent::of).toList());
+    private static List<Placed> hexLayout(List<Cluster> clusters, Options options) {
+        List<Cluster> bySize = new ArrayList<>(clusters);
+        bySize.sort(
+                Comparator.comparingInt((Cluster cluster) -> -cluster.centres().size())
+                        .thenComparing(cluster -> cluster.group().title()));
+        List<HexPacker.Shape> shapes = bySize.stream()
+                .map(cluster -> new HexPacker.Shape(
+                        cluster.centres(),
+                        HexIslandStyle.labelChoices(cluster.group().label(options), cluster.centres()),
+                        cluster.footprint()))
+                .toList();
+        List<HexPacker.Placement> placements = HexPacker.pack(shapes, GROUP_GUTTER);
+        List<Placed> placed = new ArrayList<>();
+        for (int index = 0; index < bySize.size(); index++) {
+            Cluster cluster = bySize.get(index);
+            Point offset = placements.get(index).offset();
+            placed.add(new Placed(
+                    cluster.group(),
+                    cluster.islands().stream()
+                            .map(island -> moved(island, offset))
+                            .toList(),
+                    placements.get(index).label(),
+                    null));
+        }
+        return placed;
+    }
+
+    private static List<Placed> boxLayout(List<Cluster> clusters, Options options) {
+        List<BoxContent> contents = new ArrayList<>(clusters.stream()
+                .map(cluster -> BoxContent.of(cluster, options))
+                .toList());
         contents.sort(Comparator.comparingInt((BoxContent content) -> -content.size().height)
                 .thenComparingInt(content -> -content.size().width)
-                .thenComparing(content -> content.panel().title()));
+                .thenComparing(content -> content.cluster().group().title()));
         BoxPacker.Packing packing =
                 BoxPacker.pack(contents.stream().map(BoxContent::size).toList(), BOX_GAP);
         List<Placed> placed = new ArrayList<>();
-        Rectangle content = null;
         for (int index = 0; index < contents.size(); index++) {
-            Placed box = contents.get(index).placedAt(packing.positions().get(index));
-            placed.add(box);
-            content = content == null ? new Rectangle(box.frame()) : content.union(box.frame());
+            placed.add(contents.get(index).placedAt(packing.positions().get(index)));
         }
-        Rectangle bounds = content == null ? new Rectangle(0, 0, 1, 1) : content;
-        return new Layout(placed, HexIslandStyle.Canvas.of(bounds, MAX_SIZE, header));
+        return placed;
     }
 
-    private record BoxContent(Panel panel, Rectangle hexes, Rectangle label, Dimension size) {
+    private record BoxContent(Cluster cluster, Rectangle hexes, Rectangle label, Dimension size) {
 
-        static BoxContent of(Panel panel) {
-            Rectangle hexes = HexIslandStyle.contentBounds(panel.centres().values(), List.of());
-            Rectangle label = HexIslandStyle.labelChoices(
-                            panel.title(), panel.centres().values())
+        static BoxContent of(Cluster cluster, Options options) {
+            Rectangle hexes = HexIslandStyle.contentBounds(cluster.centres(), List.of());
+            Rectangle label = HexIslandStyle.labelChoices(cluster.group().label(options), cluster.centres())
                     .getFirst();
             int width = Math.max(hexes.width, label.width) + 2 * BOX_PADDING;
             int height = label.height + BOX_LABEL_GAP + hexes.height + 2 * BOX_PADDING;
-            return new BoxContent(panel, hexes, label, new Dimension(width, height));
+            return new BoxContent(cluster, hexes, label, new Dimension(width, height));
         }
 
         Placed placedAt(Point corner) {
             Rectangle frame = new Rectangle(corner.x, corner.y, size.width, size.height);
             int hexLeft = corner.x + (size.width - hexes.width) / 2;
             int hexTop = corner.y + BOX_PADDING + label.height + BOX_LABEL_GAP;
-            Map<String, Point> centres = new LinkedHashMap<>();
-            panel.centres()
-                    .forEach((position, local) ->
-                            centres.put(position, new Point(local.x - hexes.x + hexLeft, local.y - hexes.y + hexTop)));
+            Point offset = new Point(hexLeft - hexes.x, hexTop - hexes.y);
             Rectangle placedLabel = new Rectangle(
                     corner.x + (size.width - label.width) / 2, corner.y + BOX_PADDING, label.width, label.height);
-            return new Placed(panel, centres, placedLabel, frame);
+            return new Placed(
+                    cluster.group(),
+                    cluster.islands().stream()
+                            .map(island -> moved(island, offset))
+                            .toList(),
+                    placedLabel,
+                    frame);
         }
     }
 
     private static BufferedImage render(
             Game game,
-            List<Panel> panels,
+            List<Group> groups,
             Map<String, Tile> tiles,
             TileLayers tileLayers,
             List<TileStep> steps,
             String header,
-            Style style) {
-        Layout layout = layout(panels, header, style);
+            Options options) {
+        Layout layout = layout(groups, header, options);
         BufferedImage image = layout.canvas().newImage();
         Graphics2D graphics = OverviewStyle.smoothGraphics(image);
         try {
@@ -435,7 +550,10 @@ public final class CompactOverviewGenerator {
             layout.placed().forEach(box -> drawFrame(graphics, box));
             layout.placed()
                     .forEach(box -> HexIslandStyle.drawLabel(
-                            graphics, box.label(), box.panel().title(), box.color()));
+                            graphics, box.label(), box.group().label(options), box.color()));
+            if (layout.legend() != null) {
+                layout.legend().draw(graphics);
+            }
         } finally {
             graphics.dispose();
         }
@@ -445,7 +563,7 @@ public final class CompactOverviewGenerator {
     private static void drawFrame(Graphics2D graphics, Placed box) {
         Rectangle frame = box.frame();
         if (frame == null) {
-            HexIslandStyle.drawOutline(graphics, box.centres().values(), box.color());
+            box.islands().forEach(island -> HexIslandStyle.drawOutline(graphics, island.values(), box.color()));
             return;
         }
         graphics.setColor(box.color());
@@ -468,7 +586,7 @@ public final class CompactOverviewGenerator {
                         return;
                     }
                     try {
-                        HexIslandStyle.drawLayer(graphics, tileLayers.draw(tile, step), tile, centre, step);
+                        HexIslandStyle.drawLayer(graphics, tileLayers, tile, centre, step);
                     } catch (Exception e) {
                         BotLogger.error(
                                 "Compact overview could not draw tile " + tile.getTileID() + " at " + position + " in "

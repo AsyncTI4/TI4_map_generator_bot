@@ -562,6 +562,8 @@ public final class Constants {
     public static final String FOG_FILTER = "fog_filter";
     public static final String FOG_VIEW = "fog_view";
     public static final String FOG_OVERVIEW_BOXES = "fog_overview_boxes";
+    public static final String FOG_OVERVIEW_REACH = "fog_overview_reach";
+    public static final String FOG_OVERVIEW_CODES = "fog_overview_codes";
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "system";

@@ -24,6 +24,7 @@ public final class TileLayers {
     private static final Map<TileStep, TileStepPainter> PAINTERS = Collections.unmodifiableMap(painters());
 
     private static final Rectangle FULL_LAYER = new Rectangle(0, 0, LAYER_SIZE, LAYER_SIZE);
+    private static final int TRANSPARENT_EDGE = 2;
 
     private final TileScene scene;
     private BufferedImage scratch;
@@ -94,20 +95,43 @@ public final class TileLayers {
     }
 
     public void paint(Tile tile, TileStep step, Graphics2D target, int x, int y) {
-        BufferedImage layerImage = clearedScratch();
-        scratchDirty = FULL_LAYER;
-        renderInto(layerImage, tile, step);
-        Rectangle painted = PaintedBounds.of(layerImage);
-        scratchDirty = painted;
+        Rectangle painted = renderToScratch(tile, step);
         if (painted == null) {
             return;
         }
         if (isIntegerTranslation(target.getTransform())) {
-            BufferedImage paintedPart = layerImage.getSubimage(painted.x, painted.y, painted.width, painted.height);
+            BufferedImage paintedPart = scratch.getSubimage(painted.x, painted.y, painted.width, painted.height);
             target.drawImage(paintedPart, x + painted.x, y + painted.y, null);
         } else {
-            target.drawImage(layerImage, x, y, null);
+            target.drawImage(scratch, x, y, null);
         }
+    }
+
+    public void paintPaintedPart(Tile tile, TileStep step, Graphics2D target, int x, int y) {
+        Rectangle painted = renderToScratch(tile, step);
+        if (painted == null) {
+            return;
+        }
+        Rectangle withEdge = new Rectangle(
+                        painted.x - TRANSPARENT_EDGE,
+                        painted.y - TRANSPARENT_EDGE,
+                        painted.width + 2 * TRANSPARENT_EDGE,
+                        painted.height + 2 * TRANSPARENT_EDGE)
+                .intersection(FULL_LAYER);
+        target.drawImage(
+                scratch.getSubimage(withEdge.x, withEdge.y, withEdge.width, withEdge.height),
+                x + withEdge.x,
+                y + withEdge.y,
+                null);
+    }
+
+    @Nullable
+    private Rectangle renderToScratch(Tile tile, TileStep step) {
+        BufferedImage layerImage = clearedScratch();
+        scratchDirty = FULL_LAYER;
+        renderInto(layerImage, tile, step);
+        scratchDirty = PaintedBounds.of(layerImage);
+        return scratchDirty;
     }
 
     private void renderInto(BufferedImage layerImage, Tile tile, TileStep step) {

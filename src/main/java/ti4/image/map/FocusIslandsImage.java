@@ -130,7 +130,7 @@ public final class FocusIslandsImage {
                     return;
                 }
                 try {
-                    HexIslandStyle.drawLayer(graphics, tileLayers.draw(tile, step), tile, centre, step);
+                    HexIslandStyle.drawLayer(graphics, tileLayers, tile, centre, step);
                 } catch (Exception e) {
                     BotLogger.error(
                             "Focus islands could not draw tile " + tile.getTileID() + " at " + position + " in "

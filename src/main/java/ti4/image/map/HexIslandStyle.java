@@ -22,6 +22,7 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
+import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 
 final class HexIslandStyle {
@@ -63,8 +64,34 @@ final class HexIslandStyle {
 
     private HexIslandStyle() {}
 
+    static int labelWidth(String title) {
+        return textWidth(title) + 2 * LABEL_PADDING;
+    }
+
+    static int labelHeight() {
+        return LABEL_HEIGHT;
+    }
+
+    static int textWidth(String text) {
+        return LABEL_METRICS.stringWidth(text);
+    }
+
+    static void drawText(Graphics2D graphics, String text, int left, int centreY, Color color) {
+        graphics.setFont(LABEL_FONT);
+        OutlinedText.draw(
+                graphics,
+                text,
+                left,
+                centreY,
+                color,
+                HorizontalAlign.Left,
+                VerticalAlign.Center,
+                new BasicStroke(4),
+                Color.BLACK);
+    }
+
     static List<Rectangle> labelChoices(String title, Collection<Point> centres) {
-        int width = LABEL_METRICS.stringWidth(title) + 2 * LABEL_PADDING;
+        int width = labelWidth(title);
         Point top = extreme(
                 centres, Comparator.comparingInt((Point centre) -> centre.y).thenComparingInt(centre -> centre.x));
         Point bottom = extreme(
@@ -120,7 +147,7 @@ final class HexIslandStyle {
                 TileGeometry.TILE_HEIGHT);
     }
 
-    static void drawLayer(Graphics2D graphics, BufferedImage layer, Tile tile, Point centre, TileStep step) {
+    static void drawLayer(Graphics2D graphics, TileLayers layers, Tile tile, Point centre, TileStep step) {
         Rectangle hex = tileRectangle(centre);
         Point shift = TileGeometry.followsArtworkOffset(step) ? TileGeometry.hexOffsetInArtwork(tile) : new Point();
         Shape previousClip = graphics.getClip();
@@ -128,11 +155,12 @@ final class HexIslandStyle {
             graphics.clip(MapFrame.hexPolygon(hex));
         }
         try {
-            graphics.drawImage(
-                    layer,
+            layers.paintPaintedPart(
+                    tile,
+                    step,
+                    graphics,
                     hex.x - TileGeometry.TILE_PADDING - shift.x,
-                    hex.y - TileGeometry.TILE_PADDING - shift.y,
-                    null);
+                    hex.y - TileGeometry.TILE_PADDING - shift.y);
         } finally {
             graphics.setClip(previousClip);
         }
