@@ -67,7 +67,8 @@ public class ShipSpeed {
         if (target == null) return 0;
         Map<String, Integer> memo = TickMemo.mapFor(game, TARGET_MEMO);
         return memo.computeIfAbsent(
-                seat.getFaction() + "#" + target.getPosition(), key -> boostsArriving(game, seat, target));
+                seat.getFaction() + "#" + target.getPosition() + "#" + MoveEnablers.key(game, seat),
+                key -> boostsArriving(game, seat, target));
     }
 
     public static int fleetBonusCeiling(Game game, Player seat, Tile origin) {

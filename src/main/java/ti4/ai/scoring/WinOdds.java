@@ -20,9 +20,11 @@ import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
+import ti4.ai.tactical.SkippedSpaceCombat;
 import ti4.ai.tactical.StyxTake;
 import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
@@ -102,7 +104,9 @@ public class WinOdds {
                 rival,
                 immediatePoints,
                 DecidingSeat.knowsHandOf(viewer),
-                game.getRound());
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     public static Odds without(Game game, Player viewer, Player rival, Loss loss) {
@@ -114,7 +118,9 @@ public class WinOdds {
                 rival,
                 loss,
                 DecidingSeat.knowsHandOf(viewer),
-                game.getRound());
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     public static double finishesBeforeWithout(Game game, Player viewer, Player rival, OptionalInt mine, Loss loss) {
@@ -164,6 +170,8 @@ public class WinOdds {
                 DecidingSeat.knowsHandOf(viewer),
                 Objects.toString(DecidingSeat.currentUserId(), ""),
                 ImaginedTurn.seatFaction(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction(),
                 PRICING_MECATOL_TAKE.get());
         Map<List<Object>, Odds> memo = TickMemo.mapFor(game, TICK_MEMO);
         Odds found = memo.get(key);
@@ -194,7 +202,7 @@ public class WinOdds {
     private static String secretView(Player viewer, Player rival) {
         if (!DecidingSeat.knowsHandOf(viewer)) return "";
         if (viewer == rival) return "own " + viewer.getFaction();
-        return new TreeSet<>(viewer.getSecretsUnscored().keySet()).toString();
+        return new TreeSet<>(ImaginedTurn.unscoredSecrets(viewer).keySet()).toString();
     }
 
     private static Odds computeOdds(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {

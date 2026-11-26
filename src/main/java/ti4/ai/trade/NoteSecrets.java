@@ -3,6 +3,7 @@ package ti4.ai.trade;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiMemory;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
@@ -62,12 +63,12 @@ class NoteSecrets {
     }
 
     private static boolean chasesBonds(Player seat) {
-        return seat.getSecretsUnscored().containsKey(STRENGTHEN_BONDS)
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(STRENGTHEN_BONDS)
                 && seat.getPromissoryNotesInPlayArea().stream().noneMatch(note -> !seat.ownsPromissoryNote(note));
     }
 
     private static boolean chasesBetrayal(Player seat, Player owner) {
-        return seat.getSecretsUnscored().containsKey(BETRAY_A_FRIEND)
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(BETRAY_A_FRIEND)
                 && seat.getNeighbouringPlayers(true).contains(owner)
                 && seat.getPromissoryNotesInPlayArea().stream().noneMatch(owner::ownsPromissoryNote);
     }

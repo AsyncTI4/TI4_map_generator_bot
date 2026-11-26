@@ -20,9 +20,8 @@ import ti4.ai.eval.FighterWings;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.Journey;
-import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MoveBudget;
-import ti4.ai.eval.MoveEnablers;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.trace.ShareCensus;
@@ -129,8 +128,7 @@ final class IncomingForces {
     }
 
     private static String assumptions() {
-        return MoveBoost.boostedFaction() + "/" + FleetLimit.unlimitedFaction() + "/" + MovementGraph.assumesAntimass()
-                + "/" + MoveEnablers.assumedKey() + "/" + Objects.toString(DecidingSeat.currentUserId(), "") + "/"
+        return MovementAssumptions.key() + "/" + Objects.toString(DecidingSeat.currentUserId(), "") + "/"
                 + ImaginedTurn.seatFaction();
     }
 

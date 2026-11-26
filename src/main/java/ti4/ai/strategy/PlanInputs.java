@@ -5,12 +5,15 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.eval.Threats;
 import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.TacticalPlan;
@@ -71,10 +74,9 @@ record PlanInputs(
     }
 
     private static String viewerKey(Game game, Player seat) {
-        String viewer = ImperialUses.pointsAware(game, seat)
-                ? "|" + ImperialUses.viewer(game, seat).getUserID()
-                : "";
-        return viewer + (TacticalPlanner.poolsMoveBoosts(game, seat) ? "|pooledBoosts" : "");
+        return "|" + Objects.toString(DecidingSeat.currentUserId(), "")
+                + (TacticalPlanner.poolsMoveBoosts(game, seat) ? "|pooledBoosts" : "")
+                + "|" + MovementAssumptions.key();
     }
 
     private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {

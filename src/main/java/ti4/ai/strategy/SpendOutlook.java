@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.trace.Thinking;
+import ti4.ai.xxcha.XxekirGromPlan;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -24,7 +25,8 @@ public class SpendOutlook {
 
     public static boolean spendingAhead(Game game, Player seat) {
         try (Thinking.Span timing = Thinking.measure("spend.ahead")) {
-            String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
+            String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat)
+                    + (XxekirGromPlan.isPlanning() ? "|gromPlanning" : "");
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.ahead();
             boolean ahead = DiplomacyUse.spendingAhead(game, seat, true);

@@ -28,7 +28,7 @@ public class SkippedSpaceCombat {
         return ASSUMED_FOR.get() == seat;
     }
 
-    static String assumedFaction() {
+    public static String assumedFaction() {
         Player seat = ASSUMED_FOR.get();
         return seat == null ? "" : seat.getFaction();
     }

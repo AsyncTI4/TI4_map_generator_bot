@@ -3,6 +3,7 @@ package ti4.ai.endurance;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -26,7 +27,7 @@ public class Endurance {
     }
 
     public static boolean holds(Player seat) {
-        return seat.getSecretsUnscored().containsKey(SECRET);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(SECRET);
     }
 
     public static Optional<Race> race(Game game, Player seat) {

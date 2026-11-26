@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.strategy.TechPath;
 import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.SeatStrike;
@@ -67,7 +68,7 @@ public class SecretValue {
     }
 
     public static Optional<String> lowestValueSecret(Game game, Player seat) {
-        return seat.getSecretsUnscored().keySet().stream()
+        return ImaginedTurn.unscoredSecrets(seat).keySet().stream()
                 .min(Comparator.comparingDouble((String secret) -> keepValue(game, seat, secret))
                         .thenComparing(Comparator.naturalOrder()));
     }
@@ -131,7 +132,7 @@ public class SecretValue {
     }
 
     private static boolean canOpenNexus(Game game, Player seat, Tile nexus) {
-        return seat.getActionCards().containsKey(GHOST_SHIP)
+        return ImaginedTurn.actionCards(seat).containsKey(GHOST_SHIP)
                 || game.getRealPlayers().stream().anyMatch(player -> CREUSS.equals(player.getFaction()))
                 || gammaTokenOnBoard(game, nexus);
     }
@@ -180,7 +181,7 @@ public class SecretValue {
 
     private static boolean isCongested(Game game, Player seat, String secretId) {
         if (SecretPhase.of(secretId) != SecretPhase.STATUS) return false;
-        long otherReady = seat.getSecretsUnscored().keySet().stream()
+        long otherReady = ImaginedTurn.unscoredSecrets(seat).keySet().stream()
                 .filter(other -> !other.equals(secretId))
                 .filter(other -> SecretPhase.of(other) == SecretPhase.STATUS)
                 .filter(other -> meetsThreshold(game, seat, other))

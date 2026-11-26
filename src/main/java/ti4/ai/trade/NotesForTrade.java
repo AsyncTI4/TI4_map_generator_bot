@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.brain.SearchMemo;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.naalu.GiftOfPrescience;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.strategy.CardFacade;
@@ -87,7 +88,8 @@ class NotesForTrade {
 
     static double receiveValue(Game game, Player seat, String alias, boolean seatPrivate) {
         return SearchMemo.remember(
-                () -> baseReceiveValue(game, seat, alias, seatPrivate) + NoteSecrets.value(game, seat, alias),
+                () -> baseReceiveValue(game, seat, alias, seatPrivate)
+                        + (seatPrivate ? 0 : NoteSecrets.value(game, seat, alias)),
                 RECEIVE_MEMO,
                 seat,
                 alias,
@@ -196,7 +198,7 @@ class NotesForTrade {
     }
 
     private static boolean holdsRider(Player owner) {
-        return owner.getActionCards().keySet().stream()
+        return ImaginedTurn.actionCards(owner).keySet().stream()
                 .map(Mapper::getActionCard)
                 .anyMatch(card -> card != null && card.getName().endsWith(RIDER));
     }

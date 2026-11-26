@@ -142,6 +142,10 @@ public class XxekirGromPlan {
         return readies;
     }
 
+    public static boolean isPlanning() {
+        return PLANNING.get();
+    }
+
     static Optional<String> actionReason(Game game, Player seat) {
         return planning(() -> {
             Outlook outlook = compute(game, seat);

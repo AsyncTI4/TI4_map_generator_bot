@@ -6,6 +6,7 @@ import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ScoringPaths;
@@ -78,7 +79,7 @@ class ThroneSale {
     }
 
     private static int ownActionPoints(Game game, Player seat) {
-        double secrets = seat.getSecretsUnscored().keySet().stream()
+        double secrets = ImaginedTurn.unscoredSecrets(seat).keySet().stream()
                 .filter(id -> SecretPhase.of(id) == SecretPhase.ACTION)
                 .mapToDouble(id -> ActionSecretOdds.perRound(game, seat, id))
                 .sum();

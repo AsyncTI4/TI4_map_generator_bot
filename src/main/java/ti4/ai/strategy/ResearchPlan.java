@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
@@ -62,8 +63,8 @@ public record ResearchPlan(
 
     public static ResearchPlan of(Game game, Player seat) {
         Map<String, String> parts = signature(game, seat);
-        String key = System.identityHashCode(game) + "|" + game.getName() + "|" + seat.getFaction() + "|"
-                + String.join("|", parts.values());
+        String key = System.identityHashCode(game) + "|" + game.getName() + "|" + seat.getFaction()
+                + ImaginedTurn.cacheMark(seat) + "|" + String.join("|", parts.values());
         return CACHE.get(key, ignored -> build(game, seat, parts));
     }
 
@@ -125,7 +126,7 @@ public record ResearchPlan(
         parts.put("can research", String.valueOf(canResearch(game, seat)));
         parts.put("techs", sorted(seat.getTechs()));
         parts.put("purged techs", sorted(seat.getPurgedTechs()));
-        parts.put("secrets", sorted(seat.getSecretsUnscored().keySet()));
+        parts.put("secrets", sorted(ImaginedTurn.unscoredSecrets(seat).keySet()));
         parts.put("public objectives", publics(game, seat));
         parts.put("specialty planets", specialtyPlanets(game, seat));
         parts.put("scar purchase", String.valueOf(ScarToken.canBuy(game, seat)));

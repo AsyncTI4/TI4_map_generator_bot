@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.EnemyShortcuts;
+import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.eval.Threats;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
@@ -53,7 +56,9 @@ class CeasefireValue {
 
     static double stakeAgainst(Game game, Player defender, Player attacker) {
         try (Thinking.Span timing = Thinking.measure("ceasefire.stake")) {
-            String key = game.getName() + "|" + defender.getFaction() + "|" + attacker.getFaction();
+            String key = game.getName() + "|" + defender.getFaction() + "|" + attacker.getFaction()
+                    + ImaginedTurn.cacheMark(attacker) + "|" + EnemyShortcuts.imagined(game, attacker) + "|"
+                    + MovementAssumptions.key();
             Cached cached = STAKES.get(key);
             if (cached != null && cached.isFor(game)) return cached.stake();
             double stake = Math.max(homeStake(game, defender, attacker), mecatolStake(game, defender, attacker));

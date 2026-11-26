@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner.Candidate;
 import ti4.ai.tactical.TacticalPlanner.Context;
@@ -59,7 +60,8 @@ class EnemyIntent {
 
     @SuppressWarnings("unchecked")
     static <T> T remembered(Game game, String key, Supplier<T> compute) {
-        String fullKey = game.getName() + "|" + key;
+        String fullKey = game.getName() + "|" + key + "|" + MovementAssumptions.key() + "|"
+                + SkippedSpaceCombat.assumedFaction();
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
         T value = ShareCensus.perSave("enemy.intent", game, fullKey, compute);

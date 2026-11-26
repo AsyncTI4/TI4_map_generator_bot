@@ -151,7 +151,7 @@ class KindPricing {
     }
 
     private static boolean hasExcessSecret(Player seat) {
-        return seat.getSecretsUnscored().size() > Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
+        return ImaginedTurn.unscoredSecrets(seat).size() > Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
     }
 
     private record CachedKeeps(WeakReference<Game> game, long modified, List<Double> keeps) {
@@ -163,7 +163,7 @@ class KindPricing {
 
     static List<Double> keepValues(Game game, Player seat) {
         try (Thinking.Span timing = Thinking.measure("expedition.keepValues")) {
-            String key = game.getName() + "|" + seat.getUserID();
+            String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
             CachedKeeps cached = KEEPS.get(key);
             if (cached != null && cached.isFor(game)) return cached.keeps();
             Set<String> hand = ImaginedTurn.actionCards(seat).keySet();

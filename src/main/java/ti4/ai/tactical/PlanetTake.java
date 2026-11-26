@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.ai.trace.Thinking;
@@ -34,7 +35,9 @@ public class PlanetTake {
                 "mecatol.take",
                 taker,
                 cannonRisk,
-                game.getRound());
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     public static double mecatolThisRoundWithout(Game game, Player decider, Player taker, Tile stopped) {
@@ -47,7 +50,9 @@ public class PlanetTake {
                 taker,
                 stopped.getPosition(),
                 cannonRisk,
-                game.getRound());
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     static double chance(Game game, Player taker, Target target, IncomingForces incoming, Player decider) {

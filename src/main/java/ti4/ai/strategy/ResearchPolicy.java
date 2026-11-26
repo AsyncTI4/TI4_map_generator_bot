@@ -20,6 +20,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.Territory;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.explore.ExploreValues;
@@ -258,7 +259,8 @@ public class ResearchPolicy {
     }
 
     static int secretPointsCompletedBy(Game game, Player seat, TechnologyModel tech) {
-        return seat.getSecretsUnscored().keySet().stream().anyMatch(secret -> completes(game, seat, secret, tech))
+        return ImaginedTurn.unscoredSecrets(seat).keySet().stream()
+                        .anyMatch(secret -> completes(game, seat, secret, tech))
                 ? 1
                 : 0;
     }
@@ -343,7 +345,7 @@ public class ResearchPolicy {
         if (!diodes && !CARRIER_II.equals(tech.getAlias()) || !ListTechService.isTechResearchable(tech, seat)) return 0;
         GroundCampaign campaign = GroundCampaign.of(game, seat);
         double speedUp = GROUND_SECRETS.stream()
-                .filter(seat.getSecretsUnscored()::containsKey)
+                .filter(ImaginedTurn.unscoredSecrets(seat)::containsKey)
                 .mapToDouble(secret -> groundSpeedUp(campaign, secret, diodes))
                 .sum();
         return speedUp * GROUND_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
@@ -516,7 +518,7 @@ public class ResearchPolicy {
         for (String id : game.getRevealedPublicObjectives().keySet()) {
             if (!ObjectivePolicy.hasScored(game, seat, id)) objectives.add(id);
         }
-        objectives.addAll(seat.getSecretsUnscored().keySet());
+        objectives.addAll(ImaginedTurn.unscoredSecrets(seat).keySet());
         return objectives;
     }
 

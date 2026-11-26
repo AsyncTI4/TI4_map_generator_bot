@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -16,7 +17,13 @@ public class StyxTake {
     static final StrikeRules RULES = PlanetTake.RULES;
 
     public static double thisRound(Game game, Player player) {
-        return DecisionMemo.remember(() -> compute(game, player), "styx.take", player, game.getRound());
+        return DecisionMemo.remember(
+                () -> compute(game, player),
+                "styx.take",
+                player,
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     public static double thisRoundWithout(Game game, Player player, Tile stopped) {
@@ -25,7 +32,9 @@ public class StyxTake {
                 "styx.take.without",
                 player,
                 stopped.getPosition(),
-                game.getRound());
+                game.getRound(),
+                MovementAssumptions.key(),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     private static double compute(Game game, Player player) {

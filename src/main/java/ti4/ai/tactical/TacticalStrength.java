@@ -14,6 +14,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FactionStrength;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -71,7 +72,8 @@ public class TacticalStrength {
     static double against(Game game, Player attacker, Player target, boolean seesHand) {
         Map<String, Double> memo = TickMemo.mapFor(game, MEMO);
         String key = attacker.getFaction() + ">" + target.getFaction() + "|" + seesHand + "|"
-                + Objects.toString(DecidingSeat.currentUserId(), "") + "|" + ImaginedTurn.seatFaction();
+                + Objects.toString(DecidingSeat.currentUserId(), "") + "|" + ImaginedTurn.seatFaction() + "|"
+                + MovementAssumptions.key();
         return memo.computeIfAbsent(
                 key, ignored -> reachingCost(game, attacker, target) + nonUnits(attacker, seesHand));
     }
