@@ -22,7 +22,34 @@ class FogViewServiceTest extends BaseTi4Test {
         assertThat(ComponentPanel.fits(FogViewService.components(player, "Changed: ghost hexes.")))
                 .isTrue();
         player.setFogOverviewBoxes(true);
+        player.setFogOverviewCodes(true);
+        player.setFogOverviewReach(0);
         assertThat(ComponentPanel.fits(FogViewService.components(player, null))).isTrue();
+    }
+
+    @Test
+    void choiceButtonsSetTheirSetting() {
+        Player player = new Player("player-id", "player", new Game());
+
+        FogViewService.apply(player, "layout", "hexes");
+        FogViewService.apply(player, "labels", "names");
+        FogViewService.apply(player, "islands", "0");
+        FogViewService.apply(player, "ghosts", "off");
+        FogViewService.apply(player, "islands", "x");
+
+        assertThat(player.isFogOverviewBoxes()).isFalse();
+        assertThat(player.isFogOverviewCodes()).isFalse();
+        assertThat(player.getFogOverviewReach()).isZero();
+        assertThat(player.isFogGhostHexes()).isFalse();
+        // The longest faction prefix still keeps the id inside Discord's 100 characters.
+        assertThat(FogViewService.choiceId("FFCC_" + "x".repeat(40) + "_", "islands", "4"))
+                .hasSizeLessThan(100);
+    }
+
+    @Test
+    void everyIslandChoiceHasALabel() {
+        assertThat(FogViewService.reachChoices()).containsKeys(0, 1, 2, 3, 4);
+        assertThat(FogViewService.reachChoices().get(0)).isEqualTo("Whole segments");
     }
 
     @Test

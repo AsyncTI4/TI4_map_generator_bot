@@ -344,6 +344,15 @@ public class TestBedScriptService {
                     if (problem != null) errors.add(label + ": " + problem);
                 }
             }
+            case "fogView" -> {
+                requireSeat(step, label, errors);
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+                if (step.getKey() != null && step.getValue() != null) {
+                    String problem = TestBedComponentService.fogViewProblem(step.getKey(), step.getValue());
+                    if (problem != null) errors.add(label + ": " + problem);
+                }
+            }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {
                 requireSeat(step, label, errors);

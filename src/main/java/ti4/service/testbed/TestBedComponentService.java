@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.map.CompactOverviewGenerator;
 import ti4.model.DeckModel;
 import ti4.model.DeckModel.DeckType;
 import ti4.model.MapPositionMapper;
@@ -216,12 +217,55 @@ public class TestBedComponentService {
                 player.addFragment(fragment);
             }
         }
+        if (seat.getFogMemory() != null) {
+            rememberTiles(game, player, seat.getFogMemory(), warnings);
+        }
         if (seat.getBreakthrough() != null) {
             boolean exhausted = "exhausted".equals(seat.getBreakthrough());
             for (String breakthrough : player.getBreakthroughIDs()) {
                 player.setBreakthroughUnlocked(breakthrough, true);
                 player.setBreakthroughExhausted(breakthrough, exhausted);
             }
+        }
+    }
+
+    private static void rememberTiles(Game game, Player player, List<String> positions, List<String> warnings) {
+        for (String position : positions) {
+            Tile tile = game.getTileByPosition(position.toLowerCase());
+            if (tile == null) {
+                warnings.add(player.getFaction() + ": no tile at `" + position + "` to remember.");
+                continue;
+            }
+            player.addFogTile(tile.getTileID(), tile.getPosition(), "Rnd " + game.getRound());
+        }
+    }
+
+    static final Map<String, String> FOG_VIEW_VALUES = Map.of(
+            "overview", "hexes|boxes",
+            "islands", "[1-4]|unlimited",
+            "labels", "names|codes",
+            "ghostHexes", "true|false");
+
+    @Nullable
+    static String fogViewProblem(String key, String value) {
+        String allowed = FOG_VIEW_VALUES.get(key);
+        if (allowed == null) {
+            return "unknown fog view setting `" + key + "`; use " + new TreeSet<>(FOG_VIEW_VALUES.keySet()) + ".";
+        }
+        return value.matches(allowed) ? null : "fog view `" + key + "` takes `" + allowed + "`, not `" + value + "`.";
+    }
+
+    static void setFogView(Player player, String key, String value) {
+        switch (key) {
+            case "overview" -> player.setFogOverviewBoxes("boxes".equals(value));
+            case "islands" ->
+                player.setFogOverviewReach(
+                        "unlimited".equals(value)
+                                ? CompactOverviewGenerator.Options.UNLIMITED_REACH
+                                : Integer.parseInt(value));
+            case "labels" -> player.setFogOverviewCodes("codes".equals(value));
+            case "ghostHexes" -> player.setFogGhostHexes(Boolean.parseBoolean(value));
+            default -> {}
         }
     }
 

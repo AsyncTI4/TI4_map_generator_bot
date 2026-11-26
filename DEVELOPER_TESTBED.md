@@ -92,6 +92,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Next agendas | script `do: stackAgenda` (value: agenda id) puts the agenda on top of the agenda deck; stack in reverse to set the order | `{ "do": "stackAgenda", "value": "mutiny" }` |
 | Neutral units | game `neutralUnits`: tile position to units, as in `/add_units` | `"neutralUnits": { "201": "pds quann, gf quann" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
+| Fog memory | seat `fogMemory` (fog games): positions the seat remembers, with the tile that is there and the current round as label, as if seen before | `"fogMemory": ["203", "a205"]` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
 
@@ -289,7 +290,7 @@ Seat fields (all optional): `faction`, `color`, `home`, `speaker`, `sc`; `acs`, 
 randomly, ids give that card, e.g. `["sabo1", 2]`; an action card held by another seat or in the discard is moved
 over); `techs`, `planets`; `tg`, `commodities`, `ccs` (`tactic/fleet/strategy`); `leaders`
 (`{ "unlock": ["commander"], "exhaust": ["agent"] }`); `units` (`{ "101": "2 dn, cv", "home": "2 gf" }`); `pns`,
-`scoredObjectives`, `fragments`, `breakthrough`; `teamMateYou` (`true` adds you as a teammate on that seat and turns on community mode, as `/player add_teammate` does;
+`scoredObjectives`, `fragments`, `breakthrough`, `fogMemory`; `teamMateYou` (`true` adds you as a teammate on that seat and turns on community mode, as `/player add_teammate` does;
 needs a preset without `you`, one seat at most); `botAccount` (`true` seats the bot's own Discord account instead
 of a virtual seat, so a real non-developer user holds the seat; scripts cannot act as it, one seat at most).
 Unknown fields
@@ -311,7 +312,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `stackAgenda` (value: agenda id; moves it from the deck or discard to the top of the agenda deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games), `setLore` (value: lore entries joined with `\|`, or `none` to clear; replaces the game's lore like the preset `lore` field) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `stackAgenda` (value: agenda id; moves it from the deck or discard to the top of the agenda deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games), `setLore` (value: lore entries joined with `\|`, or `none` to clear; replaces the game's lore like the preset `lore` field), `fogView` (as: seat; key `overview` `hexes`/`boxes`, `islands` `1`-`4`/`unlimited`, `labels` `names`/`codes` or `ghostHexes` `true`/`false`; sets that `/user fog_view` setting, including the island dropdown a script cannot pick) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -332,7 +333,7 @@ Every step may also have a `label` for the report.
   thread), `<seat>:comms-inbox` (its anonymous comms inbox thread, once it exists).
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
   `debt`, `scs`, `passed`, `followed` (cards 1-8), `followedAll` (every followed card, e.g. `11,21`),
-  `megagameGroup` (the seat's SC group letter), `fogView` (`filter=default,ghostHexes=true,overview=hexes`), `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
+  `megagameGroup` (the seat's SC group letter), `fogView` (`filter=default,ghostHexes=true,overview=boxes,islands=2,labels=codes`; islands is 1–4 or `unlimited`), `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
   `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,
   `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
   (commodity value, not the commodities held);

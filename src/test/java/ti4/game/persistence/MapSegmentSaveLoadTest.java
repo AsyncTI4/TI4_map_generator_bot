@@ -69,21 +69,28 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
         }
     }
 
-    // Same for the overview layout: written only when a player picked boxes.
+    // Same for the overview settings: written only when a player moved off the default.
     @Test
-    void overviewBoxesFlagIsOnlySavedWhenPicked() throws IOException {
+    void overviewSettingsAreOnlySavedWhenPicked() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             GameSaveService.save(game, "test");
             Path saveFile = Storage.getGamePath(harness.getGameName() + Constants.TXT);
-            assertThat(Files.readString(saveFile)).doesNotContain(Constants.FOG_OVERVIEW_BOXES);
+            assertThat(Files.readString(saveFile))
+                    .doesNotContain(Constants.FOG_OVERVIEW_BOXES)
+                    .doesNotContain(Constants.FOG_OVERVIEW_REACH)
+                    .doesNotContain(Constants.FOG_OVERVIEW_CODES);
 
             Player player = game.getRealPlayers().getFirst();
-            player.setFogOverviewBoxes(true);
+            player.setFogOverviewBoxes(false);
+            player.setFogOverviewReach(0);
+            player.setFogOverviewCodes(false);
             GameSaveService.save(game, "test");
 
-            assertThat(harness.load().getPlayer(player.getUserID()).isFogOverviewBoxes())
-                    .isTrue();
+            Player loaded = harness.load().getPlayer(player.getUserID());
+            assertThat(loaded.isFogOverviewBoxes()).isFalse();
+            assertThat(loaded.getFogOverviewReach()).isZero();
+            assertThat(loaded.isFogOverviewCodes()).isFalse();
         }
     }
 

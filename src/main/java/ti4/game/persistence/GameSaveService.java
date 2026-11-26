@@ -25,6 +25,7 @@ import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.game.PlayerProperties;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
@@ -849,8 +850,18 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
-            if (player.isFogOverviewBoxes()) {
-                writer.write(Constants.FOG_OVERVIEW_BOXES + " true");
+            if (!player.isFogOverviewBoxes()) {
+                writer.write(Constants.FOG_OVERVIEW_BOXES + " false");
+                writer.write(System.lineSeparator());
+            }
+
+            if (player.getFogOverviewReach() != PlayerProperties.FOG_OVERVIEW_DEFAULT_REACH) {
+                writer.write(Constants.FOG_OVERVIEW_REACH + " " + player.getFogOverviewReach());
+                writer.write(System.lineSeparator());
+            }
+
+            if (!player.isFogOverviewCodes()) {
+                writer.write(Constants.FOG_OVERVIEW_CODES + " false");
                 writer.write(System.lineSeparator());
             }
 

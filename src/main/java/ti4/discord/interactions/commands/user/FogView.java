@@ -20,11 +20,15 @@ class FogView extends GameStateSubcommand {
     private static final String OVERVIEW_LAYOUT = "overview_layout";
     private static final String HEXES = "hexes";
     private static final String BOXES = "boxes";
+    private static final String OVERVIEW_ISLANDS = "overview_islands";
+    private static final String OVERVIEW_LABELS = "overview_labels";
+    private static final String NAMES = "names";
+    private static final String CODES = "codes";
 
     public FogView() {
         super(
                 Constants.FOG_VIEW,
-                "Your fog view settings for this game: ghost hexes, overview layout, tile colour.",
+                "Your fog view settings for this game: ghost hexes, overview layout and labels, tile colour.",
                 true,
                 true);
         addOptions(
@@ -33,7 +37,18 @@ class FogView extends GameStateSubcommand {
                 new OptionData(OptionType.BOOLEAN, GHOST_HEXES, "True to show ghost hexes, false to hide them"),
                 new OptionData(OptionType.STRING, OVERVIEW_LAYOUT, "How the Overview packs the map")
                         .addChoice("Hexes", HEXES)
-                        .addChoice("Boxes", BOXES));
+                        .addChoice("Boxes", BOXES),
+                islandsOption(),
+                new OptionData(OptionType.STRING, OVERVIEW_LABELS, "Segment names or short codes with a legend")
+                        .addChoice("Names", NAMES)
+                        .addChoice("Codes", CODES));
+    }
+
+    private static OptionData islandsOption() {
+        OptionData option = new OptionData(
+                OptionType.INTEGER, OVERVIEW_ISLANDS, "How close known systems must be to stay in one island");
+        FogViewService.reachChoices().forEach((reach, label) -> option.addChoice(label, reach));
+        return option;
     }
 
     @Override
@@ -72,6 +87,16 @@ class FogView extends GameStateSubcommand {
         if (layout != null) {
             player.setFogOverviewBoxes(BOXES.equals(layout));
             changes.add("overview layout");
+        }
+        Integer reach = event.getOption(OVERVIEW_ISLANDS, null, OptionMapping::getAsInt);
+        if (reach != null) {
+            player.setFogOverviewReach(reach);
+            changes.add("overview islands");
+        }
+        String labels = event.getOption(OVERVIEW_LABELS, null, OptionMapping::getAsString);
+        if (labels != null) {
+            player.setFogOverviewCodes(CODES.equals(labels));
+            changes.add("overview labels");
         }
         String notice = changes.isEmpty() ? null : "Changed: " + String.join(", ", changes) + ".";
         MessageChannel channel = player.getCorrectChannel();

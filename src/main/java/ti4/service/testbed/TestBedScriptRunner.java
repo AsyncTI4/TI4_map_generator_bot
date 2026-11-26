@@ -58,7 +58,8 @@ public final class TestBedScriptRunner {
             "stackAgenda",
             "removeToken",
             "setGameOption",
-            "placeTile");
+            "placeTile",
+            "fogView");
 
     private enum Status {
         PASS,
@@ -515,6 +516,14 @@ public final class TestBedScriptRunner {
                 if (problem != null) problems.add(problem);
             }
             case "setLore" -> LoreService.replaceLore(game, TestBedScriptService.loreEntries(step.getValue()));
+            case "fogView" -> {
+                Player seat = seat(game, step.getAs());
+                if (seat == null) {
+                    problems.add("no seat `" + step.getAs() + "`");
+                    return;
+                }
+                TestBedComponentService.setFogView(seat, step.getKey(), step.getValue());
+            }
             case "setActivePlayer" -> {
                 Player seat = seat(game, step.getAs());
                 if (seat == null) {

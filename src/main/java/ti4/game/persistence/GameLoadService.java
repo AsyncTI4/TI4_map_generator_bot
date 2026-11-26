@@ -1239,6 +1239,14 @@ class GameLoadService {
                 case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.FOG_OVERVIEW_BOXES ->
                     player.setFogOverviewBoxes(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.FOG_OVERVIEW_REACH -> {
+                    String reach = tokenizer.nextToken();
+                    if (reach.matches("\\d{1,2}")) {
+                        player.setFogOverviewReach(Integer.parseInt(reach));
+                    }
+                }
+                case Constants.FOG_OVERVIEW_CODES ->
+                    player.setFogOverviewCodes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));

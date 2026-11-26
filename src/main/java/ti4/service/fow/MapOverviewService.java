@@ -34,22 +34,23 @@ public class MapOverviewService {
                 && CompactOverviewGenerator.drawsOverlay(displayType);
     }
 
-    public static CompactOverviewGenerator.Style gmStyle(Game game, GenericInteractionCreateEvent event) {
-        return CompactOverviewGenerator.Style.of(game.getPlayer(event.getUser().getId()));
+    public static CompactOverviewGenerator.Options gmOptions(Game game, GenericInteractionCreateEvent event) {
+        return CompactOverviewGenerator.Options.of(
+                game.getPlayer(event.getUser().getId()));
     }
 
     public static void queueOverlayOverview(
             Game game,
             @Nullable Player viewer,
             DisplayType overlay,
-            CompactOverviewGenerator.Style gmStyle,
+            CompactOverviewGenerator.Options gmOptions,
             Consumer<FileUpload> callback) {
         String viewerId = viewer == null ? null : viewer.getUserID();
         MapRenderPipeline.queueImage(
                 game,
                 "Map overview",
                 snapshot -> viewerId == null
-                        ? CompactOverviewGenerator.gmOverview(snapshot, overlay, gmStyle)
+                        ? CompactOverviewGenerator.gmOverview(snapshot, overlay, gmOptions)
                         : CompactOverviewGenerator.playerOverview(snapshot, snapshot.getPlayer(viewerId), overlay),
                 callback);
     }
@@ -77,11 +78,11 @@ public class MapOverviewService {
                     event, "Only the GM can open the GM overview, from their own private channel.");
             return;
         }
-        CompactOverviewGenerator.Style style = gmStyle(game, event);
+        CompactOverviewGenerator.Options options = gmOptions(game, event);
         MapRenderPipeline.queueImage(
                 game,
                 "GM map overview",
-                snapshot -> CompactOverviewGenerator.gmOverview(snapshot, null, style),
+                snapshot -> CompactOverviewGenerator.gmOverview(snapshot, null, options),
                 fileUpload -> ShowGameService.sendWithMapButtons(game, event, channel, fileUpload));
     }
 
@@ -116,12 +117,12 @@ public class MapOverviewService {
         Player viewer = viewer(game, event);
         MessageChannel channel = event.getMessageChannel();
         boolean replyPrivately = view == View.PLAYER && isSharedChannel(game, channel);
-        CompactOverviewGenerator.Style style = gmStyle(game, event);
+        CompactOverviewGenerator.Options options = gmOptions(game, event);
         MapRenderPipeline.queueImage(
                 game,
                 "Map overview",
                 snapshot -> view == View.GM
-                        ? CompactOverviewGenerator.gmOverview(snapshot, null, style)
+                        ? CompactOverviewGenerator.gmOverview(snapshot, null, options)
                         : CompactOverviewGenerator.playerOverview(snapshot, sameSeat(snapshot, viewer)),
                 fileUpload -> {
                     if (replyPrivately) {
