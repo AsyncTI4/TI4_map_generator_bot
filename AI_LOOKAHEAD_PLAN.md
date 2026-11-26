@@ -179,6 +179,12 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   seat on each `Hostility.observe` (15%), and 8% in `TechnologyFollowReserve.of` from production planning. Hex
   distances now stay cached per start position for good, and the follow reserve is kept per decision. The
   `tactical.for.attack` time in the census is mostly this work, reached through enemy.intent.
+- 2026-11-26: same-seed speed check (seed 7700, 4 full games, queue jobs 20261125-135241 new at c042ffb893 and
+  20261125-135242 baseline with every cache commit reverted): game thread CPU 7,766 s over 22 rounds against
+  11,357 s over 23, about 353 against 494 CPU-s per round (-29%). Game 3 ended on the same scores both ways
+  (1,566 against 2,307 s, -32%); games 1, 2 and 4 drifted. Both jobs predate the seat-id fix 3379860e70, whose
+  collisions moved seeded random streams between games of one batch, so the drift is not yet evidence against the
+  caches. Exact equality needs a rerun of both sides from 3379860e70 onward.
 
 ## Unknowns
 
