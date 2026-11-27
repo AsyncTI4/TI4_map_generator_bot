@@ -21,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -48,6 +49,10 @@ public class XinTechHandler {
 
     public static boolean hasVeiledNetworkingStar(Player player) {
         return player != null && player.hasTech("dsxinystar");
+    }
+
+    public static boolean isAffectedByQuietus(Game game, Player player, Tile tile) {
+        return !hasVeiledNetworkingStar(player) && TeHelperUnits.affectedByQuietus(game, player, tile);
     }
 
     public static List<Button> getVeiledNetworkingStarProductionButtons(

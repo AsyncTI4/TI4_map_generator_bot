@@ -116,7 +116,6 @@ import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -944,13 +943,13 @@ public class StartCombatService {
             }
         }
 
-        if (TeHelperUnits.affectedByQuietus(game, player2, tile)) {
+        if (XinTechHandler.isAffectedByQuietus(game, player2, tile)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player2.getRepresentation()
                             + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
-        if (TeHelperUnits.affectedByQuietus(game, player1, tile)) {
+        if (XinTechHandler.isAffectedByQuietus(game, player1, tile)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player1.getRepresentation()

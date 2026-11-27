@@ -58,7 +58,6 @@ import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperGeneral;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
 import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
@@ -73,6 +72,9 @@ import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
@@ -102,115 +104,11 @@ public final class ButtonHelperModifyUnits {
 
     private static final String DEFAULT_STUFF_NOT_TO_SUSTAIN = "warsunflagship";
 
-    private static int getNumberOfSustainableUnits(
-            Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
-        Tile tile = getTile(game, unitHolder);
-        if (tile != null
-                && (ButtonHelperAbilities.removesSustainDamage(game, player, tile)
-                        || MonumentsBRButtonHandler.removesSustainDamage(game, player, tile))) {
-            return 0;
-        }
-        Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int sustains = 0;
-        Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
-        if (mentak != null
-                && mentak != player
-                && !space
-                && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            return 0;
-        }
-        Player mentakFS = Helper.getPlayerFromUnit(game, "mentak_flagship");
-        if (mentakFS != null
-                && mentakFS != player
-                && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
-            return 0;
-        }
-        if (TeHelperUnits.affectedByQuietus(game, player, unitHolder)) {
-            return 0;
-        }
-        if (game.getActiveSystem() != null
-                && game.getTileByPosition(game.getActiveSystem()) != null
-                && ButtonHelper.isTileSmothered(game, game.getTileByPosition(game.getActiveSystem()), player)) {
-            return 0;
-        }
-        if (game.getActiveSystem() != null
-                && game.getTileByPosition(game.getActiveSystem()) != null
-                && game.getTileByPosition(game.getActiveSystem()).isScar(game)
-                && !player.hasUnlockedBreakthrough("nivynbt")
-                && !player.hasTech("tf-singularitypoint")
-                && !player.hasTech("dsxinystar")) {
-            return 0;
-        }
-        mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
-        if (space
-                && mentakFS != null
-                && mentakFS != player
-                && hasFlagshipInOrAdjacentToSystem(game, tile, unitHolder, mentakFS)) {
-            return 0;
-        }
-        int metali = 0;
-
-        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-            if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
-            UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-            if (unitModel == null) continue;
-            if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)) continue;
-
-            if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics")) {
-                continue;
-            }
-            if ("mech".equalsIgnoreCase(unitModel.getBaseType()) && spacecannonoffence) {
-                continue;
-            }
-            UnitKey unitKey = unitEntry.getKey();
-            int damagedUnits = 0;
-            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
-                damagedUnits = unitHolder.getUnitDamage().get(unitKey);
-            }
-            int totalUnits = unitEntry.getValue() - damagedUnits;
-            if (unitModel.getSustainDamage()) {
-                sustains += totalUnits;
-            } else {
-                if (totalUnits > 0
-                        && unitModel.getUnitType() != UnitType.Fighter
-                        && unitModel.getIsShip()
-                        && player.hasRelic("metalivoidshielding")) {
-                    metali = 1;
-                }
-            }
-        }
-        return sustains + metali;
-    }
-
-    private static boolean hasFlagshipInOrAdjacentToSystem(
-            Game game, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
-        String color = flagshipOwner.getColor();
-        if (unitHolder.getUnitCount(UnitType.Flagship, color) > 0) {
-            return true;
-        }
-        if (tile == null) {
-            return false;
-        }
-        for (String adjPos : Adjacency.of(game, flagshipOwner).into(tile.getPosition())) {
-            Tile adjTile = game.getTileByPosition(adjPos);
-            if (adjTile == null) continue;
-            UnitHolder adjSpace = adjTile.getSpaceUnitHolder();
-            if (adjSpace != null && adjSpace.getUnitCount(UnitType.Flagship, color) > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static Tile getTile(Game game, UnitHolder unitHolder) {
-        if (unitHolder instanceof Planet planet) {
-            return game.getTileFromPlanet(planet.getName());
-        }
-        return game.getTileMap().values().stream()
-                .filter(tile -> tile.getSpaceUnitHolder() == unitHolder)
-                .findFirst()
-                .orElse(null);
+    private static int countSustainableUnits(SustainContext context) {
+        UnitHolder unitHolder = context.holder();
+        return SustainEligibility.eligibleUnits(context).stream()
+                .mapToInt(unitKey -> unitHolder.getUnitCount(unitKey) - unitHolder.getDamagedUnitCount(unitKey))
+                .sum();
     }
 
     public static void autoAssignAntiFighterBarrageHits(
@@ -220,7 +118,8 @@ public final class ButtonHelperModifyUnits {
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                 + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, false);
+        SustainContext sustainContext = SustainContext.of(game, player, tile, unitHolder, HitSource.AFB);
+        int numSustains = countSustainableUnits(sustainContext);
         if (hits > 0 && unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -253,12 +152,7 @@ public final class ButtonHelperModifyUnits {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null) continue;
-                if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)) continue;
-                if ("warsun".equalsIgnoreCase(unitModel.getBaseType())
-                        && ButtonHelper.isLawInPlay(game, "schematics")) {
-                    continue;
-                }
+                if (unitModel == null || !SustainEligibility.canSustain(sustainContext, unitModel)) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 // String unitName = unitKey.unitName();
                 int damagedUnits = 0;
@@ -373,8 +267,8 @@ public final class ButtonHelperModifyUnits {
                 && !ButtonHelper.isLawInPlay(game, "articles_war");
     }
 
-    private static int calculateMinHits(Player player, UnitModel unitModel, int hits, int totalUnits) {
-        return ButtonHelper.doesSustainCancelTwoHits(player, unitModel)
+    private static int calculateMinHits(SustainContext sustainContext, UnitModel unitModel, int hits, int totalUnits) {
+        return SustainEligibility.hitsCancelled(sustainContext, unitModel) == 2
                 ? Math.min(totalUnits, (hits + 1) / 2)
                 : Math.min(totalUnits, hits);
     }
@@ -394,8 +288,9 @@ public final class ButtonHelperModifyUnits {
                         : player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                                 + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, false, false);
         Tile tile = game.getTileFromPlanet(planet);
+        SustainContext sustainContext = SustainContext.of(game, player, tile, unitHolder, HitSource.GROUND_COMBAT);
+        int numSustains = countSustainableUnits(sustainContext);
         String duraniumMsg = getDamagedUnits(player, unitHolder, game);
         boolean usedDuraniumAlready = !player.hasTech("da");
         int sardakkMechHits = 0;
@@ -411,9 +306,9 @@ public final class ButtonHelperModifyUnits {
 
                 int damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitEntry.getKey(), 0);
                 int totalUnits = unitEntry.getValue() - damagedUnits;
-                int min = calculateMinHits(player, unitModel, hits, totalUnits);
+                int min = calculateMinHits(sustainContext, unitModel, hits, totalUnits);
 
-                if (unitModel.getSustainDamage() && min > 0) {
+                if (min > 0 && SustainEligibility.canSustain(sustainContext, unitModel)) {
                     if (RandomHelper.isOneInX(40)) {
                         msg.append("> ")
                                 .append(min)
@@ -428,7 +323,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
-                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
+                    hits -= min * SustainEligibility.hitsCancelled(sustainContext, unitModel);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
                     CommanderUnlockCheckService.checkPlayer(player, "ponthous");
 
@@ -746,13 +641,9 @@ public final class ButtonHelperModifyUnits {
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int oldGloryFighterSustains = PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
-        int bulwarkSustains = units.keySet().stream()
-                .mapToInt(unitKey -> VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey))
-                .sum();
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence)
-                + oldGloryFighterSustains
-                + bulwarkSustains;
-        boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
+        SustainContext sustainContext = SustainContext.of(
+                game, player, tile, unitHolder, spaceCannonOffence ? HitSource.SPACE_CANNON : HitSource.SPACE_COMBAT);
+        int numSustains = countSustainableUnits(sustainContext);
         boolean opponentCanDirectHit = opponentCanDirectHit(game, player, tile, spaceCannonOffence);
         String stuffNotToSustain = stuffNotToSustainFor(game, player);
 
@@ -770,7 +661,7 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        boolean metailUsed = !player.hasRelic("metalivoidshielding");
+        boolean limitedGrantUsed = false;
 
         if (numSustains > 0) {
             // just for dread 2s
@@ -780,11 +671,8 @@ public final class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null
-                        || ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
                         || !unitModel.getSustainDamage()
-                        || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
-                if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics"))
-                    continue;
+                        || !SustainEligibility.canSustain(sustainContext, unitModel)) continue;
 
                 String unitName = unitKey.unitName();
                 if (!"dreadnought".equalsIgnoreCase(unitName) || !player.hasUpgradedUnit("dn2")) continue;
@@ -793,10 +681,10 @@ public final class ButtonHelperModifyUnits {
                         ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0)
                         : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
-                int min = calculateMinHits(player, unitModel, hits, totalUnits);
+                int min = calculateMinHits(sustainContext, unitModel, hits, totalUnits);
 
                 if (min > 0) {
-                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
+                    hits -= min * SustainEligibility.hitsCancelled(sustainContext, unitModel);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     if (!justSummarizing) {
@@ -836,23 +724,7 @@ public final class ButtonHelperModifyUnits {
                 boolean oldGloryFighter = unitKey.unitType() == UnitType.Fighter && oldGloryFighterSustains > 0;
                 int bulwarkShipSustains = VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey);
                 boolean bulwarkShip = bulwarkShipSustains > 0;
-                if (unitModel == null
-                        || ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
-                        || (!unitModel.getSustainDamage()
-                                && !oldGloryFighter
-                                && !bulwarkShip
-                                && (metailUsed || unitModel.getUnitType() == UnitType.Fighter))
-                        || ((!unitModel.getIsShip()
-                                        && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                                || ButtonHelper.doesPlayerHaveFSHere(
-                                                        "sigma_nekro_flagship_2", player, tile)))
-                                && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey)))
-                    continue;
-                if (!unitModel.getIsShip() && spaceCannonOffence) {
-                    continue;
-                }
-                if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics"))
-                    continue;
+                if (unitModel == null || !SustainEligibility.canSustain(sustainContext, unitModel)) continue;
                 String unitName = unitKey.unitName();
 
                 if ("dreadnought".equalsIgnoreCase(unitName) && player.hasUpgradedUnit("dn2")) continue;
@@ -866,16 +738,17 @@ public final class ButtonHelperModifyUnits {
                     totalUnits = Math.min(totalUnits, oldGloryFighterSustains);
                 } else if (bulwarkShip) {
                     totalUnits = Math.min(totalUnits, bulwarkShipSustains);
-                } else if (!unitModel.getSustainDamage() && !metailUsed && totalUnits > 0) {
+                } else if (!unitModel.getSustainDamage()) {
+                    if (limitedGrantUsed || totalUnits < 1) continue;
                     totalUnits = 1;
-                    metailUsed = true;
+                    limitedGrantUsed = true;
                 }
-                int min = calculateMinHits(player, unitModel, hits, totalUnits);
+                int min = calculateMinHits(sustainContext, unitModel, hits, totalUnits);
 
                 if (min > 0
                         && (!stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())
                                 || !opponentCanDirectHit)) {
-                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
+                    hits -= min * SustainEligibility.hitsCancelled(sustainContext, unitModel);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     if (!justSummarizing) {
@@ -903,7 +776,7 @@ public final class ButtonHelperModifyUnits {
                                     game,
                                     player,
                                     tile,
-                                    min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1));
+                                    min * SustainEligibility.hitsCancelled(sustainContext, unitModel));
                             VanguardUnitHandler.offerFlagbearerAfterSustain(buttonEvent, game, player, tile);
                             LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
                             ButtonHelper.deleteMessage(buttonEvent);
@@ -1010,7 +883,7 @@ public final class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) && isRemainingSustains)
+                int min = (SustainEligibility.hitsCancelled(sustainContext, unitModel) == 2 && isRemainingSustains)
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
@@ -1040,9 +913,7 @@ public final class ButtonHelperModifyUnits {
                         && unitModel.getSustainDamage()
                         && min > 0
                         && opponentCanDirectHit) {
-                    if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
-                            || ("warsun".equalsIgnoreCase(unitModel.getBaseType())
-                                    && ButtonHelper.isLawInPlay(game, "schematics"))) {
+                    if (!SustainEligibility.canSustain(sustainContext, unitModel)) {
                         continue;
                     }
                     if (!stuffNotToSustain.contains(unitName.toLowerCase())
@@ -1050,7 +921,7 @@ public final class ButtonHelperModifyUnits {
                         continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
-                    if (ButtonHelper.doesSustainCancelTwoHits(player, unitModel)) {
+                    if (SustainEligibility.hitsCancelled(sustainContext, unitModel) == 2) {
                         hits -= min;
                     }
 
@@ -1902,7 +1773,8 @@ public final class ButtonHelperModifyUnits {
 
                 String unitName = unitKey.unitName();
                 String prettyName = unitKey.humanReadableName();
-                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, p2, tile, unitModel);
+                boolean canSustain = SustainEligibility.canSustain(
+                        SustainContext.of(game, p2, tile, unitHolder, HitSource.ABILITY), unitModel);
                 for (UnitState state : UnitState.defaultRemoveOrder()) {
                     int amt = unitHolder.getUnitCountForState(unitKey, state);
                     if (amt == 0) continue;
@@ -1974,7 +1846,8 @@ public final class ButtonHelperModifyUnits {
             UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
             String unitName = unitKey.unitName();
             String prettyName = unitKey.getColor() + " " + unitKey.humanReadableName();
-            boolean canSustain = ButtonHelper.unitCanSustainDamage(game, p2, tile, unitModel);
+            boolean canSustain = SustainEligibility.canSustain(
+                    SustainContext.of(game, p2, tile, unitHolder, HitSource.ABILITY), unitModel);
             for (UnitState state : UnitState.defaultRemoveOrder()) {
                 int amt = unitHolder.getUnitCountForState(unitKey, state);
                 if (amt == 0) continue;
@@ -2037,7 +1910,9 @@ public final class ButtonHelperModifyUnits {
 
         Button destroy = ButtonHelper.buildAssignHitButton(player, tile, uh, state, key, 1, false);
         buttons.add(destroy.withCustomId(destroy.getCustomId() + "deleteThisMessage"));
-        if (!damaged && ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel)) {
+        if (!damaged
+                && SustainEligibility.canSustain(
+                        SustainContext.of(game, player, tile, uh, HitSource.ABILITY), unitModel)) {
             Button sustain = ButtonHelper.buildAssignHitButton(player, tile, uh, state, key, 1, true);
             buttons.add(sustain.withCustomId(sustain.getCustomId() + "deleteThisMessage"));
         }
@@ -2090,7 +1965,9 @@ public final class ButtonHelperModifyUnits {
         }
 
         buttons.add(ButtonHelper.buildAssignHitButton(player, tile, space, state, key, 1, false));
-        if (!damaged && ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel)) {
+        if (!damaged
+                && SustainEligibility.canSustain(
+                        SustainContext.of(game, player, tile, space, HitSource.ABILITY), unitModel)) {
             buttons.add(ButtonHelper.buildAssignHitButton(player, tile, space, state, key, 1, true));
         }
 
@@ -3259,10 +3136,6 @@ public final class ButtonHelperModifyUnits {
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static boolean isNomadMechApplicable(Player player, boolean noMechPowers, UnitKey unitKey) {
-        return "mech".equalsIgnoreCase(unitKey.unitName()) && player.hasUnit("nomad_mech") && !noMechPowers;
     }
 
     public static List<Button> getContractualObligationsButtons(Game game, Player player) {

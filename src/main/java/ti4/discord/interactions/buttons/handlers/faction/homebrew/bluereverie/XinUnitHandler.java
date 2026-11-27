@@ -25,6 +25,9 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
@@ -173,7 +176,8 @@ public class XinUnitHandler {
             UnitModel unitModel = target.getUnitFromUnitKey(unitKey);
             if (state.isDamaged()
                     || unitModel == null
-                    || !ButtonHelper.unitCanSustainDamage(game, target, tile, unitModel)) {
+                    || !SustainEligibility.canSustain(
+                            SustainContext.of(game, target, tile, space, HitSource.ABILITY), unitModel)) {
                 return;
             }
             space.addDamagedUnit(unitKey, 1);
@@ -240,7 +244,9 @@ public class XinUnitHandler {
                 }
                 String payload = tile.getPosition() + "|" + target.getFaction() + "|" + unitKey.unitTypeVal() + "|"
                         + state.name() + "|";
-                if (!state.isDamaged() && ButtonHelper.unitCanSustainDamage(game, target, tile, unitModel)) {
+                if (!state.isDamaged()
+                        && SustainEligibility.canSustain(
+                                SustainContext.of(game, target, tile, space, HitSource.ABILITY), unitModel)) {
                     buttons.add(Buttons.gray(
                             player.factionButtonChecker() + ASSIGN_CELESTIAL_DRAGON_HIT + payload + "sustain",
                             "Sustain " + unitKey.humanReadableName(),
