@@ -778,7 +778,16 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn", "migo");
+                player,
+                "sol",
+                "vaylerian",
+                "olradin",
+                "xxcha",
+                "sardakk",
+                "revenantoblivion",
+                "kairn",
+                "migo",
+                "vaettir");
         MigoLeadersHandler.syncMigoCommanderBonus(game);
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {

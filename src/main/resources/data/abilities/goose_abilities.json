@@ -43,7 +43,7 @@
         "name": "Take Root",
         "faction": "vaettir",
         "window": "At the end of a tactical action",
-        "windowEffect": "You may place 1 root token from your reinforcements on a planet in the active system. Planets that contain a Root token gain each trait shown on that token.",
+        "windowEffect": "You may place 1 root token with a trait that planet doesn't already have from your reinforcements on a planet in the active system. Planets that contain a Root token gain each trait shown on that token.",
         "source": "goose"
     },
     {

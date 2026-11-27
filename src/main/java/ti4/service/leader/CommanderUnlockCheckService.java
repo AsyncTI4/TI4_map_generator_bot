@@ -440,6 +440,10 @@ public class CommanderUnlockCheckService {
                 Planet blot = game.getUnitHolderFromPlanet("blot");
                 shouldBeUnlocked = blot != null && blot.getResources() + blot.getInfluence() >= 3;
             }
+            case "vaettir" ->
+                shouldBeUnlocked = (ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", true) >= 1
+                        && ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) >= 1
+                        && ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) >= 1);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

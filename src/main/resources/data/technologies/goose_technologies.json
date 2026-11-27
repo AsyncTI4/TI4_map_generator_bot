@@ -53,7 +53,7 @@
         "requirements": "Y",
         "faction": "vaettir",
         "source": "goose",
-        "text": "ACTION: Remove 1 root token from a planet to ready that planet."
+        "text": "ACTION: Exhaust this card and remove 1 root token from a planet to ready that planet."
     },
     {
         "alias": "aovaettiryw",

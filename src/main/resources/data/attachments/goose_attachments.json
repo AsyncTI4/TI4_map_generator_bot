@@ -10,6 +10,7 @@
         "id": "root_cultural",
         "name": "Cultural Root",
         "imagePath": "attachment_root_cultural.png",
+        "planetTypes": ["cultural"],
         "isFakeAttachment": true,
         "source": "goose"
     },
@@ -17,6 +18,7 @@
         "id": "root_industrial",
         "name": "Industrial Root",
         "imagePath": "attachment_root_industrial.png",
+        "planetTypes": ["industrial"],
         "isFakeAttachment": true,
         "source": "goose"
     },
@@ -24,6 +26,7 @@
         "id": "root_hazardous",
         "name": "Hazardous Root",
         "imagePath": "attachment_root_hazardous.png",
+        "planetTypes": ["hazardous"],
         "isFakeAttachment": true,
         "source": "goose"
     },

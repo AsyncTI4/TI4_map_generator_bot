@@ -17,6 +17,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
@@ -1061,6 +1062,13 @@ public class CombatModHelper {
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "number_of_planets_in_system" ->
                     scalingCount = activeSystem.getPlanetUnitHolders().size();
+                case "root_tokens_in_system" ->
+                    scalingCount = activeSystem.getPlanetUnitHolders().stream()
+                            .flatMap(planet -> planet.getTokenList().stream())
+                            .filter(token -> token.startsWith("attachment_root_"))
+                            .count();
+                case "hazardous_root_tokens_controlled" ->
+                    scalingCount = VaettirRootCardHandler.getControlledRootTokenCount(game, player, "hazardous");
                 case "blot_other_players_tokens" ->
                     scalingCount = player.getDebtTokenCount(opponent.getColor(), "Blot");
                 case "galvanized_unit_count" ->
