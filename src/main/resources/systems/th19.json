@@ -9,6 +9,9 @@
     "planets":  [
         "illyra"
     ],
+    "wormholes":  [
+        "ALPHA"
+    ],
     "shipPositionsType":  "TYPE04",
     "tileBack":  "blue",
     "source":  "theodisi"

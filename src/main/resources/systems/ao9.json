@@ -34,5 +34,5 @@
     "isNebula":  true,
     "isGravityRift":  false,
     "source":  "goose",
-    "tileBack":  "blue"
+    "tileBack":  "red"
 }

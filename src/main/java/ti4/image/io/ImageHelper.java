@@ -4,6 +4,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
@@ -25,6 +28,18 @@ public final class ImageHelper {
     @Nullable
     public static BufferedImage cached(String key, Supplier<BufferedImage> builder) {
         return ImageCache.getOrLoadStaticImage(key, _ -> builder.get());
+    }
+
+    public static <T> T leavingCacheAsFound(Collection<String> filePaths, Supplier<T> work) {
+        List<String> newlyRead = filePaths.stream()
+                .filter(Objects::nonNull)
+                .filter(path -> !ImageCache.isStaticImageCached(path))
+                .toList();
+        try {
+            return work.get();
+        } finally {
+            ImageCache.evictStaticImages(newlyRead);
+        }
     }
 
     @Nullable

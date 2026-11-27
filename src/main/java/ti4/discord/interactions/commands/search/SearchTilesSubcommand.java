@@ -3,14 +3,17 @@ package ti4.discord.interactions.commands.search;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.executors.CircuitBreaker;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
+import ti4.image.map.TileCatalogueImage;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
@@ -29,6 +32,8 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
     private static final String WITH_NEBULA = "with_nebula";
     private static final String WITH_SUPERNOVA = "with_supernova";
     private static final String WITH_LEGENDARIES = "with_legendary_planets";
+    private static final String AS_IMAGE = "image";
+    private static final int CATALOGUE_TIME_WARNING_SECONDS = 60;
 
     public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");
@@ -64,7 +69,11 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                 new OptionData(
                         OptionType.BOOLEAN,
                         WITH_LEGENDARIES,
-                        "True: Include only tiles with legendary planets; False: exclude tiles with legendary planets"));
+                        "True: Include only tiles with legendary planets; False: exclude tiles with legendary planets"),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        AS_IMAGE,
+                        "True to draw the tiles as one picture grouped by type (includes draft tiles and hyperlanes)"));
     }
 
     @Override
@@ -75,8 +84,9 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
         int minPlanets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
         int maxPlanets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
-        boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, Boolean.FALSE, OptionMapping::getAsBoolean);
-        boolean includeHyperlanes = event.getOption(INCLUDE_HYPERLANES, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean asImage = event.getOption(AS_IMAGE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, asImage, OptionMapping::getAsBoolean);
+        boolean includeHyperlanes = event.getOption(INCLUDE_HYPERLANES, asImage, OptionMapping::getAsBoolean);
         Boolean withAnomalies = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
         Boolean withAsteroids = event.getOption(WITH_ASTEROID, null, OptionMapping::getAsBoolean);
         Boolean withGrifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);
@@ -84,10 +94,9 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         Boolean withSupernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
         Boolean withLegendaries = event.getOption(WITH_LEGENDARIES, null, OptionMapping::getAsBoolean);
 
-        List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
+        List<TileModel> tiles = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
-            TileModel tile = TileHelper.getTileById(searchString);
-            tileEmbeds.add(Map.entry(tile, tile.getRepresentationEmbed(includeAliases)));
+            tiles.add(TileHelper.getTileById(searchString));
         } else {
             TileHelper.getAllTileModels().stream()
                     .filter(tile -> tile.search(searchString, source))
@@ -107,10 +116,45 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                                                     .map(Mapper::getPlanet)
                                                     .anyMatch(PlanetModel::isLegendary)))
                     .sorted(Comparator.comparing(TileModel::getId))
-                    .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
-                    .forEach(tileEmbeds::add);
+                    .forEach(tiles::add);
+        }
+        if (asImage) {
+            sendCatalogueImage(event, tiles);
+            return;
         }
         SearchHelper.sendSearchEmbedsToEventChannel(
-                event, tileEmbeds.stream().map(Entry::getValue).toList());
+                event,
+                tiles.stream()
+                        .map(tile -> tile.getRepresentationEmbed(includeAliases))
+                        .toList());
+    }
+
+    private static void sendCatalogueImage(SlashCommandInteractionEvent event, List<TileModel> tiles) {
+        List<TileModel> shown = TileCatalogueImage.catalogued(tiles);
+        MessageChannel channel = event.getMessageChannel();
+        if (shown.isEmpty()) {
+            MessageHelper.sendMessageToChannel(channel, "No tiles match those filters.");
+            return;
+        }
+        if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(channel)) {
+            return;
+        }
+        MessageHelper.sendMessageToChannel(channel, "Drawing " + shown.size() + " tiles, grouped by type...");
+        ExecutorServiceManager.runAsync(
+                "tile catalogue", CATALOGUE_TIME_WARNING_SECONDS, () -> postCatalogue(channel, shown));
+    }
+
+    private static void postCatalogue(MessageChannel channel, List<TileModel> tiles) {
+        try {
+            TileCatalogueImage.upload(tiles)
+                    .ifPresentOrElse(
+                            upload -> MessageHelper.sendFileUploadToChannel(channel, upload),
+                            () -> MessageHelper.sendMessageToChannel(
+                                    channel,
+                                    "Another tile picture is being drawn right now. Try again in a few seconds."));
+        } catch (Exception e) {
+            BotLogger.error("Could not draw the tile catalogue.", e);
+            MessageHelper.sendMessageToChannel(channel, "Could not draw the tile picture. See the bot log.");
+        }
     }
 }
