@@ -233,6 +233,22 @@ class SaveMemoTest {
         assertThat(Reentry.idle()).isTrue();
     }
 
+    // The per-decision memo ignores guards: within the decision a ranking cut short under a guard is handed to later
+    // callers that do not hold it, as before. An answer built on such a hit took a path a fresh answer would not, so it
+    // is not kept for later decisions.
+    @Test
+    void anAnswerBuiltOnAPerDecisionHitFromAnotherGuardStateIsNotKept() {
+        try (DecisionMemo.Open decision = DecisionMemo.open()) {
+            holding(ESTIMATE, () -> withinDecision("inner", () -> cutBy(ESTIMATE)));
+            assertThat(SaveMemo.remember(
+                            game, List.of("state"), () -> withinDecision("inner", this::compute), "test", "outer"))
+                    .isEqualTo("answer 1");
+        }
+
+        assertThat(decide(game, "state", "outer")).isEqualTo("answer 2");
+        assertThat(Reentry.idle()).isTrue();
+    }
+
     private static final String ESTIMATE = "test.estimate";
 
     private <T> T holding(String guard, Supplier<T> computation) {

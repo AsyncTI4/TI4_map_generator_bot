@@ -25,45 +25,65 @@ public class Reentry {
     }
 
     public static boolean cutsShort(Object guard, boolean held) {
-        for (Trace trace : TRACES.get()) trace.consult(guard, held);
+        Trace innermost = TRACES.get().peek();
+        if (innermost != null) innermost.consult(guard, held);
         return held;
     }
 
-    static Set<Object> heldAmong(Set<Object> guards) {
-        Map<Object, Integer> held = HELD.get();
-        if (held.isEmpty()) return Set.of();
-        return guards.stream().filter(held::containsKey).collect(Collectors.toUnmodifiableSet());
-    }
-
-    static void consultedAgain(Set<Object> guards) {
-        if (TRACES.get().isEmpty()) return;
-        Map<Object, Integer> held = HELD.get();
-        for (Object guard : guards) cutsShort(guard, held.containsKey(guard));
-    }
-
-    static <T> Traced<T> traced(Supplier<T> compute) {
+    public static <T> Traced<T> traced(Supplier<T> compute) {
         Trace trace = new Trace(Set.copyOf(HELD.get().keySet()));
         Deque<Trace> traces = TRACES.get();
         traces.push(trace);
         try {
             T value = compute.get();
-            return new Traced<>(value, Set.copyOf(trace.consulted), Set.copyOf(trace.cutBy));
+            return new Traced<>(value, Set.copyOf(trace.consulted), Set.copyOf(trace.cutBy), trace.tainted);
         } finally {
             traces.remove(trace);
+            Trace enclosing = traces.peek();
+            if (enclosing != null) enclosing.absorb(trace);
         }
+    }
+
+    static Set<Object> heldAmong(Set<Object> guards) {
+        Map<Object, Integer> held = HELD.get();
+        if (held.isEmpty() || guards.isEmpty()) return Set.of();
+        return guards.stream().filter(held::containsKey).collect(Collectors.toUnmodifiableSet());
     }
 
     static boolean idle() {
         return HELD.get().isEmpty() && TRACES.get().isEmpty();
     }
 
-    record Traced<T>(T value, Set<Object> consulted, Set<Object> cutBy) {}
+    private static void report(Traced<?> answer) {
+        Trace innermost = TRACES.get().peek();
+        if (innermost == null) return;
+        Map<Object, Integer> held = HELD.get();
+        for (Object guard : answer.consulted()) innermost.consult(guard, held.containsKey(guard));
+        if (answer.tainted() || !answer.servable()) innermost.tainted = true;
+    }
+
+    public record Traced<T>(T value, Set<Object> consulted, Set<Object> cutBy, boolean tainted) {
+
+        public boolean servable() {
+            return cutBy.equals(heldAmong(consulted));
+        }
+
+        public boolean keepable() {
+            return value != null && !tainted;
+        }
+
+        public T reported() {
+            report(this);
+            return value;
+        }
+    }
 
     private static final class Trace {
 
         private final Set<Object> heldAtStart;
         private final Set<Object> consulted = new HashSet<>();
         private final Set<Object> cutBy = new HashSet<>();
+        private boolean tainted;
 
         private Trace(Set<Object> heldAtStart) {
             this.heldAtStart = heldAtStart;
@@ -72,6 +92,14 @@ public class Reentry {
         private void consult(Object guard, boolean held) {
             consulted.add(guard);
             if (held && heldAtStart.contains(guard)) cutBy.add(guard);
+        }
+
+        private void absorb(Trace inner) {
+            consulted.addAll(inner.consulted);
+            for (Object guard : inner.cutBy) {
+                if (heldAtStart.contains(guard)) cutBy.add(guard);
+            }
+            tainted |= inner.tainted;
         }
     }
 }

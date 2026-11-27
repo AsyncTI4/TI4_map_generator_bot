@@ -3,11 +3,11 @@ package ti4.ai.brain;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.Reentry.Traced;
 import ti4.game.Game;
 
 @UtilityClass
@@ -21,17 +21,17 @@ public class SaveMemo {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Answer<T> answer(Game game, Object unsavedState, Supplier<T> compute, Object... key) {
-        if (!DecisionMemo.outermost()) return Answer.of(Reentry.traced(compute));
+    public static <T> Traced<T> answer(Game game, Object unsavedState, Supplier<T> compute, Object... key) {
+        if (!DecisionMemo.outermost()) return Reentry.traced(compute);
         Scope scope = scopeFor(game, List.of(game.getLastModifiedDate(), unsavedState));
         List<Object> cacheKey = Arrays.asList(key);
-        Answer<T> kept = (Answer<T>) scope.servable(cacheKey);
+        Traced<T> kept = (Traced<T>) scope.servable(cacheKey);
         if (kept != null) {
-            T checked = TickMemo.checked(String.valueOf(key[0]), cacheKey, kept.value(), compute);
-            return checked == kept.value() ? kept : new Answer<>(checked, kept.consulted(), kept.cutBy());
+            TickMemo.checked(String.valueOf(key[0]), cacheKey, kept.value(), compute);
+            return kept;
         }
-        Answer<T> computed = Answer.of(Reentry.traced(compute));
-        if (computed.value() != null) scope.keep(cacheKey, computed);
+        Traced<T> computed = Reentry.traced(compute);
+        if (computed.keepable()) scope.keep(cacheKey, computed);
         return computed;
     }
 
@@ -53,39 +53,23 @@ public class SaveMemo {
                 game.getName(), (name, old) -> old != null && old.stamp.equals(stamp) ? old : new Scope(stamp));
     }
 
-    public record Answer<T>(T value, Set<Object> consulted, Set<Object> cutBy) {
-
-        private static <T> Answer<T> of(Reentry.Traced<T> traced) {
-            return new Answer<>(traced.value(), traced.consulted(), traced.cutBy());
-        }
-
-        public T reported() {
-            Reentry.consultedAgain(consulted);
-            return value;
-        }
-
-        private boolean servable() {
-            return cutBy.equals(Reentry.heldAmong(consulted));
-        }
-    }
-
-    private record Scope(List<Object> stamp, Map<List<Object>, List<Answer<?>>> values) {
+    private record Scope(List<Object> stamp, Map<List<Object>, List<Traced<?>>> values) {
 
         private Scope(List<Object> stamp) {
             this(stamp, new ConcurrentHashMap<>());
         }
 
-        private Answer<?> servable(List<Object> key) {
-            List<Answer<?>> variants = values.get(key);
+        private Traced<?> servable(List<Object> key) {
+            List<Traced<?>> variants = values.get(key);
             if (variants == null) return null;
-            for (Answer<?> variant : variants) {
+            for (Traced<?> variant : variants) {
                 if (variant.servable()) return variant;
             }
             return null;
         }
 
-        private void keep(List<Object> key, Answer<?> answer) {
-            List<Answer<?>> variants = values.computeIfAbsent(key, ignored -> new CopyOnWriteArrayList<>());
+        private void keep(List<Object> key, Traced<?> answer) {
+            List<Traced<?>> variants = values.computeIfAbsent(key, ignored -> new CopyOnWriteArrayList<>());
             variants.removeIf(variant -> variant.cutBy().equals(answer.cutBy()));
             variants.add(answer);
         }

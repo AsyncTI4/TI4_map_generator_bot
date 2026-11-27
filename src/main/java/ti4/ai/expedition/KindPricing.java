@@ -155,7 +155,7 @@ class KindPricing {
         return ImaginedTurn.unscoredSecrets(seat).size() > Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
     }
 
-    private record CachedKeeps(WeakReference<Game> game, long modified, List<Double> keeps) {
+    private record CachedKeeps(WeakReference<Game> game, long modified, Reentry.Traced<List<Double>> keeps) {
 
         boolean isFor(Game current) {
             return game.get() == current && modified == current.getLastModifiedDate();
@@ -166,17 +166,18 @@ class KindPricing {
         try (Thinking.Span timing = Thinking.measure("expedition.keepValues")) {
             String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
             CachedKeeps cached = KEEPS.get(key);
-            if (cached != null && cached.isFor(game)) return cached.keeps();
+            if (cached != null && cached.isFor(game)) return cached.keeps().reported();
             Set<String> hand = ImaginedTurn.actionCards(seat).keySet();
             if (!hand.isEmpty()
                     && Reentry.cutsShort(
                             pricingEachCard(seat), PRICING_EACH_CARD.get().contains(seat))) {
                 return keepPriors(hand);
             }
-            List<Double> keeps = keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat));
+            Reentry.Traced<List<Double>> keeps =
+                    Reentry.traced(() -> keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat)));
             if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
             KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
-            return keeps;
+            return keeps.value();
         }
     }
 
@@ -197,7 +198,7 @@ class KindPricing {
     }
 
     private static String pricingEachCard(Player seat) {
-        return "expedition.pricingEachCard|" + seat.getFaction();
+        return "expedition.pricingEachCard|" + System.identityHashCode(seat);
     }
 
     private static List<Double> keepPriors(Set<String> hand) {

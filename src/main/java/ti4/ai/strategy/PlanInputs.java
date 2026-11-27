@@ -50,7 +50,7 @@ record PlanInputs(
         }
     };
 
-    private record Cached(WeakReference<Game> game, long modified, PlanInputs inputs) {
+    private record Cached(WeakReference<Game> game, long modified, Reentry.Traced<PlanInputs> inputs) {
 
         boolean isFor(Game current) {
             return game.get() == current && modified == current.getLastModifiedDate();
@@ -64,29 +64,37 @@ record PlanInputs(
             return withoutPlans(game, seat, moment);
         }
         return DecisionMemo.remember(
-                () -> cachedOrComputed(game, seat, moment, key), DECISION_MEMO, game, game.getLastModifiedDate(), key);
+                        () -> cachedOrComputed(game, seat, moment, key),
+                        DECISION_MEMO,
+                        game,
+                        game.getLastModifiedDate(),
+                        key)
+                .reported();
     }
 
-    private static PlanInputs cachedOrComputed(Game game, Player seat, PlanMoment moment, String key) {
+    private static Reentry.Traced<PlanInputs> cachedOrComputed(Game game, Player seat, PlanMoment moment, String key) {
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        String guard = computingGuard(key);
-        COMPUTING.get().add(key);
-        PlanInputs inputs;
-        Reentry.enter(guard);
-        try {
-            inputs = compute(game, seat, moment);
-        } finally {
-            COMPUTING.get().remove(key);
-            Reentry.exit(guard);
-        }
+        Reentry.Traced<PlanInputs> inputs = Reentry.traced(() -> computeHoldingTheGuard(game, seat, moment, key));
         if (DecisionMemo.isolated()) return inputs;
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
         return inputs;
+    }
+
+    private static PlanInputs computeHoldingTheGuard(Game game, Player seat, PlanMoment moment, String key) {
+        String guard = computingGuard(key);
+        COMPUTING.get().add(key);
+        Reentry.enter(guard);
+        try {
+            return compute(game, seat, moment);
+        } finally {
+            COMPUTING.get().remove(key);
+            Reentry.exit(guard);
+        }
     }
 
     private static String computingGuard(String key) {
