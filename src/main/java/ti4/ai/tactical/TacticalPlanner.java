@@ -1463,7 +1463,8 @@ public class TacticalPlanner {
         for (Tile origin : context.origins()) {
             if (origin != tile) pool.addAll(candidatesFrom(context, tile, origin, opponent));
         }
-        pool.addAll(combinations(context, tile, opponent, pool, transportParts(context, tile)));
+        List<Part> transports = skipsStyxTake(context, opponent, tile) ? List.of() : transportParts(context, tile);
+        pool.addAll(combinations(context, tile, opponent, pool, transports));
         commanderOnly(context, tile, opponent).ifPresent(pool::add);
         return pool;
     }
@@ -2126,7 +2127,9 @@ public class TacticalPlanner {
 
     private static double laterLanding(Context context, Tile tile, Strike strike, StrikeEstimate estimate) {
         Player opponent = strike.opponent();
-        if (!isNeutralStyx(tile, opponent) || !estimate.landings().isEmpty() || estimate.spaceWin() <= 0) return 0;
+        if (!isNeutralStyx(context, tile, opponent) || !estimate.landings().isEmpty() || estimate.spaceWin() <= 0) {
+            return 0;
+        }
         if (!canFetch(context)) return 0;
         int capacity = context.laterCapacity(tile, strike.origins(), nonFighterCount(estimate.survivors()));
         return estimate.spaceWin()
@@ -2372,7 +2375,7 @@ public class TacticalPlanner {
             Player opponent = singleOpponent(game, seat, tile);
             if (opponent == null || !worthStagingFor(context, tile, opponent)) continue;
             double feasibility = stageFeasibility(context, tile, opponent);
-            if (tooFarToStage(feasibility, tile, opponent)
+            if (tooFarToStage(context, feasibility, tile, opponent)
                     || context.attackPlan(tile).isPresent()) continue;
             ranked.add(new RankedTarget(tile, stagePrize(context, tile, opponent) * feasibility));
         }
@@ -2380,12 +2383,12 @@ public class TacticalPlanner {
         return ranked.stream().limit(STAGE_TARGETS).map(RankedTarget::tile).toList();
     }
 
-    private static boolean tooFarToStage(double feasibility, Tile tile, Player opponent) {
-        return isNeutralStyx(tile, opponent) ? feasibility <= 0 : feasibility < STAGE_MIN_FEASIBILITY;
+    private static boolean tooFarToStage(Context context, double feasibility, Tile tile, Player opponent) {
+        return isNeutralStyx(context, tile, opponent) ? feasibility <= 0 : feasibility < STAGE_MIN_FEASIBILITY;
     }
 
-    private static boolean belowStageBar(double future, Tile target, Player opponent) {
-        return isNeutralStyx(target, opponent) ? future <= 0 : future < attackMinScore(opponent);
+    private static boolean belowStageBar(Context context, double future, Tile target, Player opponent) {
+        return isNeutralStyx(context, target, opponent) ? future <= 0 : future < attackMinScore(opponent);
     }
 
     static boolean worthStagingFor(Context context, Tile tile, Player opponent) {
@@ -2423,7 +2426,7 @@ public class TacticalPlanner {
     }
 
     static double stageFeasibility(Context context, Tile target, Player opponent) {
-        double ours = gatherableFleetCost(context, target, Journey.rounds(stageLead(opponent, target) + 1));
+        double ours = gatherableFleetCost(context, target, Journey.rounds(stageLead(context, opponent, target) + 1));
         double theirs = Math.max(
                         1,
                         context.defense()
@@ -2503,12 +2506,15 @@ public class TacticalPlanner {
             if (staging == target || staging == seat.getHomeSystemTile() || !activatable.test(staging)) continue;
             if (!MovementGraph.canEnter(game, seat, staging)) continue;
             if (BoardView.hasEnemyShips(game, seat, staging)) continue;
-            gather(context, target, staging, stageLead(opponent, target)).ifPresent(gatherings::add);
+            gather(context, target, staging, stageLead(context, opponent, target))
+                    .ifPresent(gatherings::add);
         }
         gatherings.sort(Comparator.comparingDouble(Gathering::cost)
                 .reversed()
                 .thenComparingInt(gathering -> systemsTo(context, gathering.staging(), target)));
-        if (isNeutralStyx(target, opponent)) gatherings = byStyxProgress(context, target, opponent, gatherings);
+        if (isNeutralStyx(context, target, opponent)) {
+            gatherings = byStyxProgress(context, target, opponent, gatherings);
+        }
         List<Gathering> candidates = new ArrayList<>();
         for (Gathering gathering : gatherings.subList(0, Math.min(STAGING_CANDIDATES, gatherings.size()))) {
             candidates.add(gathering.withCounter(counterAt(context, gathering, opponent)));
@@ -2539,8 +2545,24 @@ public class TacticalPlanner {
         return opponent.isNeutral() ? FRACTURE_STAGE_LEAD : 1;
     }
 
-    static int stageLead(Player opponent, Tile target) {
-        return opponent.isNeutral() && isStyxSystem(target) ? STYX_MARCH_HORIZON : stageLead(opponent);
+    static int stageLead(Context context, Player opponent, Tile target) {
+        return isNeutralStyx(context, target, opponent) ? STYX_MARCH_HORIZON : stageLead(opponent);
+    }
+
+    private static boolean takesStyx(Context context) {
+        return FractureCampaign.takesStyx(context.seat);
+    }
+
+    private static boolean takesStyx(Context context, Tile target) {
+        return isStyxSystem(target) && takesStyx(context);
+    }
+
+    private static boolean skipsStyxTake(Context context, Player opponent, Tile target) {
+        return opponent.isNeutral() && revertsStyxTake(context, target);
+    }
+
+    private static boolean revertsStyxTake(Context context, Tile target) {
+        return isStyxSystem(target) && !takesStyx(context);
     }
 
     private static boolean isStyxSystem(Tile tile) {
@@ -2573,10 +2595,18 @@ public class TacticalPlanner {
 
     private static double stageShare(Context context, Tile target, Player opponent, Gathering gathering) {
         if (!opponent.isNeutral()) return STAGE_SHARE;
-        if (isStyxSystem(target)) return styxShare(context, gathering.staging(), target, gathering.ships(), false);
-        int steps = gathering.ships().stream()
+        if (takesStyx(context, target)) {
+            return styxShare(context, gathering.staging(), target, gathering.ships(), false);
+        }
+        List<UnitMove> ships = gathering.ships().stream()
                 .filter(move -> move.type() != UnitType.Fighter)
-                .mapToInt(move -> stepsToTarget(context, gathering.staging(), target, move.type(), FRACTURE_STAGE_LEAD))
+                .toList();
+        return stepShare(context, gathering.staging(), target, ships);
+    }
+
+    private static double stepShare(Context context, Tile from, Tile target, List<UnitMove> ships) {
+        int steps = ships.stream()
+                .mapToInt(move -> stepsToTarget(context, from, target, move.type(), FRACTURE_STAGE_LEAD))
                 .max()
                 .orElse(FRACTURE_STAGE_LEAD);
         return routeShare(context) * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
@@ -2713,7 +2743,7 @@ public class TacticalPlanner {
             if (origin == null || origin == styx.get()) continue;
             if (!origin.isFracture()
                     && !context.marchesFrom(position)
-                    && !FractureCampaign.isDock(context.game, context.seat, origin)) continue;
+                    && !(takesStyx(context) && FractureCampaign.isDock(context.game, context.seat, origin))) continue;
             if (plan.kind() == Kind.STAGE && target != null && closerTo(context, styx.get(), target, origin)) continue;
             double stationed = fleetCost(context.seat, context.stageGroup(origin));
             if (stationed <= 0) continue;
@@ -2721,7 +2751,7 @@ public class TacticalPlanner {
                     .filter(move -> move.origin().equals(position))
                     .toList();
             double leaving = fleetCost(context.seat, leavingShips);
-            double charge = target != null && closerTo(context, styx.get(), target, origin)
+            double charge = takesStyx(context) && target != null && closerTo(context, styx.get(), target, origin)
                     ? -marchGain(context, origin, target, styx.get(), leavingShips)
                     : 1;
             forfeit += marchValue(context, origin, styx.get()) * Math.min(1, leaving / stationed) * charge;
@@ -2740,7 +2770,8 @@ public class TacticalPlanner {
         Optional<Tile> styx = styxToTake(context);
         Tile target = game.getTileByPosition(plan.target());
         if (styx.isEmpty() || target == null) return false;
-        if (systemsTo(context, target, styx.get()) == Integer.MAX_VALUE) return false;
+        int systems = systemsTo(context, target, styx.get());
+        if (systems == Integer.MAX_VALUE || !takesStyx(context) && systems > FRACTURE_STAGE_LEAD) return false;
         List<String> origins = departingShips(plan.moves()).stream()
                 .map(UnitMove::origin)
                 .distinct()
@@ -2760,7 +2791,9 @@ public class TacticalPlanner {
     }
 
     private static boolean closerTo(Context context, Tile goal, Tile next, Tile origin) {
-        return systemsTo(context, next, goal) < systemsTo(context, origin, goal);
+        if (takesStyx(context)) return systemsTo(context, next, goal) < systemsTo(context, origin, goal);
+        int beyond = FRACTURE_STAGE_LEAD + 2;
+        return Math.min(beyond, systemsTo(context, next, goal)) < Math.min(beyond, systemsTo(context, origin, goal));
     }
 
     private static double marchValue(Context context, Tile origin, Tile styx) {
@@ -2775,7 +2808,9 @@ public class TacticalPlanner {
                             new UnitMove(position, BoardView.SPACE, type, BoardView.count(space, context.seat, type)))
                     .toList();
             double future = futureScore(context, styx, opponent, origin, List.of(), cargo);
-            if (belowStageBar(future, styx, opponent)) return 0.0;
+            if (belowStageBar(context, future, styx, opponent)) return 0.0;
+            if (revertsStyxTake(context, styx))
+                return stepShare(context, origin, styx, context.stageGroup(origin)) * future;
             return styxShare(context, origin, styx, context.stageGroup(origin), true) * future;
         });
     }
@@ -2796,17 +2831,19 @@ public class TacticalPlanner {
         }
         contributions.sort(Comparator.comparingDouble((Contribution found) -> found.shipCost(seat))
                 .reversed());
-        Optional<Gathering> byCost = gathering(context, staging, fitTogether(context, staging, contributions));
         Player opponent = singleOpponent(context.game, seat, target);
+        boolean keepsHauler = opponent == null || !skipsStyxTake(context, opponent, target);
+        Optional<Gathering> byCost =
+                gathering(context, staging, fitTogether(context, staging, contributions, keepsHauler));
         Optional<Contribution> hauler = contributions.stream()
                 .filter(found -> !found.cargo().isEmpty())
                 .max(Comparator.comparingInt((Contribution found) -> count(found.cargo()))
                         .thenComparingDouble(found -> found.shipCost(seat)));
-        if (opponent == null || hauler.isEmpty() || !planetsToTake(context, target)) return byCost;
+        if (!keepsHauler || opponent == null || hauler.isEmpty() || !planetsToTake(context, target)) return byCost;
         if (byCost.isPresent() && byCost.get().contributions().contains(hauler.get())) return byCost;
         List<Contribution> haulerFirst = new ArrayList<>(List.of(hauler.get()));
         contributions.stream().filter(found -> found != hauler.get()).forEach(haulerFirst::add);
-        Optional<Gathering> carrying = gathering(context, staging, fitTogether(context, staging, haulerFirst));
+        Optional<Gathering> carrying = gathering(context, staging, fitTogether(context, staging, haulerFirst, true));
         if (carrying.isEmpty() || byCost.isEmpty()) return byCost.isPresent() ? byCost : carrying;
         double costFirst = futureScore(
                 context,
@@ -2837,7 +2874,8 @@ public class TacticalPlanner {
                 || !freePlanetsIn(context, target).isEmpty();
     }
 
-    private static List<Contribution> fitTogether(Context context, Tile staging, List<Contribution> ordered) {
+    private static List<Contribution> fitTogether(
+            Context context, Tile staging, List<Contribution> ordered, boolean keepsHauler) {
         Predicate<List<Contribution>> fits =
                 chosen -> !exceedsFleetSupply(context, staging, chosen) && reachTogether(context, staging, chosen);
         List<Contribution> kept = new ArrayList<>();
@@ -2846,7 +2884,7 @@ public class TacticalPlanner {
             kept.add(next);
             if (fits.test(kept)) continue;
             kept.removeLast();
-            if (next.cargo().isEmpty()) continue;
+            if (!keepsHauler || next.cargo().isEmpty()) continue;
             List<Contribution> roomMade = roomForHauler(context, staging, kept, next);
             if (!roomMade.isEmpty() && fits.test(roomMade)) {
                 kept.clear();
@@ -2939,14 +2977,16 @@ public class TacticalPlanner {
         List<UnitMove> ships = FleetSupplyFit.fit(
                 gathered,
                 room,
-                haul,
+                haul && (lead == 1 || !revertsStyxTake(context, target)),
                 type -> cost(seat, type),
                 type -> BoardView.capacity(seat, type),
                 FighterWings.flies(game, seat) ? FighterWings.perFleetSlot(seat) : 0);
         if (ships.isEmpty()) return Optional.empty();
         int capacity = capacityOf(seat, ships);
+        int groundRoom =
+                lead > 1 && revertsStyxTake(context, target) ? Math.min(capacity, FractureCampaign.INFANTRY) : capacity;
         List<UnitMove> cargo = planetsToTake
-                ? take(availableGroundForces(game, seat, origin, context.defense(), ships), capacity)
+                ? take(availableGroundForces(game, seat, origin, context.defense(), ships), groundRoom)
                 : List.of();
         List<UnitMove> group = new ArrayList<>(ships);
         if (lead > 1) group.addAll(fightersAboard(context, origin, capacity - count(cargo)));
@@ -2958,7 +2998,7 @@ public class TacticalPlanner {
 
     private static boolean advances(Context context, Tile staging, Tile origin, Tile target, UnitType type, int lead) {
         if (lead == 1) return true;
-        if (isStyxSystem(target)) return closerTo(context, target, staging, origin);
+        if (takesStyx(context, target)) return closerTo(context, target, staging, origin);
         return stepsToTarget(context, staging, target, type, lead)
                 < stepsToTarget(context, origin, target, type, lead + 1);
     }
@@ -2999,7 +3039,7 @@ public class TacticalPlanner {
         Player seat = context.seat;
         Tile staging = gathering.staging();
         double future = futureScore(context, target, opponent, staging, gathering.ships(), gathering.cargo());
-        if (belowStageBar(future, target, opponent)) return Optional.empty();
+        if (belowStageBar(context, future, target, opponent)) return Optional.empty();
         boolean diplomacy = context.defense().standings().holdsUnplayedDiplomacy(opponent)
                 && target.getPlanetUnitHolders().stream()
                         .anyMatch(planet -> BoardView.controller(context.game, planet.getName()) == opponent
@@ -3038,7 +3078,7 @@ public class TacticalPlanner {
     }
 
     private static double stagingHaulerPenalty(Context context, Tile target, Player opponent, Gathering gathering) {
-        if (isNeutralStyx(target, opponent) && canFetch(context)) return 0;
+        if (isNeutralStyx(context, target, opponent) && canFetch(context)) return 0;
         return emptyHaulerPenalty(context.seat, gathering);
     }
 
@@ -3066,7 +3106,7 @@ public class TacticalPlanner {
         Map<UnitType, Integer> ships = new EnumMap<>(UnitType.class);
         ships.putAll(BoardView.ships(BoardView.space(staging), seat));
         group.forEach(move -> ships.merge(move.type(), move.count(), Integer::sum));
-        boolean styx = isNeutralStyx(target, opponent);
+        boolean styx = isNeutralStyx(context, target, opponent);
         Map<UnitType, Integer> ground = styx ? groundWithStaging(context, staging, cargo) : countsOf(cargo);
         IncomingForces.IncomingForce reinforcement =
                 context.defense().force(opponent, target, IncomingForces.Horizon.NEXT_ROUND);
@@ -3093,7 +3133,9 @@ public class TacticalPlanner {
                     Map.of());
             StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
             if (estimate.spaceWin() < rules.landMinWin()) {
-                return opponent.isNeutral() ? gatheringProgress(context, strike, staging, group, cargo) : 0;
+                return opponent.isNeutral() && !revertsStyxTake(context, target)
+                        ? gatheringProgress(context, strike, staging, group, cargo)
+                        : 0;
             }
             StrikeValue value = context.offense()
                     .evaluate(strike, estimate, context.seatTerms(target, estimate), true, ATTACK_MIN_SCORE);
@@ -3105,8 +3147,8 @@ public class TacticalPlanner {
         return styx ? Math.max(score, gatheringProgress(context, strike, staging, group, cargo)) : score;
     }
 
-    private static boolean isNeutralStyx(Tile target, Player opponent) {
-        return opponent.isNeutral() && isStyxSystem(target);
+    private static boolean isNeutralStyx(Context context, Tile target, Player opponent) {
+        return opponent.isNeutral() && takesStyx(context, target);
     }
 
     private static Map<UnitType, Integer> groundWithStaging(Context context, Tile staging, List<UnitMove> cargo) {
@@ -3130,7 +3172,7 @@ public class TacticalPlanner {
 
     private static double gatheringProgress(
             Context context, Strike strike, Tile staging, List<UnitMove> group, List<UnitMove> cargo) {
-        boolean styx = isNeutralStyx(strike.target(), strike.opponent());
+        boolean styx = isNeutralStyx(context, strike.target(), strike.opponent());
         Joined joiners = styx
                 ? styxJoiners(context, strike.target(), staging, group, cargo, strike.ships())
                 : new Joined(withJoiners(context, strike.target(), staging, group, strike.ships()), 0);

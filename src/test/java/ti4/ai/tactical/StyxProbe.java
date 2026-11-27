@@ -266,7 +266,7 @@ public final class StyxProbe {
                 continue;
             }
             if (BoardView.hasEnemyShips(game, seat, staging)) continue;
-            TacticalPlanner.gather(context, styx, staging, TacticalPlanner.stageLead(opponent, styx))
+            TacticalPlanner.gather(context, styx, staging, TacticalPlanner.stageLead(context, opponent, styx))
                     .ifPresent(gatherings::add);
         }
         if (gatherings.isEmpty()) {

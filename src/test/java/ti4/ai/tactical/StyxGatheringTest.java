@@ -178,7 +178,10 @@ class StyxGatheringTest extends BaseTi4Test {
         TacticalPlanner.Context context = new TacticalPlanner.Context(game(), fracture.nekro());
 
         TacticalPlanner.Gathering gathering = TacticalPlanner.gather(
-                        context, styx(), fracture.fracture("frac2"), TacticalPlanner.stageLead(neutral(), styx()))
+                        context,
+                        styx(),
+                        fracture.fracture("frac2"),
+                        TacticalPlanner.stageLead(context, neutral(), styx()))
                 .orElseThrow();
 
         assertThat(gathering.cargo()).isNotEmpty();

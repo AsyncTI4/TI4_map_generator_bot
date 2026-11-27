@@ -185,7 +185,7 @@ class FractureTargetsTest extends BaseTi4Test {
             if (staging == styx || staging == seat.getHomeSystemTile()) continue;
             if (!TacticalPlanner.activatable(game, seat, staging)) continue;
             Optional<TacticalPlan> plan = TacticalPlanner.gather(
-                            context, styx, staging, TacticalPlanner.stageLead(neutral, styx))
+                            context, styx, staging, TacticalPlanner.stageLead(context, neutral, styx))
                     .flatMap(gathering -> TacticalPlanner.stagePlan(
                             context,
                             styx,
@@ -598,7 +598,8 @@ class FractureTargetsTest extends BaseTi4Test {
         Tile styx = fracture.fracture(FractureScenario.STYX);
         Player neutral = game.getNeutral();
         TacticalPlanner.Context context = new TacticalPlanner.Context(game, fracture.nekro());
-        return TacticalPlanner.gather(context, styx, fracture.ingress, TacticalPlanner.stageLead(neutral, styx))
+        return TacticalPlanner.gather(
+                        context, styx, fracture.ingress, TacticalPlanner.stageLead(context, neutral, styx))
                 .map(gathering -> TacticalPlanner.futureScore(
                         context, styx, neutral, fracture.ingress, gathering.ships(), gathering.cargo()))
                 .orElse(0.0);

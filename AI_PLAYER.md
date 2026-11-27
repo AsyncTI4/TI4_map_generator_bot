@@ -1529,6 +1529,9 @@ to build one by hand:
     slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
     give up and the fleet it builds for Styx at half, and skips the Styx-taking token levels and the Styx fleet level
     (it still keeps fleet tokens for the gathering fleet, the ships already within two rounds of Styx).
+    The Styx parts (gathering credit, the ten-system horizon, the dock as a march origin, the later landing, transport
+    parts toward Styx, hauler-first gatherings, the rival-sized fleet and the gathering and early Styx fleet
+    tokens) sit behind the experiment `STYX_TAKE`; a seat with it off stages for Styx like the other Fracture planets.
     Three things cover two steps of the march in one round. A seat holding _Flank Speed_ also plans its moves into
     the Fracture with one more move for every ship (`MoveBoost`), keeps such a plan only when it needs the extra move,
     at 1.5 less for the card, and plays the card right after activating the system, before it moves

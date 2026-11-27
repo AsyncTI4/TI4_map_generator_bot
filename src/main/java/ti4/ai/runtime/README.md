@@ -968,8 +968,12 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 ### AiExperiments
 
 - **Role:** informs (feature flags).
-- **Algorithm:** 35 experiments (`READY_PUBLIC_POINTS` … `XXCHA_LEADER_READIES`). Three split the spending on planets
+- **Algorithm:** 38 experiments (`READY_PUBLIC_POINTS` … `XXCHA_LEADER_READIES`). Three split the spending on planets
   readied again (4b2988f8f6). `TECH_FOLLOW_KEEP` off: `TokenPurchase.technologyFollowToKeep` keeps nothing.
+  `STYX_TAKE` off (per seat, `FractureCampaign.takesStyx`): Styx plans like the other Fracture prizes, as before
+  92db32a718: three-step staging lead, no gathering credit below the landing gate, no later-landing term, no transport
+  parts toward Styx, the fixed three-dreadnought fleet and six infantry, and no gathering or early Styx fleet tokens.
+  The other Fracture prizes keep the new planning either way.
   `DIPLOMACY_READIED_PLANNING` off: `ExpectedReadying.plannedReadies` (used by `ScoringReserve.planAfterReserve`'s
   readied branch, `StrategyCardRules.readiedAgainCovers` and `StructurePolicy.spendableThisRound`) counts no Diplomacy
   readies; the Leadership purchase still counts its own Diplomacy (`ExpectedReadying.afterPaying`). `XXCHA_LEADER_READIES`

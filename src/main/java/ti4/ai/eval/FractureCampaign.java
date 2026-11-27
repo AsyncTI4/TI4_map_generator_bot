@@ -3,6 +3,7 @@ package ti4.ai.eval;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -36,13 +37,18 @@ public class FractureCampaign {
         return Optional.ofNullable(best);
     }
 
+    public static boolean takesStyx(Player seat) {
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.STYX_TAKE);
+    }
+
     public static int fleetShips(Game game, Player seat) {
+        if (!takesStyx(seat)) return TAKING_SHIPS;
         return Math.max(TAKING_SHIPS, strongestRivalFleet(game, seat));
     }
 
     public static int gatheringFleet(Game game, Player seat) {
         Optional<Tile> styx = styxTile(game);
-        if (styx.isEmpty() || !styxToTake(game, seat)) return 0;
+        if (!takesStyx(seat) || styx.isEmpty() || !styxToTake(game, seat)) return 0;
         Map<String, Map<UnitType, Integer>> gathered = MoveBudget.shipsWithin(
                 game,
                 seat,
@@ -74,6 +80,7 @@ public class FractureCampaign {
     }
 
     public static int infantry(Game game, Player seat) {
+        if (!takesStyx(seat)) return INFANTRY;
         int room = dreadnoughts(game, seat) * BoardView.capacity(seat, UnitType.Dreadnought)
                 + CARRIERS * BoardView.capacity(seat, UnitType.Carrier);
         return Math.max(INFANTRY, room);
