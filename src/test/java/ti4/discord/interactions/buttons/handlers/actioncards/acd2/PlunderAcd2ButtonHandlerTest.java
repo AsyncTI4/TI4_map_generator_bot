@@ -31,7 +31,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.async.DieRollSequenceService;
 
-class TombRaidersAcd2ButtonHandlerTest {
+class PlunderAcd2ButtonHandlerTest {
 
     private static final String PLANET = "testplanet";
 
@@ -42,7 +42,7 @@ class TombRaidersAcd2ButtonHandlerTest {
         assertEquals(2, outcome.rolls().size());
         assertEquals(2, outcome.activities().size());
         assertTrue(outcome.header().contains("up to 3 dice"), outcome.header());
-        assertEquals(List.of("fcdrawRelic", "fctombRaidersKeepRolling_1_testplanet"), outcome.buttonIds());
+        assertEquals(List.of("fcdrawRelic", "fcplunderKeepRolling_1_testplanet"), outcome.buttonIds());
     }
 
     @Test
@@ -66,11 +66,11 @@ class TombRaidersAcd2ButtonHandlerTest {
     @Test
     void keepRollingResumesWithTheRemainingDice() {
         Outcome outcome =
-                resolve(Set.of(), 0, 0, new ArrayDeque<>(List.of(1, 10, 1)), "tombRaidersKeepRolling_3_" + PLANET);
+                resolve(Set.of(), 0, 0, new ArrayDeque<>(List.of(1, 10, 1)), "plunderKeepRolling_3_" + PLANET);
 
         assertEquals(2, outcome.rolls().size());
         assertTrue(outcome.header().contains("keeps rolling up to 3 dice"), outcome.header());
-        assertEquals(List.of("fcdrawRelic", "fctombRaidersKeepRolling_1_testplanet"), outcome.buttonIds());
+        assertEquals(List.of("fcdrawRelic", "fcplunderKeepRolling_1_testplanet"), outcome.buttonIds());
     }
 
     @Test
@@ -82,39 +82,37 @@ class TombRaidersAcd2ButtonHandlerTest {
 
     @Test
     void offersOnlyActiveSystemPlanetsAndAnOtherButtonWhenThereIsAnActiveSystem() {
-        List<String> ids =
-                offeredButtonIds("resolveTombRaiders", "101", List.of("inactive", "active"), List.of("active"));
+        List<String> ids = offeredButtonIds("resolvePlunder", "101", List.of("inactive", "active"), List.of("active"));
 
-        assertEquals(List.of("fctombRaidersPlanet_active", "fctombRaidersOther"), ids);
+        assertEquals(List.of("fcplunderPlanet_active", "fcplunderOther"), ids);
     }
 
     @Test
     void offersAllPlanetsWhenNoControlledPlanetIsInTheActiveSystem() {
-        List<String> ids = offeredButtonIds("resolveTombRaiders", "101", List.of("one", "two"), List.of());
+        List<String> ids = offeredButtonIds("resolvePlunder", "101", List.of("one", "two"), List.of());
 
-        assertEquals(List.of("fctombRaidersPlanet_one", "fctombRaidersPlanet_two"), ids);
+        assertEquals(List.of("fcplunderPlanet_one", "fcplunderPlanet_two"), ids);
     }
 
     @Test
     void offersAllPlanetsWhenThereIsNoActiveSystem() {
-        List<String> ids = offeredButtonIds("resolveTombRaiders", null, List.of("one", "two"), List.of());
+        List<String> ids = offeredButtonIds("resolvePlunder", null, List.of("one", "two"), List.of());
 
-        assertEquals(List.of("fctombRaidersPlanet_one", "fctombRaidersPlanet_two"), ids);
+        assertEquals(List.of("fcplunderPlanet_one", "fcplunderPlanet_two"), ids);
     }
 
     @Test
     void omitsOtherButtonWhenEveryPlanetIsInTheActiveSystem() {
-        List<String> ids = offeredButtonIds("resolveTombRaiders", "101", List.of("active"), List.of("active"));
+        List<String> ids = offeredButtonIds("resolvePlunder", "101", List.of("active"), List.of("active"));
 
-        assertEquals(List.of("fctombRaidersPlanet_active"), ids);
+        assertEquals(List.of("fcplunderPlanet_active"), ids);
     }
 
     @Test
     void otherButtonOffersThePlanetsOutsideTheActiveSystem() {
-        List<String> ids =
-                offeredButtonIds("tombRaidersOther", "101", List.of("inactive", "active"), List.of("active"));
+        List<String> ids = offeredButtonIds("plunderOther", "101", List.of("inactive", "active"), List.of("active"));
 
-        assertEquals(List.of("fctombRaidersPlanet_inactive"), ids);
+        assertEquals(List.of("fcplunderPlanet_inactive"), ids);
     }
 
     private static List<String> offeredButtonIds(
@@ -145,10 +143,10 @@ class TombRaidersAcd2ButtonHandlerTest {
             helper.when(() -> Helper.getPlanetRepresentation(anyString(), any()))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            if ("tombRaidersOther".equals(handler)) {
-                TombRaidersAcd2ButtonHandler.tombRaidersOther(player, game, event);
+            if ("plunderOther".equals(handler)) {
+                PlunderAcd2ButtonHandler.plunderOther(player, game, event);
             } else {
-                TombRaidersAcd2ButtonHandler.resolveTombRaiders(player, game, event);
+                PlunderAcd2ButtonHandler.resolvePlunder(player, game, event);
             }
 
             ArgumentCaptor<List<Button>> captor = ArgumentCaptor.captor();
@@ -162,7 +160,7 @@ class TombRaidersAcd2ButtonHandlerTest {
             String header, List<DiceHelper.Die> rolls, List<String> activities, List<String> buttonIds) {}
 
     private static Outcome resolve(Set<String> traits, int resources, int influence, Deque<Integer> rolls) {
-        return resolve(traits, resources, influence, rolls, "tombRaidersPlanet_" + PLANET);
+        return resolve(traits, resources, influence, rolls, "plunderPlanet_" + PLANET);
     }
 
     private static Outcome resolve(
@@ -188,10 +186,10 @@ class TombRaidersAcd2ButtonHandlerTest {
                     .thenReturn("planet");
 
             DiceHelper.withForcedResults(rolls, () -> {
-                if (buttonId.startsWith("tombRaidersKeepRolling_")) {
-                    TombRaidersAcd2ButtonHandler.tombRaidersKeepRolling(player, game, event, buttonId);
+                if (buttonId.startsWith("plunderKeepRolling_")) {
+                    PlunderAcd2ButtonHandler.plunderKeepRolling(player, game, event, buttonId);
                 } else {
-                    TombRaidersAcd2ButtonHandler.tombRaidersPlanet(player, game, event, buttonId);
+                    PlunderAcd2ButtonHandler.plunderPlanet(player, game, event, buttonId);
                 }
             });
 

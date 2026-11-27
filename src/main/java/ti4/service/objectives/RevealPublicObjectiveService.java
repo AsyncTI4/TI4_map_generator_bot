@@ -12,7 +12,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.Tyr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -107,7 +106,6 @@ public class RevealPublicObjectiveService {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
                 TyrisLeaderHandler.offerInfantry(game, player);
             }
-            ActionCardHelper.sendAmendmentReminder(player);
         }
         var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
@@ -267,7 +265,6 @@ public class RevealPublicObjectiveService {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
                 TyrisLeaderHandler.offerInfantry(game, player);
             }
-            ActionCardHelper.sendAmendmentReminder(player);
         }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode() && !Objects.equals(objective.getKey(), Constants.IMPERIUM_REX_ID)) {

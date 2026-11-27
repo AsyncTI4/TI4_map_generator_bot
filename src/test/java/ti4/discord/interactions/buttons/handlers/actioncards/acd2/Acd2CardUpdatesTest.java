@@ -17,6 +17,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
@@ -210,11 +211,12 @@ class Acd2CardUpdatesTest extends BaseTi4Test {
     }
 
     @Test
-    void brokeredAlliancePaysOnceAndGrantsTheRevealedAbilityToTheChosenPlayer() {
+    void brokeredAllianceGivesTheReactingPlayerAStrategyTokenAndTheTargetARandomAlliance() {
         game.addPlayer("recipient", "Recipient");
         Player recipient = game.getPlayer("recipient");
         recipient.setFaction("hacan");
         recipient.setColor("yellow");
+        int strategicBefore = player.getStrategicCC();
         player.setTg(5);
         try (var messages = mockStatic(MessageHelper.class);
                 var buttons = mockStatic(ButtonHelper.class);
@@ -222,28 +224,39 @@ class Acd2CardUpdatesTest extends BaseTi4Test {
             commanders
                     .when(() -> UnusedCommanderHelper.getUnusedCommander(game))
                     .thenReturn("jolnarcommander");
-            BrokeredAllianceAcd2ButtonHandler.resolveBrokeredAlliance(player, game, event);
-            BrokeredAllianceAcd2ButtonHandler.resolveBrokeredAlliance(player, game, event);
-            assertThat(player.getTg()).isEqualTo(2);
-            commanders.verify(() -> UnusedCommanderHelper.getUnusedCommander(game), times(1));
             BrokeredAllianceAcd2ButtonHandler.resolveBrokeredAllianceTarget(
                     player, game, event, "brokeredAllianceTarget_yellow");
+            assertThat(player.getStrategicCC()).isEqualTo(strategicBefore + 1);
+            assertThat(player.getTg()).isEqualTo(5);
             assertThat(recipient.hasLeader("jolnarcommander")).isTrue();
             assertThat(recipient.getLeader("jolnarcommander").orElseThrow().isLocked())
                     .isFalse();
             assertThat(player.hasLeader("jolnarcommander")).isFalse();
-            assertThat(game.getStoredValue("brokeredAlliancePending_actor")).isEmpty();
         }
     }
 
     @Test
-    void brokeredAllianceDoesNotRevealOrChargeWithoutEnoughTradeGoods() {
-        player.setTg(2);
+    void brokeredAllianceCannotTargetThePlayerWhoPlayedIt() {
+        int strategicBefore = player.getStrategicCC();
         try (var messages = mockStatic(MessageHelper.class);
                 var commanders = mockStatic(UnusedCommanderHelper.class)) {
-            BrokeredAllianceAcd2ButtonHandler.resolveBrokeredAlliance(player, game, event);
+            BrokeredAllianceAcd2ButtonHandler.resolveBrokeredAllianceTarget(
+                    player, game, event, "brokeredAllianceTarget_blue");
             commanders.verifyNoInteractions();
-            assertThat(player.getTg()).isEqualTo(2);
+            assertThat(player.getStrategicCC()).isEqualTo(strategicBefore);
+        }
+    }
+
+    @Test
+    void tombRaidersKeepsRevealedFragmentsAndGainsCommoditiesForTheRest() {
+        game.setExploreDeck(new java.util.ArrayList<>(List.of("crf1", "irf1", "cm1", "lc1")));
+        try (var messages = mockStatic(MessageHelper.class);
+                var buttons = mockStatic(ButtonHelper.class);
+                var stats = mockStatic(ButtonHelperStats.class)) {
+            TombRaidersAcd2ButtonHandler.resolveTombRaiders(player, game, event);
+            assertThat(player.getFragments()).containsExactlyInAnyOrder("crf1", "irf1");
+            assertThat(game.getAllExplores()).doesNotContain("crf1", "irf1");
+            stats.verify(() -> ButtonHelperStats.gainComms(event, game, player, 2, false));
         }
     }
 
@@ -295,5 +308,24 @@ class Acd2CardUpdatesTest extends BaseTi4Test {
         assertThat(Mapper.getActionCard("hijacked_signal").getSource()).isEqualTo(ComponentSource.deprecated);
         assertThat(Mapper.getActionCard("oracle").getSource()).isEqualTo(ComponentSource.deprecated);
         assertThat(Mapper.getActionCard("fractured_reality").getSource()).isEqualTo(ComponentSource.action_deck_2);
+    }
+
+    @Test
+    void deckListsMatchTheNovemberCardsTab() {
+        List<String> base = Mapper.getDeck("action_deck_2").getNewDeck();
+        assertThat(base).hasSize(100).contains("misallocated_funding").doesNotContain("unexpected_strategy");
+        List<String> pok = Mapper.getDeck("action_deck_2_pok").getNewDeck();
+        assertThat(pok).hasSize(120).contains("plunder", "tomb_raiders").doesNotContain("mysterious_brokers");
+        List<String> te = Mapper.getDeck("action_deck_2_te").getNewDeck();
+        assertThat(te)
+                .hasSize(120)
+                .contains("collusion", "hijack", "mysterious_brokers", "unexpected_strategy", "overthrow1")
+                .doesNotContain("overthrow2", "overthrow3", "overthrow4");
+        assertThat(Mapper.getDeck("action_deck_2_pok_te").getNewDeck()).hasSize(140);
+        for (String retired : List.of("overthrow2", "overthrow3", "overthrow4")) {
+            assertThat(Mapper.getActionCard(retired).getSource()).isEqualTo(ComponentSource.deprecated);
+        }
+        assertThat(Mapper.getActionCard("collusion").getSource()).isEqualTo(ComponentSource.action_deck_2);
+        assertThat(Mapper.getActionCard("plunder").getAutomationID()).isEqualTo("plunder");
     }
 }

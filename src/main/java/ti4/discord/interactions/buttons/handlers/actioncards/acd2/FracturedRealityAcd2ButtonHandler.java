@@ -45,8 +45,8 @@ class FracturedRealityAcd2ButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose the ship that moved using an ingress, egress, or"
-                        + " wormhole to replace with _Fractured Reality_.",
+                player.getRepresentationUnfogged() + ", choose the ship that moved between 2 systems that do not"
+                        + " share a border to replace with _Fractured Reality_.",
                 buttons);
     }
 
@@ -83,7 +83,7 @@ class FracturedRealityAcd2ButtonHandler {
                 .append(unit.getName())
                 .append(" in ")
                 .append(tile.getRepresentationForButtons(game, player))
-                .append(". Choose 1 replacement unit with a cost value of ")
+                .append(". Choose 1 replacement unit with a cost of ")
                 .append(result)
                 .append(" or less.");
         String loreQuip = getFracturedRealityLoreQuip(result);

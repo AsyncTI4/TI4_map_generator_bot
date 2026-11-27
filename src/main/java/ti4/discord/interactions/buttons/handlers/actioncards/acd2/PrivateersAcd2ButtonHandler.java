@@ -38,7 +38,7 @@ class PrivateersAcd2ButtonHandler {
     public static void resolvePrivateers(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
-            if (countNonFighterShips(tile, player) > 0) {
+            if (!tile.isHomeSystem(game) && countNonFighterShips(tile, player) > 0) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "privateersChoose_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
@@ -49,7 +49,7 @@ class PrivateersAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + ", you have no systems containing your non-fighter ships for _Privateers_.");
+                            + ", you have no non-home systems containing your non-fighter ships for _Privateers_.");
             return;
         }
         buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
@@ -66,7 +66,7 @@ class PrivateersAcd2ButtonHandler {
         String pos = buttonID.replace("privateersChoose_", "");
         Tile tile = game.getTileByPosition(pos);
         ButtonHelper.deleteMessage(event);
-        if (tile == null) {
+        if (tile == null || tile.isHomeSystem(game)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Privateers_.");
             return;
         }
@@ -104,7 +104,7 @@ class PrivateersAcd2ButtonHandler {
         UnitType chosen = UnitType.valueOf(parts[1]);
         Tile tile = game.getTileByPosition(pos);
         ButtonHelper.deleteMessage(event);
-        if (tile == null) {
+        if (tile == null || tile.isHomeSystem(game)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Privateers_.");
             return;
         }
