@@ -134,6 +134,7 @@ import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
@@ -177,6 +178,7 @@ public final class ButtonHelperTacticalAction {
         OblivionAbilityHandler.offerReflectionExplore(event, game);
         TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
         JotunnBreakthroughHandler.offerGlacialDrift(game, player);
+        BrynfolkAgent.offerAtEndOfTacticalAction(game, player);
         if (player.getPlanets().contains("petraunleashed")
                 && !player.getExhaustedPlanetsAbilities().contains("petraunleashed")) {
             List<Button> buttons = new ArrayList<>();
@@ -788,6 +790,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         game.removeStoredValue("gyraxisActive");
+        game.removeStoredValue("hearthcallMoveBonus");
         RiggedExplosivesLLButtonHandler.clearRiggedExplosives(game);
         TacticalRetreatLLButtonHandler.clearTacticalRetreat(game);
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
@@ -1057,6 +1060,19 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentation() + ", you must spend 1 influence to activate this system.",
                         buttons);
             }
+        }
+        if (player.hasTechReady("aobrynfolkhb") && tile.containsPlayersUnits(player)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "exhaustTech_aobrynfolkhb",
+                    "Use Hearthcall Beacon",
+                    FactionEmojis.brynfolk));
+            buttons.add(Buttons.DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you may exhaust _Hearthcall Beacon_ to apply +1 to the move value of each of your ships during this tactical action.",
+                    buttons);
         }
         if (game.isMonumentsMode()) {
             BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);

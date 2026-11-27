@@ -432,6 +432,9 @@ public class TacticalActionOutputService {
                     .append(battlecruiserDistance)
                     .append(")");
         }
+        if (player.getFaction().equals(game.getStoredValue("hearthcallMoveBonus"))) {
+            output.append(" (Receives +1 from _Hearthcall Beacon_)");
+        }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
         }
@@ -586,6 +589,9 @@ public class TacticalActionOutputService {
         if (model.getIsShip()
                 && player.hasAbility("sacred_passage")
                 && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
+            bonusMoveValue++;
+        }
+        if (player.getFaction().equals(game.getStoredValue("hearthcallMoveBonus"))) {
             bonusMoveValue++;
         }
 
