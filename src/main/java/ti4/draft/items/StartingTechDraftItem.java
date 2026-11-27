@@ -51,6 +51,8 @@ public class StartingTechDraftItem extends DraftItem {
     private static final Map<String, String> specialStartingTech = Map.ofEntries(
             Map.entry("winnu", "Choose any 1 technology that has no prerequisites."),
             Map.entry("keleresa", "Choose 2 non-faction technologies owned by other players."),
+            Map.entry("keleresm", "Choose 2 non-faction technologies owned by other players."),
+            Map.entry("keleresx", "Choose 2 non-faction technologies owned by other players."),
             Map.entry("deepwrought", "Research 2 technologies."),
             Map.entry("edyn", "Choose any 3 technologies that have different colors and no prerequisites."),
             Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."));
@@ -63,7 +65,10 @@ public class StartingTechDraftItem extends DraftItem {
         }
 
         List<String> techs = startingTechs();
-        if (techs != null) {
+        if ((techs == null || techs.isEmpty()) && getFaction().getStartingTechOptions() == null) {
+            return errataTextOrNone();
+        }
+        if (techs != null && !techs.isEmpty()) {
             techs = startingTechs().stream()
                     .map(Mapper::getTech)
                     .map(TechnologyModel::getNameRepresentation)

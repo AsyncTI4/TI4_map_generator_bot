@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedScript;
@@ -269,6 +270,63 @@ class TestBedDataTest extends BaseTi4Test {
                   ] }"""));
         assertContains(scriptErrors, "unknown agenda `notanagenda`", "needs `value`");
         assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
+    // Lore entries use the stored format; a typo in a receiver or trigger must fail before a live run.
+    // `none` clears lore, and `gm:activity` is a shared scope with no seat.
+    @Test
+    void loreAndActivityScopeAreValidated() {
+        List<String> presetErrors = TestBedPresetService.validate(TestBedPresetService.parse("""
+                { "you": { "faction": "sol" },
+                  "lore": [
+                    "strategy#1;Ok;!tg +1;ALL;PHASE_START;NO;ALWAYS",
+                    "strategy#2;Bad;!tg +1;EVERYONE;PHASE_START;NO;ALWAYS",
+                    "strategy#3;Short" ] }"""));
+        assertContains(presetErrors, "unknown receiver, trigger, ping or persistance", "needs `target;text;footer;");
+        assertEquals(2, presetErrors.size(), String.join("\n", presetErrors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "fog-galaxies-2p",
+                  "steps": [
+                    { "do": "setLore", "value": "none" },
+                    { "do": "setLore", "value": "101;Ok;!tg +1;CURRENT;CONTROLLED;NO;ONCE|102;Bad;x;ALL;NEVER;NO;ONCE" },
+                    { "do": "setLore" },
+                    { "expect": { "in": "gm:activity", "contains": "Phase lore fired" } }
+                  ] }"""));
+        assertContains(scriptErrors, "unknown receiver, trigger, ping or persistance", "needs `value`");
+        assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
+    // Fog overview scripts remember scattered tiles and switch a seat's overview settings mid-run.
+    @Test
+    void fogMemoryAndFogViewAreValidated() {
+        List<String> presetErrors = TestBedPresetService.validate(TestBedPresetService.parse("""
+                { "you": { "faction": "sol", "fogMemory": ["201", "nowhere"] } }"""));
+        assertContains(presetErrors, "fog memory position", "`fogMemory` needs `\"fog\": true`");
+        assertEquals(2, presetErrors.size(), String.join("\n", presetErrors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "fog-galaxies-2p",
+                  "steps": [
+                    { "do": "fogView", "as": "you", "key": "islands", "value": "unlimited" },
+                    { "do": "fogView", "as": "seat1", "key": "labels", "value": "codes" },
+                    { "do": "fogView", "as": "you", "key": "islands", "value": "7" },
+                    { "do": "fogView", "as": "you", "key": "zoom", "value": "1" },
+                    { "do": "fogView", "key": "overview", "value": "boxes" }
+                  ] }"""));
+        assertContains(scriptErrors, "takes `[1-4]|unlimited`", "unknown fog view setting `zoom`", "needs `as`");
+        assertEquals(3, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
+    @Test
+    void aFogViewStepChangesOnlyThatSetting() {
+        Player seat = new Player("seat-" + java.util.UUID.randomUUID(), "seat", new Game());
+        TestBedComponentService.setFogView(seat, "islands", "unlimited");
+        TestBedComponentService.setFogView(seat, "labels", "names");
+
+        assertEquals(0, seat.getFogOverviewReach());
+        assertFalse(seat.isFogOverviewCodes());
+        assertTrue(seat.isFogOverviewBoxes());
     }
 
     // Neutral units need a real tile position.

@@ -253,11 +253,7 @@ public final class PlayerPreferenceHelper {
 
     private static List<Button> getDirectHitManagementButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
-        if (stuffNotToSustain.isEmpty()) {
-            game.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
-            stuffNotToSustain = "warsun";
-        }
+        String stuffNotToSustain = ButtonHelperModifyUnits.stuffNotToSustainFor(game, player);
         String unit = "warsun";
         if (stuffNotToSustain.contains(unit)) {
             buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
@@ -292,7 +288,7 @@ public final class PlayerPreferenceHelper {
     public static void resolveRiskDirectHit(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String yesOrNo = buttonID.split("_")[2];
         String unit = buttonID.split("_")[1];
-        String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
+        String stuffNotToSustain = ButtonHelperModifyUnits.stuffNotToSustainFor(game, player);
         if ("yes".equalsIgnoreCase(yesOrNo)) {
             stuffNotToSustain = stuffNotToSustain.replace(unit, "");
         } else {

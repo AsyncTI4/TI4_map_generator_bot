@@ -3,7 +3,7 @@
         "id": "nesting_burrows",
         "name": "Nesting Burrows",
         "faction": "arachnera",
-        "window": "After you produce 1 or more infantry:",
+        "window": "After you produce 1 or more infantry",
         "windowEffect": "You may place up to 2 of those units on your faction sheet. Those units are captured.",
         "source": "luminous"
     },
@@ -11,7 +11,7 @@
         "id": "necrogenesis",
         "name": "Necrogenesis",
         "faction": "arachnera",
-        "window": "Once per ground combat, after 1 of your opponent's units are destroyed:",
+        "window": "Once per ground combat, after 1 of your opponent's units are destroyed",
         "windowEffect": "You may place 2 of your captured infantry from your faction sheet on that planet.",
         "source": "luminous"
     },
@@ -26,7 +26,7 @@
         "id": "swarm",
         "name": "Swarm",
         "faction": "arachnera",
-        "window": "Once per action, during invasion on a planet that contains your units:",
+        "window": "Once per action, during invasion on a planet that contains your units",
         "windowEffect": "You may resolve ground combat on that planet even if it does not contain another player's ground forces.",
         "source": "luminous"
     },
@@ -41,7 +41,7 @@
         "id": "galactic_industrial_complex",
         "name": "Galactic Industrial Complex",
         "faction": "psm",
-        "window": "ACTION:",
+        "window": "ACTION",
         "windowEffect": "Return a promissory note to its owner. You may spend 2 resource or influence to place a PDS in a system you control.",
         "source": "luminous"
     },
@@ -63,7 +63,7 @@
         "id": "occupational_hazard",
         "name": "Occupational Hazard",
         "faction": "opa",
-        "window": "At the start of the game:",
+        "window": "At the start of the game",
         "windowEffect": "You may replace 1 anomaly system tile, that does not contain a planet, with an asteroid field anomaly system tile.",
         "source": "luminous"
     },
@@ -71,7 +71,7 @@
         "id": "the_belter_way",
         "name": "The Belter Way",
         "faction": "opa",
-        "window": "After frontier tokens have been placed during setup:",
+        "window": "After frontier tokens have been placed during setup",
         "windowEffect": "Place a station planet token in each system that is an asteroid field anomaly.",
         "source": "luminous"
     },

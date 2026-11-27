@@ -1,0 +1,22 @@
+{
+  "name": "lore-phase-2p",
+  "description": "Normal game with lore mode on, in the action phase, with 8 strategy-start lore entries: 6 map entries and 2 tg entries.",
+  "fog": false,
+  "you": { "faction": "sol", "color": "blue", "home": "301" },
+  "seats": [
+    { "faction": "hacan", "color": "yellow", "home": "310" }
+  ],
+  "defaults": { "tg": 2, "ccs": "3/3/2" },
+  "start": "action",
+  "gameOptions": { "lore_mode": "true" },
+  "lore": [
+    "strategy#m1;Rifts open.;!unit red 1 infantry @101;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#m2;Rifts open.;!unit red 1 infantry @102;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#m3;Rifts open.;!unit red 1 infantry @103;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#m4;Rifts open.;!unit red 1 infantry @104;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#m5;Rifts open.;!unit red 1 infantry @105;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#m6;Rifts open.;!unit red 1 infantry @106;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#tg1;A windfall.;!tg +1;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#tg2;Another windfall.;!tg +1;ALL;PHASE_START;NO;ALWAYS"
+  ]
+}

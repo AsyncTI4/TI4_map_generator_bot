@@ -21,6 +21,8 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
 import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.JotunnAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -40,6 +42,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.VyserixAgent;
 
 public final class HomebrewAgents implements AgentCatalog {
 
@@ -98,10 +101,13 @@ public final class HomebrewAgents implements AgentCatalog {
                             new NatauAgent(),
                             new DreamAgent(),
                             new ArvaxiAgent(),
+                            new VyserixAgent(),
                             new ToldarAgent(),
                             new QhetAgent(),
                             new BelkoseaAgent(),
                             new AtokeraAgent(),
+                            new BrynfolkAgent(),
+                            new JotunnAgent(),
                             new EdynBrAgent(),
                             new CrystellumAgent(),
                             new ChoirAgent(),

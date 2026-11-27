@@ -1,0 +1,21 @@
+{
+    "tileBack": "green",
+    "id": "ao12",
+    "name": "Hoddmimis/Mimirsrot - Vaettir",
+    "aliases": [
+        "ao12",
+        "mimirsrot",
+        "hoddmimis",
+        "vaettir",
+        "vaettirhs",
+        "vaettir_hs"
+    ],
+    "imagePath": "ao12_vaettirhs.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "mimirsrot",
+        "hoddmimis"
+    ],
+    "source": "goose"
+}

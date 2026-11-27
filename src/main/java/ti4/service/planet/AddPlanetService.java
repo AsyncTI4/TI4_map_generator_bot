@@ -16,9 +16,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.Mig
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
@@ -26,6 +28,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
@@ -236,6 +239,12 @@ public class AddPlanetService {
                         alreadyOwned = true;
                         previousOwner = player_;
                     }
+                    if ("garbozia".equalsIgnoreCase(planet)
+                            && !ActionCardHelper.getGarboziaActionCards(game).isEmpty()) {
+                        ActionCardHelper.clearActionCardPresets(
+                                game,
+                                ActionCardHelper.getGarboziaActionCards(game).keySet());
+                    }
                     if (player_.hasAbility("planetary_reconfiguration")) {
                         TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
                     }
@@ -363,6 +372,9 @@ public class AddPlanetService {
             }
         }
         ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
+        if (alreadyOwned && !doubleCheck && !setup) {
+            BrynfolkAbilityHandler.offerWarSpoils(player, previousOwner, unitHolder, game);
+        }
         if (!doubleCheck && !setup) {
             MigoAbilityHandler.onPlanetGained(player, planet);
             MigoUnitHandler.syncNevermen(game);
@@ -678,6 +690,10 @@ public class AddPlanetService {
                     saarButton);
         }
 
+        if (game.getActivePlayer() == player && game.playerHasLeaderUnlockedOrAlliance(player, "xancommander")) {
+            XanLeaderHandler.offerStructureMoveButton(game, player, planet);
+        }
+
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && !setup
@@ -722,10 +738,13 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             }
         }
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
 
-        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
+        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile) && uH != null) {
+            Set<String> tokenList = uH.getTokenList();
+            boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
             Planet p = tile.getUnitHolderFromPlanet(planet);
-            if (p != null && !alreadyOwned) {
+            if (p != null && !alreadyOwned && !containsDMZ) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);
             } else {
                 FealtyUplinkService.resolveAddInf(player, p);

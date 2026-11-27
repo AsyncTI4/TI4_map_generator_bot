@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInit
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
@@ -238,6 +239,7 @@ public class TacticalActionService {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         if (ctx.unitsWereMoved) {
             CrystellumAgent.offerAfterMovement(game, player);
+            BrynfolkBreakthroughHandler.offerBerserkerDropPods(event, game, player, ctx.tile);
         }
 
         // Post-core triggers

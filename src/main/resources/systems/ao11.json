@@ -1,0 +1,22 @@
+{
+    "tileBack": "green",
+    "id": "ao11",
+    "name": "Althing/Blot - Brynfolk",
+    "aliases": [
+        "ao11",
+        "ginnungagap",
+        "althing",
+        "blot",
+        "brynfolk",
+        "brynfolkhs",
+        "brynfolk_hs"
+    ],
+    "imagePath": "ao11_brynfolkhs.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "althing",
+        "blot"
+    ],
+    "source": "goose"
+}

@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.leader.agent.modules.homebrew.wftv.VyserixAgent;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -42,5 +43,11 @@ public class VyserixBreakthroughHandler {
                 + tile.getRepresentationForButtons(game, player) + " due to _M.O.R.A.Y. System_.";
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 ff");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (player.hasUnexhaustedLeader("vyserixagent") && VyserixAgent.hasTargets(game, player, tile)) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", you may also use Vaexis in response to this placement.",
+                    List.of(VyserixAgent.button(player, tile)));
+        }
     }
 }

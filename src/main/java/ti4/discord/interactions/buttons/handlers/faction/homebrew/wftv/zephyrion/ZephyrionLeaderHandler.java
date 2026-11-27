@@ -62,17 +62,6 @@ public class ZephyrionLeaderHandler {
                     player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
-        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
-        if (unit != null) {
-            p2.gainTG((int) unit.getCost(), true);
-            ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
-            MessageHelper.sendMessageToChannel(
-                    p2.getCorrectChannel(),
-                    p2.getRepresentationNoPing() + " received " + (int) unit.getCost()
-                            + " trade good(s) equal to the ship's cost.");
-            ZephyrionBountyHandler.claimBounty(game, player, p2, unit.getUnitType(), false);
-        }
-
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unitTypeString), p2.getColorID())
                 .unitType();
         List<Tile> validTiles = new ArrayList<>();
@@ -81,6 +70,14 @@ public class ZephyrionLeaderHandler {
             if (space.getUnitCount(type, p2.getColor()) > 0 && CommandCounterHelper.hasCC(p2, tile)) {
                 validTiles.add(tile);
             }
+        }
+        if (validTiles.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    p2.getRepresentationNoPing() + " has no " + StringUtils.capitalize(unitTypeString)
+                            + " in a system that contains 1 of their command tokens, so nothing is destroyed.");
+            ButtonHelper.deleteMessage(event);
+            return;
         }
         if (validTiles.size() == 1) {
             zephShipDestroy(
@@ -97,7 +94,6 @@ public class ZephyrionLeaderHandler {
                                 + tile.getPosition(),
                         StringUtils.capitalize(unitTypeString) + " in " + tile.getRepresentationForButtons(game, p2)));
             }
-            destroyButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     game.getMainGameChannel(),
                     p2.getRepresentation() + ", choose which ship to destroy.",
@@ -129,9 +125,23 @@ public class ZephyrionLeaderHandler {
                 game.getMainGameChannel(),
                 p2.getRepresentationNoPing() + " destroyed 1 " + StringUtils.capitalize(unitTypeString) + " in "
                         + tile.getRepresentationForButtons(game, p2) + ".");
+        payDestroyedShipCost(p2, unitTypeString);
 
         offerCapacityRemovalButtons(event, game, p2, tile);
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void payDestroyedShipCost(Player p2, String unitTypeString) {
+        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
+        if (unit == null) {
+            return;
+        }
+        int cost = (int) unit.getCost();
+        p2.gainTG(cost, true);
+        ButtonHelperAgents.resolveArtunoCheck(p2, cost);
+        MessageHelper.sendMessageToChannel(
+                p2.getCorrectChannel(),
+                p2.getRepresentationNoPing() + " received " + cost + " trade good(s) equal to the ship's cost.");
     }
 
     static void offerCapacityRemovalButtons(ButtonInteractionEvent event, Game game, Player p2, Tile tile) {

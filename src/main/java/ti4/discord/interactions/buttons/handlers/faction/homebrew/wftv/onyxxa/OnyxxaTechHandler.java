@@ -97,7 +97,7 @@ public class OnyxxaTechHandler {
     }
 
     public static void serveSacrificialCommandButtons(Game game, Player player, int scNum) {
-        if (!player.hasTech(SACRIFICIAL_COMMAND)) return;
+        if (resolvesPrimaryForFree(game, player, scNum)) return;
         List<Button> buttons = new ArrayList<>();
         for (String position : getPositionsInOrAdjacentToActivePlayerUnits(game, player)) {
             Tile tile = game.getTileByPosition(position);
@@ -124,6 +124,10 @@ public class OnyxxaTechHandler {
                         + " instead of spending a command token from your strategy pool on **"
                         + game.getSCName(scNum) + "**. If you wish to do so, please choose which ship to destroy.",
                 buttons);
+    }
+
+    private static boolean resolvesPrimaryForFree(Game game, Player player, int scNum) {
+        return player.getSCs().contains(scNum) && !OnyxxaAbilityHandler.isDetachmentCard(game, player, scNum);
     }
 
     @ButtonHandler("sacrificialShip_")

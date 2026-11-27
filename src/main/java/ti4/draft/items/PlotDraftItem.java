@@ -67,4 +67,10 @@ public class PlotDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getPlotModel().getNotes();
+    }
 }

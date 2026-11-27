@@ -73,7 +73,7 @@
             "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to replenish your commodities."
+            "Spend 1 token from your strategy pool to replenish commodities."
         ],
         "imageFileName": "base_game_5",
         "colourHexCode": "#00a99d",

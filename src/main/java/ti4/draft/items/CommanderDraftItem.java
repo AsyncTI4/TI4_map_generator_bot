@@ -113,4 +113,10 @@ public class CommanderDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getLeader().getNotes();
+    }
 }

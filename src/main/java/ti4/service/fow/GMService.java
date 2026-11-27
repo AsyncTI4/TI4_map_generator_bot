@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -29,12 +30,12 @@ import ti4.game.Player;
 import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.adjacency.AdjacencyPurpose;
+import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -69,6 +70,8 @@ public final class GMService {
             Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
+    private static final CompactOverviewGenerator.Options ACTIVITY_OVERVIEW = new CompactOverviewGenerator.Options(
+            CompactOverviewGenerator.Style.BOXES, CompactOverviewGenerator.Options.DEFAULT_REACH, true);
     private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm:ss");
@@ -102,6 +105,17 @@ public final class GMService {
         if (guild == null) return null;
         List<TextChannel> channels = guild.getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
+    }
+
+    @Nullable
+    public static ThreadChannel activityThreadOrNull(Game game) {
+        TextChannel gmRoom = gmRoomOrNull(game);
+        if (gmRoom == null) return null;
+        String name = game.getName() + ACTIVITY_LOG_THREAD;
+        return gmRoom.getThreadChannels().stream()
+                .filter(thread -> thread.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
     private static void withActivityThread(Game game, Consumer<ThreadChannel> action) {
@@ -184,10 +198,10 @@ public final class GMService {
      */
     public static void refreshMapInActivityThread(Game game) {
         if (!game.isFowMode()) return;
-        MapRenderPipeline.queue(
+        MapRenderPipeline.queueImage(
                 game,
-                null,
-                DisplayType.all,
+                "GM activity overview",
+                snapshot -> CompactOverviewGenerator.gmOverview(snapshot, null, ACTIVITY_OVERVIEW),
                 fileUpload -> withActivityThread(
                         game, threadChannel -> MessageHelper.sendFileUploadToChannel(threadChannel, fileUpload)));
     }

@@ -613,7 +613,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "sustainDamage": true,
-        "ability": "During movement, if the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships."
+        "ability": "If the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships."
     },
     {
         "id": "choir_flagship",

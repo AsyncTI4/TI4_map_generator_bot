@@ -54,6 +54,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -74,10 +78,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vangu
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
@@ -341,7 +348,7 @@ public class StartCombatService {
                     unitHolder.getName(),
                     true);
             if ((unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) < 1
-                            || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                            || !player2.hasAnyUnit("titans_pds", "titans_pds2", "jotunn_pds", "jotunn_pds2"))
                     && unitHolder.getUnitCount(Units.UnitType.Mech, player2.getColor()) < 1
                     && unitHolder.getUnitCount(Units.UnitType.Infantry, player2.getColor()) < 1
                     && (unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) > 0
@@ -587,6 +594,9 @@ public class StartCombatService {
         if (isSpaceCombat) {
             sendStartOfSpaceCombatButtonsToThread(threadChannel, game, player1, player2, tile);
         }
+        if (isGroundCombat) {
+            sendStartOfGroundCombatButtonsToThread(threadChannel, game, player1, player2, tile, unitHolderName);
+        }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
         game.setStoredValue(HumanGenome.ID, "");
@@ -757,6 +767,20 @@ public class StartCombatService {
                             threadChannel,
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
+                }
+                if (player1.hasAbility("rime_shields")
+                        && JotunnAbilityHandler.hasJotunnStructure(player1, game, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _Rime Shields_ and this system contains one of their structures. As such, you cannot modify your unit's combat rolls.");
+                }
+                if (player2.hasAbility("rime_shields")
+                        && JotunnAbilityHandler.hasJotunnStructure(player2, game, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _Rime Shields_ and this system contains one of their structures. As such, you cannot modify your unit's combat rolls.");
                 }
             }
         }
@@ -1073,8 +1097,12 @@ public class StartCombatService {
                         .append("> ")
                         .append(playerWithPds.getRepresentation())
                         .append('\n');
+                if (JotunnLeadersHandler.hasDeepFrostCoverage(game, playerWithPds)) {
+                    pdsMessage.append("-# _Deep Frost_: they may fire only if ships were moved into this system.\n");
+                }
             }
         }
+        ZephyrionAbilityHandler.offerMercenaryShipCount(game, playersWithPds2);
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile, playersWithPds2);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         MonumentsDSButtonHandler.sendPerditionArrayReminder(threadChannel, game, tile, activePlayer);
@@ -1112,6 +1140,20 @@ public class StartCombatService {
         if (!startOfSpaceCombatButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     threadChannel, "Buttons for start of space combat abilities.", startOfSpaceCombatButtons);
+        }
+    }
+
+    private static void sendStartOfGroundCombatButtonsToThread(
+            ThreadChannel threadChannel, Game game, Player player1, Player player2, Tile tile, String unitHolderName) {
+        List<Button> startOfGroundCombatButtons = new ArrayList<>();
+        BrynfolkUnitHandler.addTitheEaterDeployButton(startOfGroundCombatButtons, game, player1, tile, unitHolderName);
+        if (player2 != player1) {
+            BrynfolkUnitHandler.addTitheEaterDeployButton(
+                    startOfGroundCombatButtons, game, player2, tile, unitHolderName);
+        }
+        if (!startOfGroundCombatButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    threadChannel, "Buttons for start of ground combat abilities.", startOfGroundCombatButtons);
         }
     }
 
@@ -1300,6 +1342,14 @@ public class StartCombatService {
             if (player.hasLeader("arvaxicommander")
                     || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiLeaderHandler.sendCombatButtons(player, otherPlayer, game, msg);
+            }
+            if (player.hasTech("baarvay")) {
+                ArvaxiTechHandler.offerWartimeInnovation(player, game, msg);
+            }
+            if ("space".equalsIgnoreCase(type)
+                    && player.getPromissoryNotes().containsKey("bapnxan")
+                    && !player.getPromissoryNotesOwned().contains("bapnxan")) {
+                XanAbilityHandler.reminderWarlordsDecree(player, otherPlayer);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
@@ -1580,6 +1630,16 @@ public class StartCombatService {
                                 + ", a reminder that you have _Völundr Protocol_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
+            if (player.hasAbility("gald_tithe") && BrynfolkAbilityHandler.hasBlotCapacity(player)) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that if you win this combat you may place 1 of your opponent's control tokens on the Blot legendary ability card. If you lost the combat, place one of your own.",
+                        BrynfolkAbilityHandler.selectBlotPlayer(player, game));
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasAbility("thrall_conscription")) {
+                BrynfolkAbilityHandler.offerThrallConscription(player, game, unitHolderName);
+            }
         }
         if (mentakFound) {
             Button steal = Buttons.gray(
@@ -1620,7 +1680,7 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player.getRepresentationUnfogged()
-                                    + " Reminder that you have the Metal Void Armaments relic to use AFB 3x6.");
+                                    + " Reminder that you have the Metali Void Armaments relic to use AFB 6x3.");
                 }
                 if (player.hasTech("tf-projectionofpow")) {
                     MessageHelper.sendMessageToChannel(
@@ -2010,6 +2070,20 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
+            }
+        }
+        if (p1.hasTechReady("aobrynfolkrg") || (!game.isFowMode() && p2.hasTechReady("aobrynfolkrg"))) {
+            if (p1.hasTechReady("aobrynfolkrg")) {
+                buttons.add(Buttons.red(
+                        p1.factionButtonChecker() + "exhaustTech_aobrynfolkrg",
+                        "Use Roar of the Gjallarhorn",
+                        FactionEmojis.brynfolk));
+            }
+            if (!game.isFowMode() && p2.hasTechReady("aobrynfolkrg")) {
+                buttons.add(Buttons.red(
+                        p2.factionButtonChecker() + "exhaustTech_aobrynfolkrg",
+                        "Use Roar of the Gjallarhorn",
+                        FactionEmojis.brynfolk));
             }
         }
         checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);

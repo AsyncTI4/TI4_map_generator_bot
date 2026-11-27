@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Be
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
@@ -49,6 +50,7 @@ import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
@@ -71,6 +73,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
 import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -88,6 +91,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.RefractureRulesService;
+import ti4.service.megagame.MegagameTradeInfoService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -183,6 +187,9 @@ public class CardsInfoService {
         }
         Button transaction = Buttons.TRANSACTION;
         buttons.add(transaction);
+        if (MegagameTradeInfoService.isAvailable(game)) {
+            buttons.add(MegagameTradeInfoService.openButton());
+        }
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         buttons.add(modify);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
@@ -247,6 +254,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("netrunnersagent")) {
             buttons.add(NetrunnersAgent.cardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("jotunnagent")) {
+            buttons.add(JotunnLeadersHandler.cardsInfoAgentButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamAgent.anomalyTiles(game).isEmpty()) {
@@ -339,6 +349,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumAgent.addCardsInfoButton(buttons, player);
+        }
+        if (player.hasUnexhaustedLeader("brynfolkagent")) {
+            BrynfolkAgent.addCardsInfoButton(buttons, player);
         }
         if (player.hasUnexhaustedLeader("empyreanagent")) {
             buttons.add(Buttons.gray(
@@ -487,7 +500,10 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
-            FactionEmojis f = FactionEmojis.Cabal;
+            TI4Emoji f = null;
+            if ("cabal".equalsIgnoreCase(player.getFaction())) {
+                f = FactionEmojis.Cabal;
+            }
             if (player.hasAbility("mark_of_pharadn")) {
                 f = FactionEmojis.pharadn;
             }
@@ -497,7 +513,11 @@ public class CardsInfoService {
             if (player.hasAbility("shroud_of_lith")) {
                 f = FactionEmojis.kollecc;
             }
-            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
+            if (f == null) {
+                buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units"));
+            } else {
+                buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
+            }
         }
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));

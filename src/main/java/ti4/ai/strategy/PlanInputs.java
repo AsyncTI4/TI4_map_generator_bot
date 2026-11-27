@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.Reentry;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
@@ -38,6 +39,7 @@ record PlanInputs(
         boolean planless) {
 
     private static final int MAX_CACHED = 32;
+    private static final String DECISION_MEMO = "strategy.planInputs";
     private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
     private static final ThreadLocal<Boolean> RANKING_FREED = ThreadLocal.withInitial(() -> false);
     private static final String RANKING_FREED_GUARD = "strategy.rankingFreed";
@@ -58,12 +60,20 @@ record PlanInputs(
     static PlanInputs of(Game game, Player seat, PlanMoment moment) {
         String key = game.getName() + "|" + seat.getUserID() + "|" + moment + viewerKey(game, seat)
                 + ImaginedTurn.cacheMark(seat);
+        if (Reentry.cutsShort(computingGuard(key), COMPUTING.get().contains(key))) {
+            return withoutPlans(game, seat, moment);
+        }
+        return DecisionMemo.remember(
+                () -> cachedOrComputed(game, seat, moment, key), DECISION_MEMO, game, game.getLastModifiedDate(), key);
+    }
+
+    private static PlanInputs cachedOrComputed(Game game, Player seat, PlanMoment moment, String key) {
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        String guard = "strategy.planInputs|" + key;
-        if (Reentry.cutsShort(guard, !COMPUTING.get().add(key))) return withoutPlans(game, seat, moment);
+        String guard = computingGuard(key);
+        COMPUTING.get().add(key);
         PlanInputs inputs;
         Reentry.enter(guard);
         try {
@@ -72,10 +82,21 @@ record PlanInputs(
             COMPUTING.get().remove(key);
             Reentry.exit(guard);
         }
+        if (DecisionMemo.isolated()) return inputs;
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
         return inputs;
+    }
+
+    private static String computingGuard(String key) {
+        return "strategy.planInputs|" + key;
+    }
+
+    static void clearShared() {
+        synchronized (CACHE) {
+            CACHE.clear();
+        }
     }
 
     private static String viewerKey(Game game, Player seat) {

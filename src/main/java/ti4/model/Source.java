@@ -66,6 +66,7 @@ public class Source {
         goose,
         thirtyk,
         frmisc,
+        stellar_tiles,
 
         // async homebrew
         draft,
@@ -252,6 +253,7 @@ public class Source {
                 case goose -> "Homebrew from Goose [Homebrew]";
                 case thirtyk -> "30k Content Lab / JMSC [Homebrew]";
                 case frmisc -> "Miscellenious Franken Components [Homebrew]";
+                case stellar_tiles -> "Stellar Tiles - Anomaly Art Variants [Homebrew]";
                 case secrets_only -> "Secrets Only [Homebrew Game Mode]";
                 default -> toString();
             };

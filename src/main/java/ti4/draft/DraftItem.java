@@ -72,6 +72,11 @@ public abstract class DraftItem {
 
     protected abstract String getLongDescriptionImpl();
 
+    protected String errataTextOrNone() {
+        String alternateText = Errata.getAlternateText();
+        return alternateText.isBlank() ? "None." : alternateText;
+    }
+
     protected abstract String getLongDescriptionImpl(Game game);
 
     public abstract TI4Emoji getItemEmoji();
@@ -245,9 +250,23 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public List<TextDisplay> getPlainTextDisplays(Game game) {
-        String descr = getLongDescriptionImpl(game).trim().replace("\n> ", "\n").replace("\n", "\n> ");
+        String descr = getPlainDescription(game).trim().replace("\n> ", "\n").replace("\n", "\n> ");
         String details = getTitle(game) + System.lineSeparator() + "> " + descr;
-        return List.of(TextDisplay.of(details));
+        List<TextDisplay> displays = new ArrayList<>(List.of(TextDisplay.of(details)));
+        String notes = getNotes();
+        if (notes != null && !notes.isBlank()) {
+            displays.add(TextDisplay.of("-# [" + notes.trim().replace("\n", "\n-# ") + "]"));
+        }
+        return displays;
+    }
+
+    @JsonIgnore
+    public String getNotes() {
+        return null;
+    }
+
+    protected String getPlainDescription(Game game) {
+        return getLongDescriptionImpl(game);
     }
 
     @JsonIgnore

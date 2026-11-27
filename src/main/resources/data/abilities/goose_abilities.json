@@ -1,0 +1,116 @@
+[
+    {
+        "id": "rime_shields",
+        "name": "Rime Shields",
+        "faction": "jotunn",
+        "permanentEffect": "Your opponents cannot apply modifiers to their combat rolls during combat in a system that contains 1 or more of your structures.",
+        "source": "goose"
+    },
+    {
+        "id": "wardstone_doctrine",
+        "name": "Wardstone Doctrine",
+        "faction": "jotunn",
+        "window": "When a player's ships move into the active system",
+        "windowEffect": "Up to 1 of your PDS units may use its SPACE CANNON ability against those ships if that PDS is connected to the active system through a continuous chain of adjacent systems that each contain 1 or more of your structures.",
+        "source": "goose"
+    },
+    {
+        "id": "gald_tithe",
+        "name": "Gald-Tithe",
+        "faction": "brynfolk",
+        "window": "At the end of combat",
+        "windowEffect": "You may either place 1 of your opponent's control tokens on the Blot legendary card if you won that combat or 1 of your control tokens on the Blot legendary card if you lost.",
+        "source": "goose"
+    },
+    {
+        "id": "thrall_conscription",
+        "name": "Thrall Conscription",
+        "faction": "brynfolk",
+        "window": "After you win a ground combat",
+        "windowEffect": "You may remove 1 control token from the Blot legendary planet card, then place up to 3 infantry from your reinforcements on that planet.",
+        "source": "goose"
+    },
+    {
+        "id": "war_spoils",
+        "name": "War Spoils",
+        "faction": "brynfolk",
+        "window": "After you gain control of a planet that was controlled by another player",
+        "windowEffect": "You may remove 1 of that player's control tokens from Blot to gain trade goods equal to that planet's resource value.",
+        "source": "goose"
+    },
+    {
+        "id": "take_root",
+        "name": "Take Root",
+        "faction": "vaettir",
+        "window": "At the end of a tactical action",
+        "windowEffect": "You may place 1 root token from your reinforcements on a planet in the active system. Planets that contain a Root token gain each trait shown on that token.",
+        "source": "goose"
+    },
+    {
+        "id": "communion",
+        "name": "Communion",
+        "faction": "vaettir",
+        "window": "After you produce units in a system that contains a root token",
+        "windowEffect": "You may either move 1 of those units to another system containing a root token; or you may produce 1 unit in a system containing a planet that contains a root token for each trait that planet has; if you do, remove a root token.",
+        "source": "goose"
+    },
+    {
+        "id": "old_growth",
+        "name": "Old Growth",
+        "faction": "vaettir",
+        "window": "When a root token is placed on a planet",
+        "windowEffect": "That planet's controller takes the Root card that matches the trait of that token. A player cannot have more than 1 Root card of each trait.",
+        "source": "goose"
+    },
+    {
+        "id": "cultural_root_card",
+        "name": "Cultural Root Card",
+        "shortName": "Cultural\nRoot",
+        "faction": "vaettir",
+        "window": "When you exhaust a planet with a cultural Root token to cast votes on an agenda",
+        "windowEffect": "You may exhaust this card to cast 2 additional votes for each cultural Root token on planets you control.",
+        "source": "goose"
+    },
+    {
+        "id": "industrial_root_card",
+        "name": "Industrial Root Card",
+        "shortName": "Industrial\nRoot",
+        "faction": "vaettir",
+        "window": "When 1 or more of your units use PRODUCTION on a planet with an industrial Root token",
+        "windowEffect": "You may exhaust this card to reduce the combined cost of the produced units by 1 for each industrial Root token on planets you control.",
+        "source": "goose"
+    },
+    {
+        "id": "hazardous_root_card",
+        "name": "Hazardous Root Card",
+        "shortName": "Hazardous\nRoot",
+        "faction": "vaettir",
+        "window": "At the start of a combat round in a system containing a planet with a hazardous Root token",
+        "windowEffect": "You may exhaust this card to apply +1 to your combat rolls for each hazardous Root token on planets you control.",
+        "source": "goose"
+    },
+    {
+        "id": "chooser_of_the_slain",
+        "name": "Chooser of the Slain",
+        "faction": "valdyrjur",
+        "window": "At the end of a combat",
+        "windowEffect": "You may HALLOW 1 of your units that participated in that combat.",
+        "source": "goose"
+    },
+    {
+        "id": "einherjar_descent",
+        "name": "Einherjar Descent",
+        "faction": "valdyrjur",
+        "window": "When a game effect instructs a player to HALLOW a unit",
+        "windowEffect": "They place a HALLOWED token beneath it if it does not have one. When this unit would be assigned a hit, remove a HALLOWED token instead.",
+        "source": "goose"
+    },
+    {
+        "id": "weave_the_saga",
+        "name": "Weave the Saga",
+        "faction": "valdyrjur",
+        "window": "When the Saga token is attached to a planet",
+        "windowEffect": "That planet is a legendary planet, and its controller gains the Valkyrie Longhouse legendary planet ability card.",
+        "source": "goose"
+    }
+]

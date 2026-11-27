@@ -52,7 +52,7 @@ public class BreakthroughDraftItem extends DraftItem {
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
         List<TextDisplay> displays = new ArrayList<>(super.getTextDisplays(game, player, showDescr, useAlternateText));
         getBreakthroughModel()
-                .getLinkedUnitUpgrade()
+                .getLinkedUnit()
                 .map(upgrade -> DraftItem.generate(DraftCategory.UNIT, upgrade.getId()))
                 .ifPresent(upgrade -> displays.addAll(upgrade.getTextDisplays(game, player, true, useAlternateText)));
         return displays;
@@ -63,7 +63,7 @@ public class BreakthroughDraftItem extends DraftItem {
     public List<TextDisplay> getPlainTextDisplays(Game game) {
         List<TextDisplay> displays = new ArrayList<>(super.getPlainTextDisplays(game));
         getBreakthroughModel()
-                .getLinkedUnitUpgrade()
+                .getLinkedUnit()
                 .map(upgrade -> DraftItem.generate(DraftCategory.UNIT, upgrade.getId()))
                 .ifPresent(upgrade -> displays.addAll(upgrade.getPlainTextDisplays(game)));
         return displays;
@@ -112,5 +112,11 @@ public class BreakthroughDraftItem extends DraftItem {
             allItems.add(generate(DraftCategory.BREAKTHROUGH, faction.getBreakthrough()));
         }
         return allItems;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getBreakthroughModel().getNotes();
     }
 }

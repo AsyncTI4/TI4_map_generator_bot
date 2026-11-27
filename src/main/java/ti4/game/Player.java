@@ -138,6 +138,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.service.user.AFKService;
+import ti4.settings.users.FogViewSettings;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -376,22 +377,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 addOwnedUnitByID("naaz_voltron");
             }
         }
-        if (hasUnlockedBreakthrough("mentakbt")) {
-            for (String tech : getTechs()) {
-                TechnologyModel model = Mapper.getTech(tech);
-                if ("cr2".equals(model.getAlias())
-                        || "cr2".equals(model.getBaseUpgrade().orElse(""))
-                        || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
-                    activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
-                    activeUnits.add("mentak_cruiser3");
-                    if (!getUnitsOwned().contains("mentak_cruiser3")) {
-                        addOwnedUnitByID("mentak_cruiser3");
-                        removeOwnedUnitByID("cruiser2");
-                    }
-                    break;
-                }
-            }
-        }
         return activeUnits;
     }
 
@@ -457,6 +442,45 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         getBreakthroughTGs().remove(bt);
     }
 
+    public void applyBreakthroughUnitUpgrades() {
+        for (BreakthroughModel breakthrough : getBreakthroughModels()) {
+            if (!isBreakthroughUnlocked(breakthrough.getAlias())) continue;
+            Optional<UnitModel> flipSide = breakthrough.getLinkedUnitUpgrade();
+            Optional<String> flipTechName = breakthrough.getFlipTechName();
+            if (flipSide.isPresent() && flipTechName.isPresent()) {
+                coverNamedUpgradeWith(flipTechName.get(), flipSide.get());
+            }
+        }
+    }
+
+    private void coverNamedUpgradeWith(String upgradeTechName, UnitModel flipSide) {
+        List<String> namedUpgradeTechs = getTechs().stream()
+                .filter(techID -> isNamedUpgradeOrFactionVersion(techID, upgradeTechName))
+                .toList();
+        if (namedUpgradeTechs.isEmpty()) {
+            return;
+        }
+        namedUpgradeTechs.stream()
+                .map(Mapper::getUnitModelByTechUpgrade)
+                .filter(Objects::nonNull)
+                .forEach(coveredUnit -> removeOwnedUnitByID(coveredUnit.getId()));
+        addOwnedUnitByID(flipSide.getId());
+    }
+
+    private static boolean isNamedUpgradeOrFactionVersion(String techID, String upgradeTechName) {
+        TechnologyModel tech = Mapper.getTech(techID);
+        if (tech == null) {
+            return false;
+        }
+        if (upgradeTechName.equalsIgnoreCase(tech.getName())) {
+            return true;
+        }
+        return tech.getBaseUpgrade()
+                .map(Mapper::getTech)
+                .filter(baseUpgrade -> upgradeTechName.equalsIgnoreCase(baseUpgrade.getName()))
+                .isPresent();
+    }
+
     public boolean changeBreakthrough(String btOld, String btNew) {
         if (!hasBreakthrough(btOld)) return false;
 
@@ -466,6 +490,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         getBreakthroughActive().put(btNew, isBreakthroughActive(btOld));
         getBreakthroughTGs().put(btNew, getBreakthroughTGs(btOld));
         removeBreakthrough(btOld);
+        if (isBreakthroughUnlocked(btNew)) {
+            applyBreakthroughUnitUpgrades();
+        }
         return true;
     }
 
@@ -480,6 +507,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setBreakthroughUnlocked(String bt, boolean unl) {
         getBreakthroughUnlocked().put(bt, unl);
+        if (unl) {
+            applyBreakthroughUnitUpgrades();
+        }
     }
 
     public boolean isBreakthroughExhausted(String bt) {
@@ -592,6 +622,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             removeSpentThing("infantry_" + oldTgSpent);
         }
         addSpentThing("infantry_" + newTgSpent);
+    }
+
+    public int getSpentThingCount(String prefix) {
+        for (String thing : getSpentThingsThisWindow()) {
+            if (thing.startsWith(prefix + "_")) {
+                return Integer.parseInt(thing.split("_")[1]);
+            }
+        }
+        return 0;
+    }
+
+    public void increaseSpentThingCount(String prefix, int amount) {
+        int old = getSpentThingCount(prefix);
+        int newCount = old + amount;
+        if (old != 0) {
+            removeSpentThing(prefix + "_" + old);
+        }
+        addSpentThing(prefix + "_" + newCount);
     }
 
     public void setProducedUnit(String unit, int count) {
@@ -3015,29 +3063,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 addOwnedUnitByID(unitModel.getId());
             }
         }
-        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
-            removeOwnedUnitByID("cruiser2");
-            addOwnedUnitByID("mentak_cruiser3");
-        }
-        if ("dsrohdws".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("rohdhnabt")) {
-            removeOwnedUnitByID("rohdhna_warsun2");
-            addOwnedUnitByID("rohdhna_warsun3");
-        }
-        if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mirvedabt")) {
-            removeOwnedUnitByID("fighter2");
-            addOwnedUnitByID("mirveda_fighter3");
-        }
-        if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("crystellumbt")) {
-            removeOwnedUnitByID("fighter2");
-            addOwnedUnitByID("crystellum_fighter3");
-        }
-        if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
-            addOwnedUnitByID("tribune3");
-            removeOwnedUnitByID("dreadnought2");
-        }
-        if ("inf2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("uydaibt")) {
-            addOwnedUnitByID("death_commandos3");
-            removeOwnedUnitByID("infantry2");
+        if (techModel.isUnitUpgrade()) {
+            applyBreakthroughUnitUpgrades();
         }
         if (hasUnlockedBreakthrough("arcanumbt") || hasUnlockedBreakthrough("arcanumbtback")) {
             ArcanumBreakthroughHandler.handlePowerWordWishTechGain(this, techID);
@@ -3291,9 +3318,44 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return !isRealPlayer() && !isDummy() && !isNpc();
     }
 
-    @Override
     public String getFogFilter() {
-        return super.getFogFilter() == null ? "default" : super.getFogFilter();
+        return FogViewSettings.of(getUserID()).filter();
+    }
+
+    public void setFogFilter(String filter) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withFilter(filter));
+    }
+
+    public boolean isFogGhostHexes() {
+        return FogViewSettings.of(getUserID()).ghostHexes();
+    }
+
+    public void setFogGhostHexes(boolean ghostHexes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withGhostHexes(ghostHexes));
+    }
+
+    public boolean isFogOverviewBoxes() {
+        return FogViewSettings.of(getUserID()).boxes();
+    }
+
+    public void setFogOverviewBoxes(boolean boxes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withBoxes(boxes));
+    }
+
+    public int getFogOverviewReach() {
+        return FogViewSettings.of(getUserID()).reach();
+    }
+
+    public void setFogOverviewReach(int reach) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withReach(reach));
+    }
+
+    public boolean isFogOverviewCodes() {
+        return FogViewSettings.of(getUserID()).codes();
+    }
+
+    public void setFogOverviewCodes(boolean codes) {
+        FogViewSettings.change(getUserID(), prefs -> prefs.withCodes(codes));
     }
 
     public void updateTurnStats(long turnTime) {

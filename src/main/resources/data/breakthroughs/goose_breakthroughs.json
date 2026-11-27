@@ -1,0 +1,50 @@
+[
+    {
+        "alias": "jotunnbt",
+        "name": "Glacial Drift",
+        "shortName": "Glacial\nDrift",
+        "faction": "jotunn",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "At the end of a tactical action, you may exhaust this card to remove 1 of your PDS from a planet you control and place it on a planet you control in the same system or an adjacent system.",
+        "source": "goose"
+    },
+    {
+        "alias": "brynfolkbt",
+        "name": "Berserker Drop-Pods",
+        "shortName": "Berserker\nDrop-Pods",
+        "faction": "brynfolk",
+        "synergy": [
+            "WARFARE",
+            "PROPULSION"
+        ],
+        "text": "After moving ships into the active system: you may exhaust this card to roll each of your unit's BOMBARDMENT against a planet in that system. You may cancel all hits to commit a number of infantry up to the hits produced on that planet. If you do, immediately retreat all of your ships in the active system to an adjacent system containing no other player's ships.",
+        "source": "goose"
+    },
+    {
+        "alias": "vaettirbt",
+        "name": "Yggdrasil's Grove",
+        "shortName": "Yggdrasil's\nGrove",
+        "faction": "vaettir",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "Planets you control that contain root tokens may participate in ground combat with a COMBAT value of 8 and they gain PRODUCTION 1.",
+        "source": "goose"
+    },
+    {
+        "alias": "valdyrjurbt",
+        "name": "Sejd Fate Weaving",
+        "shortName": "Sejd Fate\nWeaving",
+        "faction": "valdyrjur",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When 1 or more HALLOWED tokens are removed during combat, you may exhaust this card to remove 1 command token from the active system.",
+        "source": "goose"
+    }
+]

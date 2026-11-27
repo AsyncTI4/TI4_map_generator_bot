@@ -80,7 +80,7 @@
     },
     {
         "id": "sorrow",
-        "name": "Sea of Tears",
+        "name": "The Sorrow",
         "faction": "crimson",
         "permanentEffect": "When you create the game board, place The Sorrow (tile 94) where your home system would be placed, and place an inactive breach in it. The Sorrow is not a home system. Then, place your home system (tile 118) in your play area.",
         "source": "thunders_edge"
@@ -100,7 +100,7 @@
         "name": "Puppets of the Blade",
         "shortName": "Puppets of\nthe Blade",
         "faction": "firmament",
-        "window": "If you have at least 1 plot card in your play area, gain the following ability:",
+        "window": "If you have at least 1 plot card in your play area, gain the following ability",
         "windowEffect": "ACTION: Purge The Firmament's faction sheet, leaders, planet cards, and promissory note. Then, gain all of the faction components for The Obsidian.",
         "source": "thunders_edge"
     },

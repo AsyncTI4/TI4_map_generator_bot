@@ -61,11 +61,10 @@ class SecretObjectiveButtonHandler {
                     msg += " (" + StringHelper.pluralize(amountLeftToDiscard, "player") + " still to discard)";
                 }
             }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
             if (!DiscardSecretService.discardSO(player, soIndex, game)) {
                 return;
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
-
             if (drawReplacement) {
                 String oldSO = secretObjective.getAlias();
                 DrawSecretService.drawSO(event, game, player);

@@ -30,14 +30,15 @@ public class ZephyrionBreakthroughHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
                 player.factionButtonChecker() + "zephyrionbtRes_" + otherPlayer.getFaction(),
-                "Resolve Subdue Chancellor (Upon Win)",
+                "Resolve Subdue Chancellor",
                 FactionEmojis.zephyrion));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 msg
-                        + ", a reminder that if you destroy the last of "
+                        + ", a reminder that if the last of "
                         + otherPlayer.getRepresentationNoPing()
-                        + "'s ships here, you may resolve _Subdue Chancellor_ to draw an unused agent.",
+                        + "'s ships here are destroyed or removed during your tactical action, you may resolve"
+                        + " _Subdue Chancellor_ to draw an unused agent.",
                 buttons);
     }
 

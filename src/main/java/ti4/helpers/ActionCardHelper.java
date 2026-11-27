@@ -257,6 +257,33 @@ public class ActionCardHelper {
         return cards;
     }
 
+    private static final Map<String, List<String>> PRE_ASSIGNMENT_KEYS = Map.ofEntries(
+            Map.entry("coup", List.of("Coup")),
+            Map.entry("extremeduress", List.of("ExtremeDuress")),
+            Map.entry("crisis", List.of("Crisis Target")),
+            Map.entry("tf-stasis", List.of("Stasis Target")),
+            Map.entry("disgrace", List.of("Public Disgrace", "Public Disgrace Only")),
+            Map.entry("summit", List.of("Summit")),
+            Map.entry("bounty_contracts", List.of("BountyContracts")),
+            Map.entry("tf-reverse", List.of("Reverse Splice")),
+            Map.entry("tf-manipulate", List.of("Manipulate Splice")),
+            Map.entry("investments", List.of("Investments")),
+            Map.entry("revolution", List.of("PreRevolution")),
+            Map.entry("deflection", List.of("Deflection")),
+            Map.entry("tf-tartarus", List.of("Tartarus")),
+            Map.entry("tk-compose", List.of("Compose")),
+            Map.entry("puppetsonastring", List.of("Puppets On A String")),
+            Map.entry("relitigate", List.of("Relitigate")),
+            Map.entry("escape_clause", List.of("escapeClausePreset")));
+
+    public static void clearActionCardPresets(Game game, Set<String> acAliases) {
+        for (String alias : acAliases) {
+            for (String key : PRE_ASSIGNMENT_KEYS.getOrDefault(alias, List.of())) {
+                game.removeStoredValue(key);
+            }
+        }
+    }
+
     private static List<Button> getPurgeGarboziaActionCardButtons(Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Entry<String, Integer> card : getGarboziaActionCards(game).entrySet()) {

@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiMemory;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.secrets.SecretPhase;
 import ti4.ai.selfplay.SelfPlaySetup;
 import ti4.game.Game;
@@ -200,6 +201,7 @@ final class SelfPlayGame {
     private int recordedRound;
     private long wallStart = System.nanoTime();
     private TurnDurations turnDurations;
+    private HarnessTiming harness;
     private final int slot;
     // Every random draw the game thread makes (dice, decks, seat ids, AI profile seeds) comes from this seed, so a game
     // replays from -Dai.selfplay.seed=<printed seed> with its slot. Without the property each batch picks a base seed.
@@ -471,70 +473,117 @@ final class SelfPlayGame {
         long lastProgressAt = env.now();
         String lastProgress = "";
         int ticks = 0;
-        while (true) {
-            long now = env.now();
-            ManagedGame managed = GameManager.getManagedGame(name);
-            Game game = observed(managed);
-            if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
-            long observeStart = System.nanoTime();
-            recordVictoryPoints(game);
-            recordPlayRounds(game);
-            env.promissory.observe(game);
-            objectives.observe(game);
-            agendas.observe(game, now);
-            relics.observe(game);
-            env.leaders.observe(game);
-            env.factionComponents.observe(game, env.discord);
-            env.spending.observe(game);
-            boolean forced = false;
-            if (fracture.due(game)) {
-                force(game, fracture::enter);
-                forced = true;
-            }
-            if (relicsDue(game)) {
-                relicsHandedOut = true;
-                force(game, this::handOutRelics);
-                forced = true;
-            }
-            // What the harness itself changed is not a seat spending: the spending diffs start again after it.
-            if (forced) env.spending.rebase(game);
-            fracture.observe(game);
-            probeStyx(game);
-            logFleets(game);
-            logResearchPlans(game);
-            closeOverrulePicks(game, false);
-            turnDurations.observe(game, now);
-            ti4.ai.trace.TimingReport.recordOutside("harness.observe", System.nanoTime() - observeStart);
-            if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
-            if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
-            if (announcedGameOver()) return outcome(Ending.OBJECTIVES_EXHAUSTED, game, ticks);
-            if (announcedLoop()) return outcome(Ending.LOOPED, game, ticks);
-            if (env.elapsedMillis() > maxVirtualMillis || ticks >= maxTicks) return outcome(Ending.LIMIT, game, ticks);
-
-            String progress = progressOf(game, managed);
-            if (!progress.equals(lastProgress)) {
-                lastProgress = progress;
-                lastProgressAt = now;
-            } else if (now - lastProgressAt > STALL_MILLIS) {
-                return outcome(Ending.STALLED, game, ticks);
-            }
-
-            if (lane.observeModified(managed.getLastModifiedDate())) {
-                lane.markDirty(now + AiSettings.DEBOUNCE.toMillis());
-            }
-            if (lane.watchdogDue(now, AiSettings.WATCHDOG_PERIOD.toMillis())) lane.markDirty(now);
-            if (lane.isDue(now) && lane.tryStart()) {
-                long tickStart = System.nanoTime();
-                try {
-                    AiTickRunner.tick(lane, now);
-                } finally {
-                    lane.finish();
-                    turnDurations.ticked(System.nanoTime() - tickStart);
+        harness = new HarnessTiming(name);
+        harness.start();
+        try {
+            while (true) {
+                long now = env.now();
+                HarnessTiming.Mark reloadStart = HarnessTiming.Mark.now();
+                ManagedGame managed = GameManager.getManagedGame(name);
+                boolean reloads = managed != observedManaged || observedGame == null;
+                Game game = observed(managed);
+                HarnessTiming.Mark reloadEnd = HarnessTiming.Mark.now();
+                if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
+                // The round is known only once the game is loaded; the load is charged to the round it loaded.
+                harness.observeRound(game.getRound(), this::saveBytes);
+                harness.iteration();
+                if (reloads) {
+                    harness.add(
+                            HarnessTiming.RELOAD,
+                            reloadEnd.wall() - reloadStart.wall(),
+                            reloadEnd.cpu() - reloadStart.cpu());
                 }
-                ticks++;
-                recordHands(game);
+                HarnessTiming.Mark mark = HarnessTiming.Mark.now();
+                long observeStart = mark.wall();
+                // The trackers probe the AI (objective plans, agenda forecasts) on the harness's reloaded copy, outside
+                // any decision. An isolated memo keeps what they work out out of the caches the AI shares across
+                // decisions: unscoped, an imagined rival turn inside them became the outermost scope and wrote
+                // masked-hand tactical rankings into SaveMemo, where the next real decision on the same save could read
+                // them.
+                try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+                    recordVictoryPoints(game);
+                    recordPlayRounds(game);
+                    mark = harness.add("track.rounds", mark);
+                    env.promissory.observe(game);
+                    mark = harness.add("track.promissory", mark);
+                    objectives.observe(game);
+                    mark = harness.add("track.objectives", mark);
+                    agendas.observe(game, now);
+                    mark = harness.add("track.agendas", mark);
+                    relics.observe(game);
+                    mark = harness.add("track.relics", mark);
+                    env.leaders.observe(game);
+                    mark = harness.add("track.leaders", mark);
+                    env.factionComponents.observe(game, env.discord);
+                    mark = harness.add("track.factionComponents", mark);
+                    env.spending.observe(game);
+                    mark = harness.add("track.spending", mark);
+                }
+                boolean forced = false;
+                if (fracture.due(game)) {
+                    force(game, fracture::enter);
+                    forced = true;
+                }
+                if (relicsDue(game)) {
+                    relicsHandedOut = true;
+                    force(game, this::handOutRelics);
+                    forced = true;
+                }
+                // What the harness itself changed is not a seat spending: the spending diffs start again after it.
+                if (forced) env.spending.rebase(game);
+                mark = harness.add("harness.saves", mark);
+                try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+                    fracture.observe(game);
+                    mark = harness.add("track.fracture", mark);
+                    probeStyx(game);
+                    logFleets(game);
+                    logResearchPlans(game);
+                    mark = harness.add("track.logs", mark);
+                    closeOverrulePicks(game, false);
+                    mark = harness.add("track.overrule", mark);
+                    turnDurations.observe(game, now);
+                    mark = harness.add("track.turns", mark);
+                }
+                ti4.ai.trace.TimingReport.recordOutside("harness.observe", mark.wall() - observeStart);
+                if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
+                if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
+                mark = harness.add("check.stop", mark);
+                if (announcedGameOver()) return outcome(Ending.OBJECTIVES_EXHAUSTED, game, ticks);
+                if (announcedLoop()) return outcome(Ending.LOOPED, game, ticks);
+                mark = harness.add("check.notices", mark);
+                if (env.elapsedMillis() > maxVirtualMillis || ticks >= maxTicks)
+                    return outcome(Ending.LIMIT, game, ticks);
+
+                String progress = progressOf(game, managed);
+                if (!progress.equals(lastProgress)) {
+                    lastProgress = progress;
+                    lastProgressAt = now;
+                } else if (now - lastProgressAt > STALL_MILLIS) {
+                    return outcome(Ending.STALLED, game, ticks);
+                }
+
+                if (lane.observeModified(managed.getLastModifiedDate())) {
+                    lane.markDirty(now + AiSettings.DEBOUNCE.toMillis());
+                }
+                if (lane.watchdogDue(now, AiSettings.WATCHDOG_PERIOD.toMillis())) lane.markDirty(now);
+                mark = harness.add("check.progress", mark);
+                if (lane.isDue(now) && lane.tryStart()) {
+                    long tickStart = System.nanoTime();
+                    try {
+                        AiTickRunner.tick(lane, now);
+                    } finally {
+                        lane.finish();
+                        turnDurations.ticked(System.nanoTime() - tickStart);
+                        mark = harness.add(HarnessTiming.TICK, mark);
+                    }
+                    ticks++;
+                    recordHands(game);
+                    harness.add(HarnessTiming.HANDS, mark);
+                }
+                env.advance(STEP_MILLIS);
             }
-            env.advance(STEP_MILLIS);
+        } finally {
+            harness.finish(saveBytes());
         }
     }
 
@@ -776,7 +825,13 @@ final class SelfPlayGame {
         System.out.println(turn.line());
     }
 
+    private long saveBytes() {
+        java.io.File save = ti4.helpers.Storage.getGameFile(name + ".txt");
+        return save.exists() ? save.length() : 0;
+    }
+
     private Outcome outcome(Ending ending, Game game, int ticks) {
+        if (harness != null) harness.finish(saveBytes());
         printTurnDurations();
         if (env.trajectory != null) env.trajectory.finish(ending.name(), seed, game);
         return new Outcome(

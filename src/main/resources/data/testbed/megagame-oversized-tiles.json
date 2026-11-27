@@ -1,0 +1,26 @@
+{
+  "name": "megagame-oversized-tiles",
+  "description": "megagame-6p-action with Sol at home 301 next to oversized tiles: Mallice at 302, ef2 at 318, Kwon at 201; for the My Area islands and show_as.",
+  "fog": false,
+  "strategyCardSet": "pbd30k",
+  "tags": ["megagame_sc_groups"],
+  "seats": [
+    { "faction": "sol", "sc": 11, "color": "blue", "home": "301" },
+    { "faction": "hacan", "sc": 21, "color": "yellow", "home": "304" },
+    { "faction": "jolnar", "sc": 12, "color": "purple", "home": "307" },
+    { "faction": "xxcha", "sc": 22, "color": "green", "home": "310" },
+    { "faction": "letnev", "speaker": true, "sc": 13, "color": "red", "home": "313" },
+    { "faction": "winnu", "sc": 23, "color": "orange", "home": "316" }
+  ],
+  "defaults": { "ccs": "3/3/2" },
+  "tiles": { "302": "82b", "318": "ef2", "201": "c10" },
+  "stored": {
+    "megagameGroup_A": "sol_hacan",
+    "megagameGroup_B": "jolnar_xxcha",
+    "megagameGroup_C": "letnev_winnu",
+    "megagameSpeaker_A": "hacan",
+    "megagameSpeaker_B": "jolnar"
+  },
+  "gameOptions": { "sc_count_for_map": "1" },
+  "start": "action"
+}

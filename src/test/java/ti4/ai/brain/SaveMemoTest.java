@@ -65,6 +65,28 @@ class SaveMemoTest {
         assertThat(computed).hasValue(4);
     }
 
+    // The self-play harness probes the AI on its own reloaded copy of the game; what it works out there must not reach
+    // the next tick, which plays on another instance.
+    @Test
+    void anIsolatedScopeSharesNothing() {
+        try (DecisionMemo.Open probes = DecisionMemo.openIsolated()) {
+            SaveMemo.remember(game, "state", this::compute, "k");
+            SaveMemo.remember(game, "state", this::compute, "k");
+        }
+        // An imagined rival turn opened inside the probes is not the outermost decision either.
+        try (DecisionMemo.Open probes = DecisionMemo.openIsolated();
+                DecisionMemo.Open imagined = DecisionMemo.open()) {
+            SaveMemo.remember(game, "state", this::compute, "k");
+        }
+        assertThat(computed).hasValue(3);
+        assertThat(SaveMemo.gamesKept()).isZero();
+
+        try (DecisionMemo.Open decision = DecisionMemo.open()) {
+            SaveMemo.remember(game, "state", this::compute, "k");
+        }
+        assertThat(computed).hasValue(4);
+    }
+
     @Test
     void forgettingAGameDropsItsAnswers() {
         decide(game, "state", "nekro");

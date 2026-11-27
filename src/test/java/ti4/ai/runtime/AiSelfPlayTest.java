@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import ti4.ai.AiSettings;
@@ -28,11 +29,15 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
+    // Passing first rounds took 575 to 857 ticks (7 seeds); a game at about 4 ticks a second that cannot reach
+    // round 2 fails within about 10 minutes at this limit instead of 20 (the limit was 5,000 until 2026-11-27).
+    private static final int FIRST_ROUND_MAX_TICKS = 2500;
 
     @Test
+    @Tag("selfplay")
     void sixAiSeatsPlayTheirFirstRound() throws Exception {
         ti4.ai.brain.TickMemo.resetVerification();
-        SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, 5000);
+        SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, FIRST_ROUND_MAX_TICKS);
         if (ti4.ai.brain.TickMemo.verifying()) {
             ti4.ai.brain.TickMemo.verificationLines().forEach(System.out::println);
         }
@@ -127,7 +132,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         SpendingTracker.BATCH.clear();
         ProduceTracker.BATCH.clear();
         long batchStart = System.nanoTime();
-        List<SelfPlayGame.Outcome> played = playAll(games, threads);
+        List<SelfPlayGame.Outcome> played;
+        try (FlightRecording ignored = FlightRecording.startIfAsked()) {
+            played = playAll(games, threads);
+        }
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
         List<SelfPlayGame.Outcome> unfinished = new ArrayList<>();
         List<String> summary = new ArrayList<>();

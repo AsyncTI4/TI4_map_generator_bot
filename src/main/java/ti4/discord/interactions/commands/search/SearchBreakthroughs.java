@@ -1,6 +1,5 @@
 package ti4.discord.interactions.commands.search;
 
-import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -39,8 +38,6 @@ class SearchBreakthroughs extends SearchComponentModelSubcommand {
     }
 
     private static List<MessageEmbed> getEmbeds(BreakthroughModel breakthrough) {
-        List<MessageEmbed> embeds = new ArrayList<>(List.of(breakthrough.getRepresentationEmbed(true)));
-        breakthrough.getLinkedUnitUpgrade().ifPresent(upgrade -> embeds.add(upgrade.getRepresentationEmbed(true)));
-        return embeds;
+        return breakthrough.getRepresentationEmbedsWithLinkedUnit(true);
     }
 }

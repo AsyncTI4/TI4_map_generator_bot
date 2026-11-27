@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapSegment;
 import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.FogPreset;
@@ -95,7 +96,8 @@ public class TestBedStateResolver {
             "commodityValue",
             "exhaustedPlanetAbilities",
             "followedAll",
-            "megagameGroup");
+            "megagameGroup",
+            "fogView");
 
     @Nullable
     public static String validatePath(String path) {
@@ -226,6 +228,10 @@ public class TestBedStateResolver {
             case "planets" -> joinSorted(seat.getPlanets());
             case "exhaustedPlanets" -> joinSorted(seat.getExhaustedPlanets());
             case "commodityValue" -> String.valueOf(seat.getCommoditiesTotal());
+            case "fogView" ->
+                "filter=" + seat.getFogFilter() + ",ghostHexes=" + seat.isFogGhostHexes() + ",overview="
+                        + (seat.isFogOverviewBoxes() ? "boxes" : "hexes") + ",islands=" + islandsOf(seat)
+                        + ",labels=" + (seat.isFogOverviewCodes() ? "codes" : "names");
             case "exhaustedPlanetAbilities" -> joinSorted(seat.getExhaustedPlanetsAbilities());
             case "techs" -> joinSorted(seat.getTechs());
             case "passed" -> String.valueOf(seat.isPassed());
@@ -323,6 +329,11 @@ public class TestBedStateResolver {
 
     private static String factionOf(@Nullable Player player) {
         return player == null ? "" : player.getFaction();
+    }
+
+    private static String islandsOf(Player seat) {
+        int reach = seat.getFogOverviewReach();
+        return reach == CompactOverviewGenerator.Options.UNLIMITED_REACH ? "unlimited" : String.valueOf(reach);
     }
 
     private static String joinSorted(Collection<String> values) {

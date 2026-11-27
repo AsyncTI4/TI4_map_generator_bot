@@ -185,6 +185,14 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   (1,566 against 2,307 s, -32%); games 1, 2 and 4 drifted. Both jobs predate the seat-id fix 3379860e70, whose
   collisions moved seeded random streams between games of one batch, so the drift is not yet evidence against the
   caches. Exact equality needs a rerun of both sides from 3379860e70 onward.
+- 2026-11-26: rerun with the seat-id fix (jobs 20261126-092213/092214): 4,367 against 6,647 CPU-s (-34%). Games
+  1-3 identical, game 4 split in round 2. A game 4 replay with the follow reserve keyed on the token-purchase
+  estimating mode still split in round 2 and then left the cache run in round 4, so that key gap changes play
+  but is not the round-2 split.
+- 2026-11-27: rerun after the isolated harness memo 2dd825c0eb (jobs 20261127-115501): 6,302 against 9,522
+  CPU-s over 22 rounds each, 286 against 433 per round (-34%). No game is identical now, but every split is late:
+  turn order first differs in round 5, 5, 3 and 5. The follow reserve key gap is still open on this side, so
+  the next check waits for the cache-key fixes from the Styx session.
 
 ## Unknowns
 

@@ -31,6 +31,7 @@ import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
 import ti4.service.fow.FogPreset;
+import ti4.service.fow.LoreService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
@@ -168,6 +169,7 @@ public class TestBedPresetService {
         merged.setScoredObjectives(firstNonNull(seat.getScoredObjectives(), defaults.getScoredObjectives()));
         merged.setFragments(firstNonNull(seat.getFragments(), defaults.getFragments()));
         merged.setBreakthrough(firstNonNull(seat.getBreakthrough(), defaults.getBreakthrough()));
+        merged.setFogMemory(firstNonNull(seat.getFogMemory(), defaults.getFogMemory()));
         return merged;
     }
 
@@ -305,6 +307,12 @@ public class TestBedPresetService {
         validateIds(seat.getPns(), TestBedPresetService::isPromissoryNoteEntry, label, "promissory note", errors);
         validateIds(seat.getScoredObjectives(), Mapper::isValidPublicObjective, label, "public objective", errors);
         validateIds(seat.getFragments(), Mapper::isValidExplore, label, "relic fragment", errors);
+        validateIds(
+                seat.getFogMemory(),
+                position -> MapPositionMapper.isTilePositionValid(position.toLowerCase()),
+                label,
+                "fog memory position",
+                errors);
         if (seat.getBreakthrough() != null && !BREAKTHROUGH_STATES.contains(seat.getBreakthrough())) {
             errors.add(label + ": `breakthrough` must be one of " + BREAKTHROUGH_STATES + ".");
         }
@@ -393,6 +401,11 @@ public class TestBedPresetService {
         if (placesExtraMaps && !Boolean.TRUE.equals(preset.getFog())) {
             errors.add("preset: `tiles` on maps A-G (`a000`-`g848`) need `\"fog\": true`; extra maps are fog-only.");
         }
+        boolean remembersFog = preset.allSeats().stream().anyMatch(seat -> seat.getFogMemory() != null)
+                || (preset.getDefaults() != null && preset.getDefaults().getFogMemory() != null);
+        if (remembersFog && !Boolean.TRUE.equals(preset.getFog())) {
+            errors.add("preset: `fogMemory` needs `\"fog\": true`.");
+        }
         if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
             errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");
         }
@@ -410,6 +423,10 @@ public class TestBedPresetService {
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
         });
+        for (String entry : preset.getLore()) {
+            String problem = LoreService.storedEntryProblem(entry);
+            if (problem != null) errors.add("preset: " + problem);
+        }
         if (preset.getStrategyCardSet() != null && !Mapper.isValidStrategyCardSet(preset.getStrategyCardSet())) {
             errors.add("preset: unknown `strategyCardSet` `" + preset.getStrategyCardSet() + "`.");
         }

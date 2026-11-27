@@ -126,6 +126,7 @@ import ti4.service.game.SetOrderService;
 import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.VyserixAgent;
 import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
 import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
 import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
@@ -407,6 +408,49 @@ public final class Helper {
             soMessage += " ✅ " + so;
         }
         return "> " + poMessage + '\n' + "> " + soMessage + '\n';
+    }
+
+    public static Optional<Player> firstQueuedPlayerWhoWouldWin(Game game) {
+        for (Player player : StatusHelper.getPlayersInScoringOrder(game)) {
+            int queuedPoints = queuedPublicObjectivePoints(game, player) + queuedSecretObjectivePoints(game, player);
+            if (queuedPoints > 0 && player.getTotalVictoryPoints() + queuedPoints >= game.getVp()) {
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static int queuedPublicObjectivePoints(Game game, Player player) {
+        if (!game.getStoredValue("queueToScorePOs").contains(player.getFaction() + "*")) {
+            return 0;
+        }
+        String queuedIndex = game.getStoredValue(player.getFaction() + "queuedPOScore");
+        return game.getRevealedPublicObjectives().entrySet().stream()
+                .filter(po -> String.valueOf(po.getValue()).equals(queuedIndex))
+                .findFirst()
+                .map(po -> publicObjectivePoints(game, po.getKey()))
+                .orElse(1);
+    }
+
+    private static int publicObjectivePoints(Game game, String objectiveKey) {
+        PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveKey);
+        if (objective != null && objective.getPoints() != null) {
+            return objective.getPoints();
+        }
+        return game.getCustomPublicVP().getOrDefault(objectiveKey, 1);
+    }
+
+    private static int queuedSecretObjectivePoints(Game game, Player player) {
+        if (!game.getStoredValue("queueToScoreSOs").contains(player.getFaction() + "*")) {
+            return 0;
+        }
+        try {
+            SecretObjectiveModel secret =
+                    player.getSecret(Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore")));
+            return secret == null ? 1 : secret.getPoints();
+        } catch (NumberFormatException e) {
+            return 1;
+        }
     }
 
     public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
@@ -1204,6 +1248,14 @@ public final class Helper {
                             .append(" vote")
                             .append(player.getSpentInfantryThisWindow() == 1 ? "" : "s")
                             .append(".\n");
+                case "xanships" ->
+                    msg.append("Damaged ")
+                            .append(count / 4)
+                            .append(" ship")
+                            .append(count / 4 == 1 ? "" : "s")
+                            .append(" for ")
+                            .append(count)
+                            .append(" votes via _Transformation Protocol_.\n");
                 case "planet" ->
                     msg.append(getPlanetRepresentation(secondHalf, game))
                             .append(" for ")
@@ -1249,6 +1301,12 @@ public final class Helper {
                             .append(".\n");
                 case "specialVotes" ->
                     msg.append("Used Special Votes for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
+                case "althingBarristers" ->
+                    msg.append("Used _Althing Barristers_ for ")
                             .append(count)
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
@@ -1953,7 +2011,8 @@ public final class Helper {
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("tf-lataniwarrior")
                         && !player.hasUnit("deepwrought_mech")
-                        && !player.hasUnit("arborec_infantry2")) {
+                        && !player.hasUnit("arborec_infantry2")
+                        && !player.hasUnit("arvaxi_mech")) {
 
                     int productionLimit;
                     productionLimit = Math.max(
@@ -3073,6 +3132,9 @@ public final class Helper {
             if (player.hasUnexhaustedLeader("argentagent")) {
                 unitButtons.add(ArgentAgent.button(player, tile));
             }
+            if (player.hasUnexhaustedLeader("vyserixagent") && VyserixAgent.hasTargets(game, player, tile)) {
+                unitButtons.add(VyserixAgent.button(player, tile));
+            }
             if (player.hasUnexhaustedLeader("tknovascornfulagent")) {
                 unitButtons.add(ScornfulGenome.button(player, tile));
             }
@@ -3162,7 +3224,8 @@ public final class Helper {
                                         tile.getUnitHolders().get("space"))
                                 == 0
                         && !hasRallyingCryProduction
-                        && !canProduceParturitionStructure) {
+                        && !canProduceParturitionStructure
+                        && !TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
                     continue;
                 }
 

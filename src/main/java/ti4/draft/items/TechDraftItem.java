@@ -14,6 +14,7 @@ import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class TechDraftItem extends DraftItem {
@@ -48,9 +49,18 @@ public class TechDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         if ("none".equalsIgnoreCase(getTech().getRequirementsEmoji())) {
-            return getTech().getText();
+            return rulesText();
         }
-        return getTech().getText() + " " + getTech().getRequirementsEmoji();
+        return rulesText() + " " + getTech().getRequirementsEmoji();
+    }
+
+    private String rulesText() {
+        TechnologyModel tech = getTech();
+        UnitModel upgradedUnit = tech.isUnitUpgrade() ? Mapper.getUnitModelByTechUpgrade(tech.getAlias()) : null;
+        if (upgradedUnit != null) {
+            return upgradedUnit.getRulesText().trim();
+        }
+        return tech.getText() == null ? "" : tech.getText();
     }
 
     @JsonIgnore
@@ -110,5 +120,11 @@ public class TechDraftItem extends DraftItem {
             }
         }
         return allItems;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getTech().getNotes();
     }
 }

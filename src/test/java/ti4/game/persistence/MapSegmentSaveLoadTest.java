@@ -52,20 +52,38 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
     }
 
     // Normal games must save exactly as before: the ghost-hex flag is only written when a player turned it off.
+    // Fog view settings belong to the player, not the game: they stay out of the save and follow the player into
+    // every game. Old saves that still carry them load without them.
     @Test
-    void ghostHexFlagIsOnlySavedWhenTurnedOff() throws IOException {
+    void fogViewSettingsFollowThePlayerNotTheSave() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
-            GameSaveService.save(game, "test");
-            Path saveFile = Storage.getGamePath(harness.getGameName() + Constants.TXT);
-            assertThat(Files.readString(saveFile)).doesNotContain(Constants.FOG_GHOST_HEXES);
-
             Player player = game.getRealPlayers().getFirst();
-            player.setFogGhostHexes(false);
-            GameSaveService.save(game, "test");
+            try {
+                player.setFogGhostHexes(false);
+                player.setFogOverviewBoxes(false);
+                player.setFogOverviewReach(0);
+                player.setFogFilter("pink");
+                GameSaveService.save(game, "test");
 
-            assertThat(harness.load().getPlayer(player.getUserID()).isFogGhostHexes())
-                    .isFalse();
+                Path saveFile = Storage.getGamePath(harness.getGameName() + Constants.TXT);
+                assertThat(Files.readString(saveFile))
+                        .doesNotContain(Constants.FOG_GHOST_HEXES)
+                        .doesNotContain(Constants.FOG_OVERVIEW_BOXES)
+                        .doesNotContain(Constants.FOG_OVERVIEW_REACH)
+                        .doesNotContain(Constants.FOG_FILTER + " ");
+
+                Player loaded = harness.load().getPlayer(player.getUserID());
+                assertThat(loaded.isFogGhostHexes()).isFalse();
+                assertThat(loaded.isFogOverviewBoxes()).isFalse();
+                assertThat(loaded.getFogOverviewReach()).isZero();
+                assertThat(loaded.getFogFilter()).isEqualTo("pink");
+            } finally {
+                player.setFogGhostHexes(true);
+                player.setFogOverviewBoxes(true);
+                player.setFogOverviewReach(2);
+                player.setFogFilter("default");
+            }
         }
     }
 

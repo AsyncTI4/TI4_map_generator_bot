@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,10 +20,13 @@ import ti4.testUtils.BaseTi4Test;
 // the active seat finds a fleet beside one of its planets; the seat then plans the attack, moves into the Fracture and
 // plays the combat against the neutral units to its end with the bot's real buttons: the neutral dice are rolled and
 // the neutral hits assigned by another AI seat, and the planet is taken with its relic (and, for Styx, its point).
+@Tag("selfplay")
 class FractureSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
+    // Passing games took 42 to 558 ticks over 7 seeds (Styx and Flank Speed about 60, Cocytus 42 to 558). The limit
+    // stays 1,500: 1,000 left less than a factor of 2 over the slowest pass.
     private static final int MAX_TICKS = 1500;
     private static final String ACTION = "action";
     private static final int RELIC_PATIENCE_TICKS = 25;

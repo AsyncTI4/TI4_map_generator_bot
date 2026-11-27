@@ -212,12 +212,6 @@ public final class BreakthroughCommandHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Grove \"planet\" card to your play area.");
             }
-            if ("mentakbt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("cr2")) {
-                    player.addOwnedUnitByID("mentak_cruiser3");
-                    player.removeOwnedUnitByID("cruiser2");
-                }
-            }
             if ("celdauribt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("celdauri_celagrom");
                 String output = player.getRepresentation()
@@ -225,30 +219,6 @@ public final class BreakthroughCommandHelper {
                 List<Button> buttons =
                         Helper.getTileWithShipsPlaceUnitButtons(player, game, "celagrom", "placeOneNDone_skipbuild");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), output, buttons);
-            }
-            if ("rohdhnabt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("dsrohdws")) {
-                    player.addOwnedUnitByID("rohdhna_warsun3");
-                    player.removeOwnedUnitByID("rohdhna_warsun2");
-                }
-            }
-            if ("mirvedabt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("ff2")) {
-                    player.addOwnedUnitByID("mirveda_fighter3");
-                    player.removeOwnedUnitByID("fighter2");
-                }
-            }
-            if ("kortalbt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("dn2")) {
-                    player.addOwnedUnitByID("tribune3");
-                    player.removeOwnedUnitByID("dreadnought2");
-                }
-            }
-            if ("uydaibt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("inf2")) {
-                    player.addOwnedUnitByID("death_commandos3");
-                    player.removeOwnedUnitByID("infantry2");
-                }
             }
             if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
                 Tile tile = player.getHomeSystemTile();
@@ -258,12 +228,6 @@ public final class BreakthroughCommandHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " Made your home system into a nebula.");
-            }
-            if ("crystellumbt".equalsIgnoreCase(bt.getID())) {
-                if (player.hasTech("ff2")) {
-                    player.addOwnedUnitByID("crystellum_fighter3");
-                    player.removeOwnedUnitByID("fighter2");
-                }
             }
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {

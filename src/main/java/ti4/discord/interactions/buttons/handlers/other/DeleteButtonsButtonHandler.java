@@ -510,6 +510,8 @@ class DeleteButtonsButtonHandler {
             ChoirTechHandler.clearTombResonanceProductionContext(game, player);
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
+                game.removeStoredValue("amalgFf");
+                game.removeStoredValue("amalgInf");
             }
             if (buttonID.contains("lumi7Build")) {
                 if (!game.getStoredValue("lumi7System").isEmpty()) {

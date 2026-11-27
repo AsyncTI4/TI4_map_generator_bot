@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
@@ -33,6 +34,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -209,7 +211,8 @@ public class PromissoryNoteHelper {
     private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
-            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)
+                    || BrynfolkPromissoryHandler.isAlthingBarristers(pnShortHand)) {
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -241,6 +244,13 @@ public class PromissoryNoteHelper {
         if ("bmfNotHand".equals(id)) {
             fromHand = false;
             id = "bmf";
+        }
+
+        if (BrynfolkPromissoryHandler.isAlthingBarristers(id)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_Althing Barristers_ can only be played while you are selecting planets for voting.");
+            return;
         }
 
         if (id.contains("dspnflor")) {
@@ -459,6 +469,9 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " drew 1 secret objective due to _Theory Renovation_.");
+        }
+        if ("bapnzeph".equalsIgnoreCase(id)) {
+            ZephyrionAbilityHandler.activateMercenaryDefenseContract(game, player);
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);

@@ -22,6 +22,7 @@ public enum LeaderRemovalReason {
             case "letnevhero",
                     "natauhero",
                     "nomadhero",
+                    "jotunnhero",
                     "zealotshero",
                     "nokarhero",
                     "kolumehero",

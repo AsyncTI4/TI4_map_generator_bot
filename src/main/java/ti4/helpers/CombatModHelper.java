@@ -1061,6 +1061,8 @@ public class CombatModHelper {
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "number_of_planets_in_system" ->
                     scalingCount = activeSystem.getPlanetUnitHolders().size();
+                case "blot_other_players_tokens" ->
+                    scalingCount = player.getDebtTokenCount(opponent.getColor(), "Blot");
                 case "galvanized_unit_count" ->
                     scalingCount =
                             getGalvanizedScalingCount(game, unitHolder, origUnit, player, activeSystem, rollType);

@@ -17,14 +17,21 @@ public class DecisionMemo {
     }
 
     public static Open open() {
-        Scope scope = new Scope(CURRENT.get());
-        CURRENT.set(scope);
-        return scope;
+        return opened(false);
+    }
+
+    public static Open openIsolated() {
+        return opened(true);
     }
 
     public static boolean outermost() {
         Scope scope = CURRENT.get();
-        return scope != null && scope.previous == null;
+        return scope != null && scope.previous == null && !scope.isolated;
+    }
+
+    public static boolean isolated() {
+        Scope scope = CURRENT.get();
+        return scope != null && scope.isolated;
     }
 
     @SuppressWarnings("unchecked")
@@ -39,12 +46,21 @@ public class DecisionMemo {
         return computed;
     }
 
+    private static Open opened(boolean isolated) {
+        Scope previous = CURRENT.get();
+        Scope scope = new Scope(previous, isolated || previous != null && previous.isolated);
+        CURRENT.set(scope);
+        return scope;
+    }
+
     private static final class Scope implements Open {
         private final Scope previous;
+        private final boolean isolated;
         private final Map<Object, Object> values = new HashMap<>();
 
-        private Scope(Scope previous) {
+        private Scope(Scope previous, boolean isolated) {
             this.previous = previous;
+            this.isolated = isolated;
         }
 
         @Override

@@ -9,6 +9,7 @@
             "WARFARE"
         ],
         "text": "ACTION:  Exhaust this card to attach or remove and attach the Arvaxi Mobilization Engine card to a player's non-fighter ship unit upgrade technology with either side faceup. ",
+        "notes": "The Mobilization Engine can only affect upgraded units. A unit without a capacity value does not gain capacity from it.",
         "source": "wftv"
     },
     {
@@ -68,7 +69,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "After you destroy the last of another player’s ships in a system that is in or adjacent to that player’s home system, draw an unused agent. Attach it to this card, or purge it and exhaust 1 of that player’s agents. Treat agents attached to this card as if you owned them.",
+        "text": "During your tactical action, after the last of another player’s ships are destroyed or removed in a system that is in or adjacent to that player’s home system, draw an unused agent. Attach it to this card, or purge it and exhaust 1 of that player’s agents. Treat agents attached to this card as if you owned them.",
         "source": "wftv"
     },
     {

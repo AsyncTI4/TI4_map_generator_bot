@@ -1,0 +1,34 @@
+{
+  "name": "lore-phase-fog-2p",
+  "description": "Fog game in the action phase with a burst of phase lore: 17 strategy-start map entries (3 in 101, which Sol sees; 14 in systems nobody sees), 2 strategy-start tg entries, 1 GM-only entry and 1 action-end tg entry.",
+  "fog": true,
+  "you": { "faction": "sol", "color": "blue", "home": "301", "units": { "101": "cv" } },
+  "seats": [
+    { "faction": "hacan", "color": "yellow", "home": "310" }
+  ],
+  "defaults": { "tg": 2, "ccs": "3/3/2" },
+  "start": "action",
+  "lore": [
+    "strategy#seen1;A rift opens near Wellon.;!unit red 1 infantry @101;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#seen2;A second rift opens.;!unit red 1 infantry @101;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#seen3;A third rift opens.;!unit red 1 infantry @101;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far1;Distant drums.;!unit red 1 infantry @312;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far2;Distant drums.;!unit red 1 infantry @312;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far3;Distant drums.;!unit red 1 infantry @314;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far4;Distant drums.;!unit red 1 infantry @314;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far5;Distant drums.;!unit red 1 infantry @315;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far6;Distant drums.;!unit red 1 infantry @315;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far7;Distant drums.;!unit red 1 infantry @317;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far8;Distant drums.;!unit red 1 infantry @317;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far9;Distant drums.;!unit red 1 infantry @208;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far10;Distant drums.;!unit red 1 infantry @208;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far11;Distant drums.;!unit red 1 infantry @209;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far12;Distant drums.;!unit red 1 infantry @210;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far13;Distant drums.;!unit red 1 infantry @211;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#far14;Distant drums.;!unit red 1 infantry @211;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#tg1;A windfall.;!tg +1;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#tg2;Another windfall.;!tg +1;ALL;PHASE_START;NO;ALWAYS",
+    "strategy#gm;Only the GM hears this.;!unit red 1 fighter @315;GM;PHASE_START;YES;ALWAYS",
+    "action#end;The action phase closes.;!tg +1;ALL;PHASE_END;NO;ALWAYS"
+  ]
+}

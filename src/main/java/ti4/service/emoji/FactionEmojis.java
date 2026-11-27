@@ -140,6 +140,11 @@ public enum FactionEmojis implements TI4Emoji {
     bloom,
     choir,
 
+    brynfolk,
+    jotunn,
+    vaettir,
+    valdyrjur,
+
     // luminous
     arachnera,
     psm,
@@ -475,6 +480,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "deep" -> deep;
             case "bloom" -> bloom;
             case "choir" -> choir;
+
+            case "brynfolk" -> brynfolk;
+            case "jotunn" -> jotunn;
+            case "vaettir" -> vaettir;
+            case "valdyrjur" -> valdyrjur;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;
