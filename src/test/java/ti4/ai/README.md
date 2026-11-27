@@ -288,7 +288,9 @@ The scenario self-play tests above and `AiSelfPlayTest.sixAiSeatsPlayTheirFirstR
 | Quick loop: every `ti4.ai` test except the games | `mvn -o test -Dtest='ti4.ai.**,!ti4.ai.runtime.*SelfPlayTest'` |
 | Everything in `ti4.ai` | `mvn -o test -Dtest='ti4.ai.**'` |
 | One scenario, or a replay of a failure | `mvn -o test -Dtest=LegendarySelfPlayTest -Dai.selfplay.seed=<seed from the report header>` |
-| The whole repository, as CI does | `mvn verify` |
+| The whole repository | `mvn -o test` (CI runs `mvn verify`, which adds SpotBugs) |
+
+Add `-Dspotless.check.skip=true` to skip the formatting check on local runs (run `mvn spotless:apply` before pushing).
 
 - **Two surefire executions** ([pom.xml](/pom.xml)). `default-test` runs every test without the `selfplay` tag in one JVM, one class after another, as before. `self-play` then runs the tagged tests (`**/*SelfPlayTest.java`) in `ai.selfplay.forks` JVMs (default 6, `reuseForks`), one class per JVM at a time, so the games play side by side and the wall time is about the slowest class rather than the sum. `-Dai.selfplay.forks=1` plays them one after another in one JVM.
 - **Why separate JVMs, not JUnit parallel execution.** `BaseTi4Test` puts its mock JDA back into `JdaService.jda` before every test, which would replace the `DiscordRouter` proxy under a game running in another thread; `GameManager`, `AiRuntime` and system properties (for example `AiSettingsTest`) are shared by the whole JVM, and about 180 test classes do not extend `BaseTi4Test`. Forks share none of it. On disk each game keeps its storage in its own temporary folder; a full `ti4.ai` run changed no file under `src/test/resources` or elsewhere in the worktree outside `target` (a whole-repository run rewrites `src/test/resources/global_settings.json` with the same content, as before). Classes the `self-play` execution filters out write no report, so the XML reports of the two executions do not overwrite each other.
@@ -308,7 +310,7 @@ The scenario self-play tests above and `AiSelfPlayTest.sixAiSeatsPlayTheirFirstR
 
 A game that would have passed between the new limit and the old one now fails. The slowest sampled game of each test is at least 2.6 times under its limit (Fracture stays at 1,500 because 1,000 left less than a factor of 2).
 
-**Wall time** of `mvn -o test -Dtest='ti4.ai.**'` on one 16-thread machine, compiled, before and after alternating, with two other self-play JVMs busy (about 2 of 16 threads): before 903 s and 981 s, after 362 s and 333 s (about 2.7 times faster). The ~4,700 other tests take about 40 s of that, the slowest game (Relic, Legendary or the first round, 140 to 240 s in a fork) most of the rest; one after another the games took 790 to 850 s. The quick loop took 125 s, of which about 80 s is Maven and Spring start-up (a single test class takes 82 s). A plain `mvn -o test` of the whole repository took 410 s (7,899 tests plus the 10 games).
+**Wall time** of `mvn -o test -Dtest='ti4.ai.**'` on one 16-thread machine, compiled, before and after alternating, with two other self-play JVMs busy (about 2 of 16 threads): before 903 s and 981 s, after 362 s and 333 s (about 2.7 times faster). The ~4,700 other tests take about 40 s of that, the slowest game (Relic, Legendary or the first round, 140 to 240 s in a fork) most of the rest; one after another the games took 790 to 850 s. The quick loop took 125 s, of which about 50 s is a full recompile that every run did even with nothing changed, and about 15 s the button-handler scan loading every library class in each test JVM (a single test class took 82 s); [PR 6254](https://github.com/AsyncTI4/TI4_map_generator_bot/pull/6254) on master fixes both (a single class then takes about 20 s). A plain `mvn -o test` of the whole repository took 410 s (7,899 tests plus the 10 games).
 
 ### Gated self-play tests (skipped by default)
 
