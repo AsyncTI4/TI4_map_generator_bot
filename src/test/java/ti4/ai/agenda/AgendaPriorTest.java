@@ -55,7 +55,7 @@ class AgendaPriorTest extends BaseTi4Test {
         assertThat(deck)
                 .isCloseTo(
                         Math.clamp(
-                                AgendaPrior.PIVOTAL_SHARE * AgendaPrior.deckSpread(test.game, sol) / tableVotes,
+                                AgendaPrior.PIVOTAL_SHARE * AgendaPrior.fullDeckSpread(test.game, sol) / tableVotes,
                                 AgendaPrior.MIN_VOTE,
                                 AgendaPrior.MAX_VOTE),
                         within(1e-9));

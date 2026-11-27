@@ -224,6 +224,7 @@ final class SelfPlayGame {
     private boolean relicsHandedOut;
     private final FractureTracker fracture;
     private String probedTurn = "";
+    private String probedAgenda = "";
     private ManagedGame observedManaged;
     private Game observedGame;
     private int fleetLogRound;
@@ -467,6 +468,23 @@ final class SelfPlayGame {
         }
     }
 
+    // -Dai.selfplay.agendaprior=true: one line per seat for each agenda, at the first harness step that sees it.
+    private void probeAgendaPrior(Game game) {
+        if (!ti4.ai.agenda.AgendaPriorProbe.enabled()) return;
+        String phase = game.getPhaseOfGame();
+        String info = game.getCurrentAgendaInfo();
+        if (phase == null || !phase.toLowerCase(java.util.Locale.ROOT).startsWith("agenda")) return;
+        if (info == null || info.isBlank()) return;
+        String agenda = game.getRound() + "|" + info;
+        if (probedAgenda.equals(agenda)) return;
+        probedAgenda = agenda;
+        try {
+            ti4.ai.agenda.AgendaPriorProbe.report(name, game).forEach(System.out::println);
+        } catch (RuntimeException e) {
+            System.out.println(ti4.ai.agenda.AgendaPriorProbe.PREFIX + " error " + e);
+        }
+    }
+
     Outcome run(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks) {
         env.markStart();
         if (lane == null) lane = new AiLane(name);
@@ -536,6 +554,7 @@ final class SelfPlayGame {
                     fracture.observe(game);
                     mark = harness.add("track.fracture", mark);
                     probeStyx(game);
+                    probeAgendaPrior(game);
                     logFleets(game);
                     logResearchPlans(game);
                     mark = harness.add("track.logs", mark);

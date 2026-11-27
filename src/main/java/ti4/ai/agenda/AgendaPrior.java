@@ -103,7 +103,7 @@ public class AgendaPrior {
                 () -> deckAverage(game, agenda -> expected(game, seat, agenda)), DECK_EXPECTED_MEMO, seat);
     }
 
-    static double deckSpread(Game game, Player seat) {
+    static double fullDeckSpread(Game game, Player seat) {
         return SearchMemo.remember(
                 () -> deckAverage(game, agenda -> spread(game, seat, agenda)), DECK_SPREAD_MEMO, seat);
     }
@@ -124,7 +124,7 @@ public class AgendaPrior {
     }
 
     private static double perVote(Game game, Player seat, Optional<String> agenda) {
-        double spread = agenda.map(known -> spread(game, seat, known)).orElseGet(() -> deckSpread(game, seat));
+        double spread = agenda.map(known -> spread(game, seat, known)).orElseGet(() -> fullDeckSpread(game, seat));
         int tableVotes = game.getRealPlayers().stream()
                 .mapToInt(player -> VoteCapacity.of(game, player))
                 .sum();
