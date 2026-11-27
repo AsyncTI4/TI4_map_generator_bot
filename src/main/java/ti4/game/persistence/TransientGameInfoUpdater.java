@@ -7,6 +7,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.Bl
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -41,6 +42,7 @@ class TransientGameInfoUpdater {
             MigoUnitHandler.syncNevermen(game);
             MigoLeadersHandler.syncMigoCommanderBonus(game);
             for (Player player : game.getRealPlayers()) {
+                BrynfolkAbilityHandler.syncBlotLegendaryAbility(player, game);
                 BloomAbilityHandler.syncCoexistingAbilities(game, player);
                 MigoAbilityHandler.syncHarvestCards(game, player);
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);

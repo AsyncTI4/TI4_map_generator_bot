@@ -51,6 +51,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnPromissoryHandler;
@@ -1384,6 +1385,9 @@ public class CombatRollService {
                 CommanderUnlockCheckService.checkPlayer(player, "ashen");
             }
             if (AshenBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
+                return h;
+            }
+            if (BrynfolkBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
                 return h;
             }
             if (h > 0) {

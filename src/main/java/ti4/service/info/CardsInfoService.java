@@ -73,6 +73,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
 import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -348,6 +349,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumAgent.addCardsInfoButton(buttons, player);
+        }
+        if (player.hasUnexhaustedLeader("brynfolkagent")) {
+            BrynfolkAgent.addCardsInfoButton(buttons, player);
         }
         if (player.hasUnexhaustedLeader("empyreanagent")) {
             buttons.add(Buttons.gray(
