@@ -27,9 +27,9 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    // Passing first rounds took 575 to 721 ticks; a game at about 4 ticks a second that cannot reach
-    // round 2 fails within minutes at this limit instead of running for 20 (the limit was 5,000 until 2026-11-26).
-    private static final int FIRST_ROUND_MAX_TICKS = 2000;
+    // Passing first rounds took 575 to 857 ticks (7 seeds); a game at about 4 ticks a second that cannot reach
+    // round 2 fails within about 10 minutes at this limit instead of 20 (the limit was 5,000 until 2026-11-27).
+    private static final int FIRST_ROUND_MAX_TICKS = 2500;
 
     @Test
     @Tag("selfplay")

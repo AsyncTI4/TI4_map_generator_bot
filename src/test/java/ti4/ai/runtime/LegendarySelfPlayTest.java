@@ -28,7 +28,7 @@ class LegendarySelfPlayTest extends BaseTi4Test {
     private static final Set<String> EXPECTED = Set.of("mallice", "hopesend", "primor", "ordinian");
     private static final Set<String> ANSWERS = Set.of("mallice", "placeOneNDone");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    // Passing games took 610 to 651 ticks, all in round 1; the limit was 4,000 until 2026-11-26.
+    // Passing games took 528 to 654 ticks over 7 seeds, all in round 1; the limit was 4,000 until 2026-11-27.
     private static final int MAX_TICKS = 1800;
     private static final String ACTION = "action";
 

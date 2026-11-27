@@ -30,8 +30,8 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    // Passing games took 20 to 305 ticks (wash 63 to 305, Trade and Convoys under 30); the limit was 3,000 until
-    // 2026-11-26.
+    // Passing games took 20 to 305 ticks over 7 seeds (wash 63 to 305, Trade and Convoys under 35); the limit
+    // was 3,000 until 2026-11-27.
     private static final int MAX_TICKS = 1000;
     private static final int TRADE = 5;
     private static final int WASHED = 3;

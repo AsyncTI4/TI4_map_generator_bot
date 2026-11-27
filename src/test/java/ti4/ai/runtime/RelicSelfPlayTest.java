@@ -28,8 +28,8 @@ class RelicSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    // Passing games took 627 to 707 ticks, all ending in the round-1 status phase; the limit was 6,000 until
-    // 2026-11-26.
+    // Passing games took 627 to 758 ticks over 7 seeds, all ending in the round-1 status phase; the limit was
+    // 6,000 until 2026-11-27.
     private static final int MAX_TICKS = 2000;
     private static final String ACTION = "action";
     private static final Set<String> EXPECTED_HANDLERS =
