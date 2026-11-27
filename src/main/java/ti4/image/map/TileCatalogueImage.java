@@ -1,7 +1,5 @@
 package ti4.image.map;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -19,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,6 +31,8 @@ import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageEncoder;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -104,8 +105,7 @@ public final class TileCatalogueImage {
     private static final int LABEL_BASELINE = 138;
     private static final int LABEL_MAX_FONT = 52;
     private static final int LABEL_MIN_FONT = 22;
-    private static final Cache<String, byte[]> RENDERED =
-            Caffeine.newBuilder().maximumSize(8).build();
+    private static final ReentrantLock RENDERING = new ReentrantLock();
 
     private TileCatalogueImage() {}
 
@@ -116,11 +116,21 @@ public final class TileCatalogueImage {
                 .toList();
     }
 
-    public static FileUpload upload(Collection<TileModel> tiles) {
-        List<TileModel> shown = catalogued(tiles);
-        String key = shown.stream().map(TileModel::getId).sorted().collect(Collectors.joining(","));
-        byte[] bytes = RENDERED.get(key, ignored -> ImageEncoder.webp(render(shown)));
-        return ImageUploads.createFileUpload(bytes, "tile_catalogue", "webp");
+    public static Optional<FileUpload> upload(Collection<TileModel> tiles) {
+        if (!RENDERING.tryLock()) {
+            return Optional.empty();
+        }
+        try {
+            List<TileModel> shown = catalogued(tiles);
+            byte[] bytes = ImageHelper.leavingCacheAsFound(artPaths(shown), () -> ImageEncoder.webp(render(shown)));
+            return Optional.of(ImageUploads.createFileUpload(bytes, "tile_catalogue", "webp"));
+        } finally {
+            RENDERING.unlock();
+        }
+    }
+
+    private static List<String> artPaths(Collection<TileModel> tiles) {
+        return tiles.stream().map(ImageResources::tilePath).toList();
     }
 
     static BufferedImage render(Collection<TileModel> tiles) {

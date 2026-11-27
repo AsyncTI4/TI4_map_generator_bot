@@ -8,9 +8,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.executors.CircuitBreaker;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
-import ti4.image.map.MapRenderPipeline;
 import ti4.image.map.TileCatalogueImage;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
@@ -31,6 +33,7 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
     private static final String WITH_SUPERNOVA = "with_supernova";
     private static final String WITH_LEGENDARIES = "with_legendary_planets";
     private static final String AS_IMAGE = "image";
+    private static final int CATALOGUE_TIME_WARNING_SECONDS = 60;
 
     public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");
@@ -133,10 +136,25 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
             MessageHelper.sendMessageToChannel(channel, "No tiles match those filters.");
             return;
         }
+        if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(channel)) {
+            return;
+        }
         MessageHelper.sendMessageToChannel(channel, "Drawing " + shown.size() + " tiles, grouped by type...");
-        MapRenderPipeline.queueDetachedImage(
-                "Tile catalogue",
-                () -> TileCatalogueImage.upload(shown),
-                upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
+        ExecutorServiceManager.runAsync(
+                "tile catalogue", CATALOGUE_TIME_WARNING_SECONDS, () -> postCatalogue(channel, shown));
+    }
+
+    private static void postCatalogue(MessageChannel channel, List<TileModel> tiles) {
+        try {
+            TileCatalogueImage.upload(tiles)
+                    .ifPresentOrElse(
+                            upload -> MessageHelper.sendFileUploadToChannel(channel, upload),
+                            () -> MessageHelper.sendMessageToChannel(
+                                    channel,
+                                    "Another tile picture is being drawn right now. Try again in a few seconds."));
+        } catch (Exception e) {
+            BotLogger.error("Could not draw the tile catalogue.", e);
+            MessageHelper.sendMessageToChannel(channel, "Could not draw the tile picture. See the bot log.");
+        }
     }
 }

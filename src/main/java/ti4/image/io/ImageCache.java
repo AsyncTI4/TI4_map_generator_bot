@@ -3,6 +3,7 @@ package ti4.image.io;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
@@ -47,6 +48,14 @@ class ImageCache {
             BotLogger.error("Unable to load from image cache.", e);
         }
         return null;
+    }
+
+    boolean isStaticImageCached(String key) {
+        return fileImageCache.getIfPresent(key) != null;
+    }
+
+    void evictStaticImages(Collection<String> keys) {
+        fileImageCache.invalidateAll(keys);
     }
 
     BufferedImage getOrLoadExpiringImage(String key, Function<String, BufferedImage> loader) {
