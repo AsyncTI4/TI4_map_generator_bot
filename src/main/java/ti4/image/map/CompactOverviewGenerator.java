@@ -540,7 +540,17 @@ public final class CompactOverviewGenerator {
             List<TileStep> steps,
             String header,
             Options options) {
-        Layout layout = layout(groups, header, options);
+        return render(game, layout(groups, header, options), tiles, tileLayers, steps, header, options);
+    }
+
+    static BufferedImage render(
+            Game game,
+            Layout layout,
+            Map<String, Tile> tiles,
+            TileLayers tileLayers,
+            List<TileStep> steps,
+            String header,
+            Options options) {
         BufferedImage image = layout.canvas().newImage();
         Graphics2D graphics = OverviewStyle.smoothGraphics(image);
         try {
