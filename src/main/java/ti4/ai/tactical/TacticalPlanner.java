@@ -42,6 +42,7 @@ import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MoveEnablers;
+import ti4.ai.eval.MovementAssumptions;
 import ti4.ai.eval.MovementCard;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.RiftRisk;
@@ -395,29 +396,34 @@ public class TacticalPlanner {
 
     private static List<TacticalPlan> sharedRanking(Context context, Predicate<Tile> activatable) {
         return DecisionMemo.remember(
-                () -> SaveMemo.remember(
-                        context.game,
-                        unsavedState(context.game),
-                        () -> List.copyOf(rankedCandidates(context, activatable)),
+                        () -> SaveMemo.answer(
+                                context.game,
+                                unsavedState(context.game),
+                                () -> List.copyOf(rankedCandidates(context, activatable)),
+                                "tactical.ranking",
+                                context.seat.getFaction(),
+                                DecidingSeat.currentUserId(),
+                                context.freed,
+                                context.hints,
+                                context.tokenFree,
+                                FleetLimit.ships(context.seat),
+                                MoveBoost.extra(context.seat),
+                                ShipSpeed.flankSpeedPlayed(context.game, context.seat, activeSystem(context.game)),
+                                MoveEnablers.key(context.game, context.seat),
+                                MovementAssumptions.key(),
+                                SkippedSpaceCombat.assumedFaction()),
                         "tactical.ranking",
-                        context.seat.getFaction(),
-                        DecidingSeat.currentUserId(),
+                        context.seat,
                         context.freed,
                         context.hints,
                         context.tokenFree,
                         FleetLimit.ships(context.seat),
                         MoveBoost.extra(context.seat),
-                        SkippedSpaceCombat.assumedFaction()),
-                "tactical.ranking",
-                context.seat,
-                context.freed,
-                context.hints,
-                context.tokenFree,
-                FleetLimit.ships(context.seat),
-                MoveBoost.extra(context.seat),
-                ShipSpeed.flankSpeedPlayed(context.game, context.seat, activeSystem(context.game)),
-                MoveEnablers.key(context.game, context.seat),
-                SkippedSpaceCombat.assumedFaction());
+                        ShipSpeed.flankSpeedPlayed(context.game, context.seat, activeSystem(context.game)),
+                        MoveEnablers.key(context.game, context.seat),
+                        MovementAssumptions.key(),
+                        SkippedSpaceCombat.assumedFaction())
+                .reported();
     }
 
     @Nullable

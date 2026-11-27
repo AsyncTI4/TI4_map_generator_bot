@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.actioncards.AiCard.Window;
+import ti4.ai.brain.Reentry;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.ImaginedTurn;
@@ -213,7 +214,8 @@ public class ActionCardValue {
 
     private static List<DiscardKey> discardKeys(Game game, Player seat) {
         Set<String> ranking = RANKING_THE_HAND.get();
-        boolean reentered = !ranking.add(seat.getFaction());
+        boolean reentered = Reentry.cutsShort(handRanking(seat), !ranking.add(seat.getFaction()));
+        if (!reentered) Reentry.enter(handRanking(seat));
         try (Thinking.Span ignored = Thinking.enter("cards.discardOrder")) {
             return ImaginedTurn.actionCards(seat).keySet().stream()
                     .map(alias -> new DiscardKey(
@@ -227,8 +229,15 @@ public class ActionCardValue {
                             .thenComparing(DiscardKey::alias))
                     .toList();
         } finally {
-            if (!reentered) ranking.remove(seat.getFaction());
+            if (!reentered) {
+                ranking.remove(seat.getFaction());
+                Reentry.exit(handRanking(seat));
+            }
         }
+    }
+
+    private static String handRanking(Player seat) {
+        return "cards.discardOrder|" + seat.getFaction();
     }
 
     private static double timedKeep(Game game, Player seat, String alias) {

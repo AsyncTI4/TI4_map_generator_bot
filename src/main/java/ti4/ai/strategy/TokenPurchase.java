@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.actioncards.ActionCardRules;
+import ti4.ai.brain.Reentry;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.expedition.ExpeditionUnlock;
@@ -31,6 +32,7 @@ public class TokenPurchase {
     static final int MAX_TOKENS = 3;
     static final int CUSTODIANS_COST = 6;
     private static final ThreadLocal<Boolean> ESTIMATING_PLANS = ThreadLocal.withInitial(() -> false);
+    private static final String ESTIMATING_PLANS_GUARD = "strategy.estimatingPlans";
 
     record Purchase(int tokens, Wallet.Payment payment) {}
 
@@ -94,29 +96,33 @@ public class TokenPurchase {
     }
 
     static boolean estimatingPlans() {
-        return ESTIMATING_PLANS.get();
+        return Reentry.cutsShort(ESTIMATING_PLANS_GUARD, ESTIMATING_PLANS.get());
     }
 
     static SpendCost technologyFollowToKeep(Game game, Player seat, Wallet wallet) {
         if (!AiExperiments.enabled(seat, AiExperiments.Experiment.TECH_FOLLOW_KEEP)) return SpendCost.NONE;
-        if (ESTIMATING_PLANS.get()) return SpendCost.NONE;
+        if (estimatingPlans()) return SpendCost.NONE;
         ESTIMATING_PLANS.set(true);
+        Reentry.enter(ESTIMATING_PLANS_GUARD);
         try {
             SpendCost follow = TechnologyFollowReserve.of(game, seat);
             return wallet.canPay(follow) ? follow : SpendCost.NONE;
         } finally {
             ESTIMATING_PLANS.set(false);
+            Reentry.exit(ESTIMATING_PLANS_GUARD);
         }
     }
 
     private static SpendCost kept(Game game, Player seat, Wallet wallet) {
         SpendCost scoring = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
-        if (ESTIMATING_PLANS.get()) return scoring;
+        if (estimatingPlans()) return scoring;
         ESTIMATING_PLANS.set(true);
+        Reentry.enter(ESTIMATING_PLANS_GUARD);
         try {
             return withPlans(game, seat, wallet, scoring);
         } finally {
             ESTIMATING_PLANS.set(false);
+            Reentry.exit(ESTIMATING_PLANS_GUARD);
         }
     }
 

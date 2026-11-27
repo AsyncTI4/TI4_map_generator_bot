@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.Reentry;
 import ti4.ai.trace.Thinking;
 
 @UtilityClass
@@ -16,8 +17,10 @@ public class ExploreDeck {
 
     private static final ThreadLocal<Integer> ESTIMATING = ThreadLocal.withInitial(() -> 0);
 
+    private static final String ESTIMATING_GUARD = "explore.estimating";
+
     static boolean estimating() {
-        return ESTIMATING.get() > 0;
+        return Reentry.cutsShort(ESTIMATING_GUARD, ESTIMATING.get() > 0);
     }
 
     public static double expectedValue(ExploreSite site, String trait) {
@@ -33,12 +36,14 @@ public class ExploreDeck {
         Map<String, Double> valueByKind = new HashMap<>();
         double total = 0;
         ESTIMATING.set(ESTIMATING.get() + 1);
+        Reentry.enter(ESTIMATING_GUARD);
         try {
             for (String card : deck) {
                 total += valueByKind.computeIfAbsent(CardValue.kind(card), kind -> CardValue.of(card, site));
             }
         } finally {
             ESTIMATING.set(ESTIMATING.get() - 1);
+            Reentry.exit(ESTIMATING_GUARD);
         }
         return total / deck.size();
     }

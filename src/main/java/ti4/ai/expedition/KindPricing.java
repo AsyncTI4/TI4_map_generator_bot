@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.brain.Reentry;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectiveValue;
@@ -167,7 +168,11 @@ class KindPricing {
             CachedKeeps cached = KEEPS.get(key);
             if (cached != null && cached.isFor(game)) return cached.keeps();
             Set<String> hand = ImaginedTurn.actionCards(seat).keySet();
-            if (!hand.isEmpty() && PRICING_EACH_CARD.get().contains(seat)) return keepPriors(hand);
+            if (!hand.isEmpty()
+                    && Reentry.cutsShort(
+                            pricingEachCard(seat), PRICING_EACH_CARD.get().contains(seat))) {
+                return keepPriors(hand);
+            }
             List<Double> keeps = keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat));
             if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
             KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
@@ -178,13 +183,21 @@ class KindPricing {
     private static List<Double> keepValuesInOrder(Game game, Player seat, List<String> order) {
         Set<Player> pricing = PRICING_EACH_CARD.get();
         boolean outermost = pricing.add(seat);
+        if (outermost) Reentry.enter(pricingEachCard(seat));
         try {
             return order.stream()
                     .map(alias -> ActionCardValue.keepValue(game, seat, alias))
                     .toList();
         } finally {
-            if (outermost) pricing.remove(seat);
+            if (outermost) {
+                pricing.remove(seat);
+                Reentry.exit(pricingEachCard(seat));
+            }
         }
+    }
+
+    private static String pricingEachCard(Player seat) {
+        return "expedition.pricingEachCard|" + seat.getFaction();
     }
 
     private static List<Double> keepPriors(Set<String> hand) {

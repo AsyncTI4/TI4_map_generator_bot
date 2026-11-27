@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import ti4.ai.brain.Reentry;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
@@ -39,6 +40,7 @@ record PlanInputs(
     private static final int MAX_CACHED = 32;
     private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
     private static final ThreadLocal<Boolean> RANKING_FREED = ThreadLocal.withInitial(() -> false);
+    private static final String RANKING_FREED_GUARD = "strategy.rankingFreed";
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Cached> eldest) {
@@ -60,12 +62,15 @@ record PlanInputs(
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        if (!COMPUTING.get().add(key)) return withoutPlans(game, seat, moment);
+        String guard = "strategy.planInputs|" + key;
+        if (Reentry.cutsShort(guard, !COMPUTING.get().add(key))) return withoutPlans(game, seat, moment);
         PlanInputs inputs;
+        Reentry.enter(guard);
         try {
             inputs = compute(game, seat, moment);
         } finally {
             COMPUTING.get().remove(key);
+            Reentry.exit(guard);
         }
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
@@ -149,14 +154,16 @@ record PlanInputs(
             Map<String, List<TacticalPlan>> freeing, String position, Function<String, List<TacticalPlan>> rank) {
         List<TacticalPlan> known = freeing.get(position);
         if (known != null) return known;
-        if (RANKING_FREED.get()) return List.of();
+        if (Reentry.cutsShort(RANKING_FREED_GUARD, RANKING_FREED.get())) return List.of();
         RANKING_FREED.set(true);
+        Reentry.enter(RANKING_FREED_GUARD);
         try {
             List<TacticalPlan> ranked = rank.apply(position);
             List<TacticalPlan> raced = freeing.putIfAbsent(position, ranked);
             return raced != null ? raced : ranked;
         } finally {
             RANKING_FREED.set(false);
+            Reentry.exit(RANKING_FREED_GUARD);
         }
     }
 
