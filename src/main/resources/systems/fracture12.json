@@ -7,7 +7,7 @@
         "frac12"
     ],
     "hasEgress": true,
-    "isRift": true,
+    "isGravityRift": true,
     "imagePath": "fracture12.png",
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",

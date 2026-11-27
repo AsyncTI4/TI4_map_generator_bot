@@ -18,7 +18,7 @@
         "y": 95.0
     },
     "resources": 4,
-    "influence": 2,
+    "influence": 1,
     "factionHomeworld": "vaettir",
     "planetType": "FACTION",
     "cardImagePath": null,

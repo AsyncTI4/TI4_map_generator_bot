@@ -7,7 +7,7 @@
         "frac28",
         "fracrift"
     ],
-    "isRift": true,
+    "isGravityRift": true,
     "imagePath": "fracture28.png",
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",

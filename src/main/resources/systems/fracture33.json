@@ -8,7 +8,7 @@
         "astroidfrac"
     ],
     "hasEgress": true,
-    "isAstroid": true,
+    "isAsteroidField": true,
     "imagePath": "fracture33.png",
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",

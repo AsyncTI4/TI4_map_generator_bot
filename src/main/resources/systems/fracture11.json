@@ -9,7 +9,7 @@
     "imagePath": "fracture11.png",
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",
-    "isAstroid": true,
+    "isAsteroidField": true,
     "isFracture": true,
     "source": "merford"
 }

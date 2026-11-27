@@ -29,10 +29,11 @@
         }
     ],
     "hasEgress": true,
-    "hasingress": true,
+    "hasIngress": true,
     "planets": [
         "demeterii"
     ],
     "source": "merford",
-    "tileBack": "black"
+    "tileBack": "fracture",
+    "isFracture": true
 }

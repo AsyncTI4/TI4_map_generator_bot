@@ -20,7 +20,9 @@
     "factionHomeworld": null,
     "planetType": "HAZARDOUS",
     "cardImagePath": null,
-    "techSpecialties": null,
+    "techSpecialties": [
+        "BIOTIC"
+    ],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {

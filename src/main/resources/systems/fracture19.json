@@ -8,7 +8,7 @@
         "nebfrac"
     ],
     "imagePath": "fracture19.png",
-    "isNebulae": true,
+    "isNebula": true,
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",
     "isFracture": true,
