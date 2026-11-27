@@ -1,0 +1,153 @@
+{
+  "id": "20261126-2149-styx-batch-tracker-memo",
+  "kind": "benchmark",
+  "question": "Does the tracker memo fix remove the batch slowdown under 10-thread load? Same 32 games, 10 threads, seed 9700 and Fracture as styx-take-rate (513e5d1, 31095 s batch wall, game 2 = seed 9701 took 28123 s, games 1-2 h otherwise), with only the fix added (92289cc6a4 on claude/ai-replay-9701: isolated harness memo, plan inputs kept per decision) plus HARNESS timing. Compare per-game wall time and harness share; the fix can change some games' play, so compare times, not outcomes.",
+  "started": "2026-11-27T02:49:19.042192600Z",
+  "finished": "2026-11-27T09:53:28.416361400Z",
+  "status": "finished",
+  "code": {
+    "commit": "92289cc6a4f849d793914b458e28dcea9a46265d",
+    "commitSubject": "Keep the harness's AI probes in an isolated memo and keep plan inputs for the whole decision",
+    "commitDate": "2026-11-26T20:19:11-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261126-214718-styx-batch-tracker-memo",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 32,
+    "threads": 10,
+    "baseSeed": 9700,
+    "seedFixed": true,
+    "experimentsUnderTest": null,
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "POOLED_BOOST_RESPLIT",
+      "TECH_FOLLOW_KEEP",
+      "DIPLOMACY_READIED_PLANNING",
+      "XXCHA_LEADER_READIES"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.fracture": "true",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "32",
+      "ai.selfplay.queue.id": "20261126-214718-styx-batch-tracker-memo",
+      "ai.selfplay.record": "true",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\replay-9701\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "styx-batch-tracker-memo",
+      "ai.selfplay.record.question": "Does the tracker memo fix remove the batch slowdown under 10-thread load? Same 32 games, 10 threads, seed 9700 and Fracture as styx-take-rate (513e5d1, 31095 s batch wall, game 2 = seed 9701 took 28123 s, games 1-2 h otherwise), with only the fix added (92289cc6a4 on claude/ai-replay-9701: isolated harness memo, plan inputs kept per decision) plus HARNESS timing. Compare per-game wall time and harness share; the fix can change some games' play, so compare times, not outcomes.",
+      "ai.selfplay.seed": "9700",
+      "ai.selfplay.threads": "10",
+      "ai.timing": "true"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "batch": {
+    "games": 32,
+    "batchWallSeconds": 25448,
+    "endings": {
+      "VICTORY_POINTS": 32
+    },
+    "averageFinalRound": 5.75,
+    "averageLeaderPoints": 10.188,
+    "averageTablePoints": 45.156,
+    "averageGameWallSeconds": 6878.5,
+    "wallMillisPerTick": 1402.541
+  },
+  "data": "games.csv",
+  "verdict": "pending",
+  "queue": {
+    "id": "20261126-214718-styx-batch-tracker-memo",
+    "submittedBy": "replay-9701-session",
+    "sourceWorktree": "C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/replay-9701",
+    "sourceBranch": "claude/ai-replay-9701",
+    "submittedAt": "2026-11-27T02:47:18.455Z",
+    "approvedAt": "2026-11-27T02:47:18.455Z",
+    "startedAt": "2026-11-27T02:47:19.168Z",
+    "finishedAt": "2026-11-27T09:53:30.515Z",
+    "waitHours": 0,
+    "runHours": 7.1,
+    "estimateHours": 9,
+    "exitCode": 0,
+    "status": "done",
+    "load": {
+      "samples": 86,
+      "cpuPercentAverage": 88,
+      "cpuPercentMax": 100,
+      "samplesWithOtherBuilds": 86,
+      "otherBuildWorktrees": [
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/ai-styx",
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/savememo-baseline",
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/test-speed-baseline",
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/xenodochial-pike-095907"
+      ],
+      "otherJavaProcessesMax": 0
+    },
+    "mavenArguments": [
+      "-o",
+      "test",
+      "-Dspotless.skip=true",
+      "-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames",
+      "-Dsurefire.failIfNoSpecifiedTests=false",
+      "-Dai.selfplay.full=true",
+      "-Dai.selfplay.games=32",
+      "-Dai.selfplay.threads=10",
+      "-Dai.selfplay.seed=9700",
+      "-Dai.selfplay.fracture=true",
+      "-Dai.timing=true",
+      "-Dai.selfplay.record=true",
+      "-Dai.selfplay.record.label=styx-batch-tracker-memo",
+      "-Dai.selfplay.record.question=Does the tracker memo fix remove the batch slowdown under 10-thread load? Same 32 games, 10 threads, seed 9700 and Fracture as styx-take-rate (513e5d1, 31095 s batch wall, game 2 = seed 9701 took 28123 s, games 1-2 h otherwise), with only the fix added (92289cc6a4 on claude/ai-replay-9701: isolated harness memo, plan inputs kept per decision) plus HARNESS timing. Compare per-game wall time and harness share; the fix can change some games' play, so compare times, not outcomes.",
+      "-Dai.selfplay.record.dir=C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\replay-9701\\docs\\ai\\experiments",
+      "-Dai.selfplay.queue.id=20261126-214718-styx-batch-tracker-memo"
+    ]
+  }
+}

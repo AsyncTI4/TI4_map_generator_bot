@@ -1,0 +1,151 @@
+{
+  "id": "20261126-1920-replay-9701-tracker-memo",
+  "kind": "benchmark",
+  "question": "Does the isolated harness memo and per-decision PlanInputs memo (claude/ai-tracker-memo e204f695c7) remove the agenda tracker's between-tick cost? Seed 9701 (slot 1 of seed 9700) alone with HARNESS timing. Before, at 513e5d1 alone: track.agendas 987 s of 1004 s harness CPU, 7758 s game CPU, 6752 s in decisions. The code differs from that run, so the game may play differently; compare the harness share, not the exact game.",
+  "started": "2026-11-27T00:20:34.373343600Z",
+  "finished": "2026-11-27T00:44:40.882603300Z",
+  "status": "finished",
+  "code": {
+    "commit": "e204f695c7c5d06e05dd89552e085407344ec856",
+    "commitSubject": "Keep the harness's AI probes in an isolated memo and keep plan inputs for the whole decision",
+    "commitDate": "2026-11-26T17:46:57-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261126-180906-replay-9701-tracker-memo",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 1,
+    "threads": 1,
+    "baseSeed": 9700,
+    "seedFixed": true,
+    "experimentsUnderTest": null,
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "TECH_FOLLOW_KEEP",
+      "DIPLOMACY_READIED_PLANNING",
+      "XXCHA_LEADER_READIES"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.firstslot": "1",
+      "ai.selfplay.fracture": "true",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "1",
+      "ai.selfplay.queue.id": "20261126-180906-replay-9701-tracker-memo",
+      "ai.selfplay.record": "true",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-tracker-memo\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "replay-9701-tracker-memo",
+      "ai.selfplay.record.question": "Does the isolated harness memo and per-decision PlanInputs memo (claude/ai-tracker-memo e204f695c7) remove the agenda tracker's between-tick cost? Seed 9701 (slot 1 of seed 9700) alone with HARNESS timing. Before, at 513e5d1 alone: track.agendas 987 s of 1004 s harness CPU, 7758 s game CPU, 6752 s in decisions. The code differs from that run, so the game may play differently; compare the harness share, not the exact game.",
+      "ai.selfplay.seed": "9700",
+      "ai.selfplay.threads": "1",
+      "ai.timing": "true"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "batch": {
+    "games": 1,
+    "batchWallSeconds": 1448,
+    "endings": {
+      "VICTORY_POINTS": 1
+    },
+    "averageFinalRound": 5,
+    "averageLeaderPoints": 10,
+    "averageTablePoints": 45,
+    "averageGameWallSeconds": 1447,
+    "wallMillisPerTick": 303.8
+  },
+  "data": "games.csv",
+  "verdict": "pending",
+  "queue": {
+    "id": "20261126-180906-replay-9701-tracker-memo",
+    "submittedBy": "replay-9701-session",
+    "sourceWorktree": "C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/ai-tracker-memo",
+    "sourceBranch": "claude/ai-tracker-memo",
+    "submittedAt": "2026-11-26T23:09:06.361Z",
+    "approvedAt": "2026-11-26T23:09:06.361Z",
+    "startedAt": "2026-11-27T00:19:01.785Z",
+    "finishedAt": "2026-11-27T00:44:43.046Z",
+    "waitHours": 1.17,
+    "runHours": 0.43,
+    "estimateHours": 3,
+    "exitCode": 0,
+    "status": "done",
+    "load": {
+      "samples": 6,
+      "cpuPercentAverage": 48,
+      "cpuPercentMax": 69,
+      "samplesWithOtherBuilds": 4,
+      "otherBuildWorktrees": [
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/ai-styx"
+      ],
+      "otherJavaProcessesMax": 0
+    },
+    "mavenArguments": [
+      "-o",
+      "test",
+      "-Dspotless.skip=true",
+      "-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames",
+      "-Dsurefire.failIfNoSpecifiedTests=false",
+      "-Dai.selfplay.full=true",
+      "-Dai.selfplay.games=1",
+      "-Dai.selfplay.threads=1",
+      "-Dai.selfplay.firstslot=1",
+      "-Dai.selfplay.seed=9700",
+      "-Dai.selfplay.fracture=true",
+      "-Dai.timing=true",
+      "-Dai.selfplay.record=true",
+      "-Dai.selfplay.record.label=replay-9701-tracker-memo",
+      "-Dai.selfplay.record.question=Does the isolated harness memo and per-decision PlanInputs memo (claude/ai-tracker-memo e204f695c7) remove the agenda tracker's between-tick cost? Seed 9701 (slot 1 of seed 9700) alone with HARNESS timing. Before, at 513e5d1 alone: track.agendas 987 s of 1004 s harness CPU, 7758 s game CPU, 6752 s in decisions. The code differs from that run, so the game may play differently; compare the harness share, not the exact game.",
+      "-Dai.selfplay.record.dir=C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-tracker-memo\\docs\\ai\\experiments",
+      "-Dai.selfplay.queue.id=20261126-180906-replay-9701-tracker-memo"
+    ]
+  }
+}
