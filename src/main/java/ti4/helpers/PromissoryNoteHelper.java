@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
@@ -210,7 +211,8 @@ public class PromissoryNoteHelper {
     private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
-            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)
+                    || BrynfolkPromissoryHandler.isAlthingBarristers(pnShortHand)) {
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -242,6 +244,13 @@ public class PromissoryNoteHelper {
         if ("bmfNotHand".equals(id)) {
             fromHand = false;
             id = "bmf";
+        }
+
+        if (BrynfolkPromissoryHandler.isAlthingBarristers(id)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_Althing Barristers_ can only be played while you are selecting planets for voting.");
+            return;
         }
 
         if (id.contains("dspnflor")) {

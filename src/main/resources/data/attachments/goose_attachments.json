@@ -26,5 +26,101 @@
         "imagePath": "attachment_root_hazardous.png",
         "isFakeAttachment": true,
         "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_1",
+        "name": "Blot: +1 Resources",
+        "imagePath": "attachment_blot_positive_resource_1.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_2",
+        "name": "Blot: +2 Resources",
+        "imagePath": "attachment_blot_positive_resource_2.png",
+        "resourcesModifier": 2,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_3",
+        "name": "Blot: +3 Resources",
+        "imagePath": "attachment_blot_positive_resource_3.png",
+        "resourcesModifier": 3,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_4",
+        "name": "Blot: +4 Resources",
+        "imagePath": "attachment_blot_positive_resource_4.png",
+        "resourcesModifier": 4,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_5",
+        "name": "Blot: +5 Resources",
+        "imagePath": "attachment_blot_positive_resource_5.png",
+        "resourcesModifier": 5,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_resource_6",
+        "name": "Blot: +6 Resources",
+        "imagePath": "attachment_blot_positive_resource_6.png",
+        "resourcesModifier": 6,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_1",
+        "name": "Blot: +1 Influence",
+        "imagePath": "attachment_blot_positive_influence_1.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_2",
+        "name": "Blot: +2 Influence",
+        "imagePath": "attachment_blot_positive_influence_2.png",
+        "influenceModifier": 2,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_3",
+        "name": "Blot: +3 Influence",
+        "imagePath": "attachment_blot_positive_influence_3.png",
+        "influenceModifier": 3,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_4",
+        "name": "Blot: +4 Influence",
+        "imagePath": "attachment_blot_positive_influence_4.png",
+        "influenceModifier": 4,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_5",
+        "name": "Blot: +5 Influence",
+        "imagePath": "attachment_blot_positive_influence_5.png",
+        "influenceModifier": 5,
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "blot_positive_influence_6",
+        "name": "Blot: +6 Influence",
+        "imagePath": "attachment_blot_positive_influence_6.png",
+        "influenceModifier": 6,
+        "isFakeAttachment": true,
+        "source": "goose"
     }
 ]

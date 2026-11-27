@@ -39,6 +39,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.Ch
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
@@ -2064,6 +2065,7 @@ public final class AgendaHelper {
                 }
             }
         }
+        planetButtons.addAll(BrynfolkPromissoryHandler.getAgendaVotingButtons(player, game));
         planetButtons.add(Buttons.gray(
                 "exhaustForVotes_allPlanets_" + totalPlanetVotes,
                 "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));

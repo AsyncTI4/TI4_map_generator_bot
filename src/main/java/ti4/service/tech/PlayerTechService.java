@@ -808,6 +808,21 @@ public class PlayerTechService {
             case "bedeepy" -> {
                 DeepTechHandler.startAbyssalGenesis(event, game, player);
             }
+            case "aobrynfolkhb" -> {
+                game.setStoredValue("hearthcallMoveBonus", player.getFaction());
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing()
+                                + " is applying +1 to the MOVE value of each of their ships during this tactical action.");
+                ButtonHelper.deleteMessage(event);
+            }
+            case "aobrynfolkrg" -> {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + " is ignoring PLANETARY SHIELD until the end of this tactical action due to exhausting _Roar of the Gjallarhorn_.");
+                ButtonHelper.deleteTheOneButton(event);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");

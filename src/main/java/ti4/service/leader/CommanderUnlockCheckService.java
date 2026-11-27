@@ -436,6 +436,10 @@ public class CommanderUnlockCheckService {
             case "jotunn" ->
                 shouldBeUnlocked = game.getTileMap().values().stream()
                         .anyMatch(tile -> JotunnAbilityHandler.getJotunnStructureCount(player, tile) >= 3);
+            case "brynfolk" -> {
+                Planet blot = game.getUnitHolderFromPlanet("blot");
+                shouldBeUnlocked = blot != null && blot.getResources() + blot.getInfluence() >= 3;
+            }
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

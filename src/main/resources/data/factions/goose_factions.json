@@ -46,7 +46,7 @@
     },
     {
         "alias": "brynfolk",
-        "factionName": "The Brynfolk Konungsvark",
+        "factionName": "The Brynfolk",
         "homeSystem": "ao11",
         "startingFleet": "2 cv, 1 cr, 3 ff, 4 inf althing, 1 sd althing",
         "commodities": 3,
