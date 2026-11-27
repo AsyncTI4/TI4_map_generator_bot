@@ -15,6 +15,8 @@
 //   node scripts/ai-ab-queue.mjs list [--all]     what runs, what waits, and when each should start and finish
 //   node scripts/ai-ab-queue.mjs wait <id>        blocks until the job ends; run it in the background to be told
 //   node scripts/ai-ab-queue.mjs show <id>        the job's full record
+//   node scripts/ai-ab-queue.mjs postpone <id>    a queued job is skipped and the next one runs, until resumed
+//   node scripts/ai-ab-queue.mjs resume <id>      puts a postponed job back in its place in the queue
 //   node scripts/ai-ab-queue.mjs cancel <id>      drops a waiting job, or stops a running one (whole process tree)
 //   node scripts/ai-ab-queue.mjs run              runs queued jobs until none are left (approve starts this)
 //
@@ -141,6 +143,26 @@ export function approve(queue, id) {
   return job;
 }
 
+// A postponed job keeps its place: the runner skips it and plays the next queued job, and resuming puts it back in
+// the order it was approved in.
+export function postpone(queue, id) {
+  return updateJob(queue, id, job => {
+    if (job.status !== "queued") throw new Error(`${id} is ${job.status}; only a queued job can be postponed`);
+    job.status = "postponed";
+    job.postponedAt = new Date().toISOString();
+  });
+}
+
+export function resume(queue, id) {
+  const job = updateJob(queue, id, job => {
+    if (job.status !== "postponed") throw new Error(`${id} is ${job.status}, not postponed`);
+    job.status = "queued";
+    job.resumedAt = new Date().toISOString();
+  });
+  ensureRunner(queue);
+  return job;
+}
+
 export function cancel(queue, id) {
   return updateJob(queue, id, job => {
     if (FINISHED.has(job.status)) throw new Error(`${id} is already ${job.status}`);
@@ -207,6 +229,7 @@ export function listing(queue, all = false) {
     const time = times.get(job.id);
     let when = "";
     if (job.status === "awaiting-approval") when = "needs the user's yes";
+    else if (job.status === "postponed") when = "skipped until resumed";
     else if (time) when = `start ${clock(time.start)}, finish ${clock(time.finish)}`;
     else if (job.finishedAt) when = `waited ${hoursBetween(job.approvedAt, job.startedAt) ?? "-"} h, ran ${hoursBetween(job.startedAt, job.finishedAt) ?? "-"} h`;
     const estimate = estimateMs(job, jobs);
@@ -512,9 +535,12 @@ function annotate(folder, job) {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+class NotQueued extends Error {}
+
 async function runJob(queue, queued, { sampleSeconds, pollSeconds }) {
   const frozen = frozenPath(queued);
   let job = updateJob(queue, queued.id, job => {
+    if (job.status !== "queued") throw new NotQueued(`${job.id} is ${job.status}`);
     job.status = "running";
     job.startedAt = new Date().toISOString();
     job.runnerPid = process.pid;
@@ -607,7 +633,14 @@ export async function runQueue(queue, options = {}) {
         .sort((a, b) => a.approvedAt.localeCompare(b.approvedAt))[0];
       if (!next) break;
       console.log(`${new Date().toISOString()} start ${next.id}`);
-      const job = await runJob(queue, next, { sampleSeconds, pollSeconds });
+      let job;
+      try {
+        job = await runJob(queue, next, { sampleSeconds, pollSeconds });
+      } catch (error) {
+        if (!(error instanceof NotQueued)) throw error;
+        console.log(`${new Date().toISOString()} skipped ${next.id}: ${error.message}`);
+        continue;
+      }
       console.log(`${new Date().toISOString()} ${job.status} ${job.id} (exit ${job.exitCode})`);
     }
   } finally {
@@ -663,6 +696,14 @@ async function main() {
     }
     case "approve":
       console.log(`${approve(queue, id()).id} queued`);
+      console.log(listing(queue));
+      return 0;
+    case "postpone":
+      console.log(`${postpone(queue, id()).id} postponed`);
+      console.log(listing(queue));
+      return 0;
+    case "resume":
+      console.log(`${resume(queue, id()).id} queued again`);
       console.log(listing(queue));
       return 0;
     case "cancel": {

@@ -5,13 +5,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 import ti4.game.Game;
 import ti4.game.Player;
 
 // Splits a self-play game into turns and measures each one: a seat's turn in the action phase, and every other phase
 // (strategy, status, agenda) as one stretch of its own. For each turn it keeps the virtual game time it took (how long
 // the table waited, including AI waits and timeouts), the real time the AI spent thinking in its ticks, and the number
-// of ticks. A stall shows up as a turn with a long game time and little thinking; a slow AI as the reverse.
+// of ticks. A stall shows up as a turn with a long game time and little thinking; a slow AI as the reverse. Each turn
+// is also handed to a listener the moment it closes, so a long game logs its turns as it plays, not all at its end.
 final class TurnDurations {
 
     private static final String ACTION = "action";
@@ -33,6 +35,7 @@ final class TurnDurations {
     }
 
     private final String game;
+    private final Consumer<Turn> closed;
     private final List<Turn> turns = new ArrayList<>();
     private final Map<String, Integer> turnsTaken = new LinkedHashMap<>();
     private String openKey;
@@ -43,7 +46,12 @@ final class TurnDurations {
     private int ticks;
 
     TurnDurations(String game) {
+        this(game, turn -> {});
+    }
+
+    TurnDurations(String game, Consumer<Turn> closed) {
         this.game = game;
+        this.closed = closed;
     }
 
     void observe(Game game, long now) {
@@ -73,7 +81,9 @@ final class TurnDurations {
     private void close(long now) {
         if (openKey == null) return;
         int number = turnsTaken.merge(openRound + "|" + openWho, 1, Integer::sum);
-        turns.add(new Turn(game, openRound, openWho, number, now - openedAt, thinkNanos, ticks));
+        Turn turn = new Turn(game, openRound, openWho, number, now - openedAt, thinkNanos, ticks);
+        turns.add(turn);
+        closed.accept(turn);
         openKey = null;
         thinkNanos = 0;
         ticks = 0;

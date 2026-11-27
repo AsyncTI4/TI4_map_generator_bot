@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.SaveMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
@@ -394,7 +395,19 @@ public class TacticalPlanner {
 
     private static List<TacticalPlan> sharedRanking(Context context, Predicate<Tile> activatable) {
         return DecisionMemo.remember(
-                () -> rankedCandidates(context, activatable),
+                () -> SaveMemo.remember(
+                        context.game,
+                        unsavedState(context.game),
+                        () -> List.copyOf(rankedCandidates(context, activatable)),
+                        "tactical.ranking",
+                        context.seat.getFaction(),
+                        DecidingSeat.currentUserId(),
+                        context.freed,
+                        context.hints,
+                        context.tokenFree,
+                        FleetLimit.ships(context.seat),
+                        MoveBoost.extra(context.seat),
+                        SkippedSpaceCombat.assumedFaction()),
                 "tactical.ranking",
                 context.seat,
                 context.freed,
@@ -411,6 +424,13 @@ public class TacticalPlanner {
     private static Tile activeSystem(Game game) {
         String position = game.getCurrentActiveSystem();
         return position == null || position.isEmpty() ? null : game.getTileByPosition(position);
+    }
+
+    private static List<Object> unsavedState(Game game) {
+        return List.of(
+                AttackLedger.snapshot(game.getName()),
+                SlayIntent.snapshot(game.getName()),
+                FractureMarch.snapshot(game.getName()));
     }
 
     private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {

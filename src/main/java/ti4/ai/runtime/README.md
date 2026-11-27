@@ -801,7 +801,14 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 - **CombatOdds cache:** `CombatOdds.resolveDetailed` is pure, so its answers are kept across ticks, seats and saves in a
   static map keyed by the forces (65,536 entries, emptied when full). `Force` copies its unit list so a caller cannot
   change a remembered key.
-- **Tested:** `TickMemoTest`, `SearchMemoTest`, `SecretOddsTickMemoTest`, `CombatOddsCacheTest`.
+- **SaveMemo (tactical rankings across decisions):** `TacticalPlanner`'s ranking is kept per game until the save or
+  the unsaved tactical state (`AttackLedger`, `SlayIntent`, `FractureMarch`) changes. The key adds the ranked seat's
+  faction and the deciding seat, so every seat and tick on one save reuses one ranking; agenda-phase vote deals ranked
+  each rival's moves on every idle tick before (about 37% of AI thinking in the 2026-11-25 agenda profile). Only the
+  outermost decision scope shares: imagined rival turns and Xxekir Grom planning open nested scopes and compute
+  afresh. `AiGameState.forget/restore` drop a game's answers; at most 64 games are kept. `-Dai.tickmemo.verify=true`
+  recomputes every reused ranking and counts differences in the `TICKMEMO tactical.ranking` line.
+- **Tested:** `TickMemoTest`, `SearchMemoTest`, `SecretOddsTickMemoTest`, `CombatOddsCacheTest`, `SaveMemoTest`.
 
 ### AiActuator, AiActor, Proxies and SyncMessage
 
@@ -1414,7 +1421,7 @@ from `profile.seed()` in `SabotageRules`).
 
 ### Randomness
 
-- **In the core:** none in decisions. `AiSeats.newSeatId` draws 9 digits from `RandomHelper.current()`. The seat's
+- **In the core:** none in decisions. `AiSeats.newSeatId` draws 9 digits from `RandomHelper.current()` once (salted with the game name, stepped on collision). The seat's
   profile (aggression level and a `seed`) is drawn once at seat creation in `AiProfile.createHidden`, outside this scope.
 - **Seeded behaviour outside the core:** timing delays XOR a hash with `profile.seed()`: `SabotageRules`
   (`prompt.messageId().hashCode()`), `ShenanigansRules` (`(messageId + handlerId).hashCode()`) and `ReadyForDice`

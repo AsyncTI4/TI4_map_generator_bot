@@ -29,8 +29,11 @@ agenda, promises) that treat AI partners differently from humans. Outside `ti4.a
 **Algorithm:**
 - `ID_PREFIX = "7100000"`, total length 16, so 9 random decimal digits follow. `isAiSeatId` requires exactly 16 chars,
   the prefix, and all digits.
-- `newSeatId` draws 9 digits from `RandomHelper.current()` up to 1000 times until the id is neither a player of this
-  game nor a managed player anywhere (`GameManager.getManagedPlayer`), else throws `IllegalStateException`.
+- `newSeatId` draws 9 digits from `RandomHelper.current()` once and adds the game name's hash times 1,000,003 (mod
+  10^9), so two games on one seed (an A/B pair) get different seats. While the id is a player of this game or a managed
+  player anywhere (`GameManager.getManagedPlayer`) it steps to the next number, up to 1000 times, else throws
+  `IllegalStateException`. It never draws again: a redraw would move the game's seeded random stream depending on which
+  other games exist, so a seeded game replayed alone would deal different card ids than it did in its batch.
 - `isActiveAiSeat` = AI id and `isRealPlayer()` and not eliminated.
 - `isSelfPlay(game)` = at least one real player and every real player is an AI seat. The game owner added by
   `CreateGameService.createNewGame` is a `Player` but not a real player until set up, so an all-AI table with an
@@ -788,7 +791,7 @@ Everything else is fixed rule order, string matching on button ids/labels, count
 
 | Draw | Source | Distribution |
 | --- | --- | --- |
-| Synthetic seat id (9 digits) | `RandomHelper.current()` in `AiSeats.newSeatId` | uniform digits, retried up to 1000 times on collision |
+| Synthetic seat id (9 digits) | `RandomHelper.current()` in `AiSeats.newSeatId` | uniform digits salted with the game name, stepped (never redrawn) up to 1000 times on collision |
 | Hidden aggression level | `AggressionLevel.drawHidden(RandomHelper.current())` | weights 1/3/4/3/1 of 12 (PEACEFUL..WARLORD) |
 | Profile seed | `random.nextLong() & Long.MAX_VALUE` | uniform non-negative long |
 | `/ai watch` factions | `Collections.shuffle(DEFAULT_FACTIONS, random)`, first N | uniform subset order |

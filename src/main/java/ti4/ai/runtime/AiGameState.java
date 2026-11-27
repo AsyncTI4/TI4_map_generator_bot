@@ -2,6 +2,7 @@ package ti4.ai.runtime;
 
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.SaveMemo;
 import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.tactical.AttackLedger;
 import ti4.ai.tactical.FractureMarch;
@@ -25,6 +26,7 @@ public class AiGameState {
     }
 
     public static void restore(String gameName, Snapshot snapshot) {
+        SaveMemo.forget(gameName);
         SecondaryQueue.restore(gameName, snapshot.openFollows());
         SlayIntent.restore(gameName, snapshot.slayIntents());
         FractureMarch.restore(gameName, snapshot.marches());
@@ -32,6 +34,7 @@ public class AiGameState {
     }
 
     public static void forget(String gameName) {
+        SaveMemo.forget(gameName);
         SecondaryQueue.forget(gameName);
         SlayIntent.forget(gameName);
         FractureMarch.forget(gameName);

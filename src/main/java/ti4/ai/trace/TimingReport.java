@@ -24,7 +24,9 @@ public class TimingReport {
     private static final double[] PERCENTILES = {50, 90, 99, 99.9};
     private static final int SPAN_ROWS = 80;
     private static final int RULE_ROWS = 40;
+    private static final int PHASE_SPAN_ROWS = 30;
     private static final ThreadLocal<String> DECIDED_BY = new ThreadLocal<>();
+    private static final ThreadLocal<String> PHASE = new ThreadLocal<>();
     private static final ThreadMXBean THREADS = ManagementFactory.getThreadMXBean();
     private static boolean enabled = Boolean.getBoolean(PROPERTY);
 
@@ -49,6 +51,14 @@ public class TimingReport {
     private static final Map<String, Tally> INPUT_CHANGES = new HashMap<>();
     private static final Map<String, Tally> REPEATS = new HashMap<>();
     private static final Map<String, SeenOnSave> SEEN_ON_LATEST_SAVE = new HashMap<>();
+    private static final Map<String, PhaseTotals> PHASES = new HashMap<>();
+
+    private static final class PhaseTotals {
+        private final Tally decisions = new Tally();
+        private final Map<String, Tally> outcomes = new HashMap<>();
+        private final Map<String, Tally> spans = new HashMap<>();
+        private final Map<String, Tally> outside = new HashMap<>();
+    }
 
     public record Save(String game, long modified) {}
 
@@ -72,6 +82,19 @@ public class TimingReport {
 
     public static void startDecision() {
         DECIDED_BY.remove();
+    }
+
+    public static void enterPhase(String phase) {
+        if (enabled) PHASE.set(phase == null || phase.isBlank() ? "(none)" : phase);
+    }
+
+    public static void leavePhase() {
+        PHASE.remove();
+    }
+
+    private static PhaseTotals currentPhase() {
+        String phase = PHASE.get();
+        return phase == null ? null : PHASES.computeIfAbsent(phase, key -> new PhaseTotals());
     }
 
     public static void decidedBy(String rule) {
@@ -109,6 +132,19 @@ public class TimingReport {
                 SPANS.computeIfAbsent(span.name(), key -> new Tally())
                         .add(span.calls(), span.totalNanos(), span.selfNanos(), span.maxNanos());
             }
+            recordPhaseDecision(profile, cpuNanos, outcome, wall);
+        }
+    }
+
+    private static void recordPhaseDecision(ThinkingProfile profile, long cpuNanos, String outcome, long wall) {
+        PhaseTotals phase = currentPhase();
+        if (phase == null) return;
+        phase.decisions.add(1, wall, cpuNanos, wall);
+        phase.outcomes.computeIfAbsent(outcome, key -> new Tally()).add(1, wall, cpuNanos, wall);
+        for (SpanTotal span : profile.spans()) {
+            phase.spans
+                    .computeIfAbsent(span.name(), key -> new Tally())
+                    .add(span.calls(), span.totalNanos(), span.selfNanos(), span.maxNanos());
         }
     }
 
@@ -129,6 +165,9 @@ public class TimingReport {
         if (!enabled) return;
         synchronized (TimingReport.class) {
             OUTSIDE.computeIfAbsent(name, key -> new Tally()).add(1, nanos, nanos, nanos);
+            PhaseTotals phase = currentPhase();
+            if (phase != null)
+                phase.outside.computeIfAbsent(name, key -> new Tally()).add(1, nanos, nanos, nanos);
         }
     }
 
@@ -140,6 +179,7 @@ public class TimingReport {
         INPUT_CHANGES.clear();
         REPEATS.clear();
         SEEN_ON_LATEST_SAVE.clear();
+        PHASES.clear();
         WALL.clear();
         CPU.clear();
     }
@@ -191,6 +231,39 @@ public class TimingReport {
         lines.add("TIMING around decisions; ai.tick and ai.seat include the decisions (calls, total, mean, max):");
         rows(OUTSIDE, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
                 .forEach(row -> lines.add("TIMING   " + outsideRow(row.getKey(), row.getValue())));
+        PHASES.entrySet().stream()
+                .sorted(Comparator.comparingLong(entry -> -tickNanos(entry.getValue())))
+                .forEach(entry -> lines.addAll(phaseLines(entry.getKey(), entry.getValue())));
+        return lines;
+    }
+
+    private static long tickNanos(PhaseTotals phase) {
+        Tally tick = phase.outside.get("ai.tick");
+        return tick == null ? 0 : tick.totalNanos;
+    }
+
+    private static List<String> phaseLines(String name, PhaseTotals phase) {
+        List<String> lines = new ArrayList<>();
+        Tally tick = phase.outside.getOrDefault("ai.tick", new Tally());
+        String prefix = "TIMING phase " + name + " ";
+        lines.add(String.format(
+                Locale.ROOT,
+                "%sticks %d: %s, decisions %d: %s (%.1f%% of tick time), %.1f decisions per tick, mean decision %s",
+                prefix,
+                tick.count,
+                millis(tick.totalNanos),
+                phase.decisions.count,
+                millis(phase.decisions.totalNanos),
+                share(phase.decisions.totalNanos, tick.totalNanos),
+                tick.count == 0 ? 0 : (double) phase.decisions.count / tick.count,
+                millis(phase.decisions.totalNanos / Math.max(1, phase.decisions.count))));
+        long wallTotal = phase.decisions.totalNanos;
+        rows(phase.outcomes, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
+                .forEach(row -> lines.add(prefix + "outcome " + decisionRow(row.getKey(), row.getValue(), wallTotal)));
+        rows(phase.outside, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
+                .forEach(row -> lines.add(prefix + "around " + outsideRow(row.getKey(), row.getValue())));
+        rows(phase.spans, PHASE_SPAN_ROWS, Comparator.comparingLong(tally -> -tally.selfNanos))
+                .forEach(row -> lines.add(prefix + "span " + spanRow(row.getKey(), row.getValue(), wallTotal)));
         return lines;
     }
 

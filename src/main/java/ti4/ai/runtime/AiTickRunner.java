@@ -119,6 +119,7 @@ class AiTickRunner {
             tickOnce(lane, now);
         } finally {
             TimingReport.recordOutside(TICK_SPAN, System.nanoTime() - start);
+            TimingReport.leavePhase();
         }
     }
 
@@ -134,6 +135,7 @@ class AiTickRunner {
         }
         long loadStart = System.nanoTime();
         Game game = managed.getGame();
+        TimingReport.enterPhase(game.getPhaseOfGame());
         TimingReport.recordOutside(LOAD_SPAN, System.nanoTime() - loadStart);
         try (TickMemo.Open shared = TickMemo.open(game)) {
             ShareCensus.startTick(game);

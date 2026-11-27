@@ -10,9 +10,11 @@ import {
   cancel,
   classify,
   mavenArgs,
+  postpone,
   readJob,
   readJobs,
   resolveId,
+  resume,
   runQueue,
   schedule,
   submit,
@@ -98,6 +100,25 @@ test("jobs run one at a time in the order they were approved, and failures are k
   assert.equal(a.status, "failed");
   assert.equal(a.exitCode, 3);
   assert.ok(b.finishedAt <= a.startedAt, "the job approved first runs first");
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
+test("a postponed job is skipped while the next one runs, and runs again once resumed", async () => {
+  const { root, repo, queue } = sandbox();
+  const first = submit(repo, { label: "first", approved: true, args: ["-Dtest=X"] });
+  const second = submit(repo, { label: "second", approved: true, args: ["-Dtest=X"] });
+  postpone(queue, first.id);
+  assert.equal(schedule(readJobs(queue)).has(first.id), false, "a postponed job is off the schedule");
+
+  await runQueue(queue, { sampleSeconds: 0, pollSeconds: 1 });
+  assert.equal(readJob(queue, first.id).status, "postponed");
+  assert.equal(readJob(queue, second.id).status, "done");
+
+  assert.throws(() => postpone(queue, second.id), /only a queued job/);
+  resume(queue, first.id);
+  await runQueue(queue, { sampleSeconds: 0, pollSeconds: 1 });
+  assert.equal(readJob(queue, first.id).status, "done");
+  assert.throws(() => resume(queue, first.id), /not postponed/);
   fs.rmSync(root, { recursive: true, force: true });
 });
 
