@@ -57,6 +57,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
@@ -1311,6 +1313,12 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "culturalRoot" ->
+                    msg.append("Exhausted _Cultural Root Card_ for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
                 case "letnevMonument" ->
                     msg.append("Used **Palatine Obelisk** for ")
                             .append(count)
@@ -2298,6 +2306,13 @@ public final class Helper {
                 }
             }
         }
+        if (uH instanceof Planet rootPlanet
+                && player.hasUnlockedBreakthrough("vaettirbt")
+                && player.getPlanets().contains(rootPlanet.getName())
+                && VaettirAbilityHandler.hasRootToken(rootPlanet)) {
+            productionValueTotal++;
+        }
+
         if (unitsOnly) {
             return productionValueTotal;
         }
@@ -2838,6 +2853,7 @@ public final class Helper {
                 }
             }
             cost = Math.max(0, cost - MigoHarvestHandler.getYellowHarvestProductionDiscount(game, player));
+            cost = Math.max(0, cost - VaettirRootCardHandler.getIndustrialRootProductionDiscount(game, player));
             cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
                 cost = Math.max(
@@ -2931,6 +2947,7 @@ public final class Helper {
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
         MigoHarvestHandler.clearYellowHarvestProduction(game, player);
+        VaettirRootCardHandler.clearIndustrialRootProduction(game, player);
         boolean asn = warfareNOtherstuff.contains("asn");
         warfareNOtherstuff = warfareNOtherstuff.replace("asn", "");
         ArcanumBreakthroughHandler.setPowerWordWishProductionContext(game, player, warfareNOtherstuff);
@@ -3393,6 +3410,7 @@ public final class Helper {
         }
 
         MigoHarvestHandler.addYellowHarvestButton(unitButtons, game, player, tile);
+        VaettirRootCardHandler.addIndustrialRootCardButton(unitButtons, game, player, tile);
         BloomBreakthroughHandler.addMycelialBridgesProductionButtons(event, unitButtons, game, player, tile);
         BeansMonumentHandler.offerIronTideProduction(game, player, tile);
         return unitButtons;

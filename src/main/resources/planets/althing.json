@@ -3,8 +3,8 @@
         "unitHolderName": "althing",
         "resourcesLocation": "TopLeft",
         "centerPosition": {
-            "x": 120,
-            "y": 95
+            "x": 138,
+            "y": 92
         }
     },
     "id": "althing",
@@ -14,8 +14,8 @@
         "althing"
     ],
     "positionInTile": {
-        "x": 120.0,
-        "y": 95.0
+        "x": 138.0,
+        "y": 92.0
     },
     "resources": 3,
     "influence": 1,
@@ -25,68 +25,6 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
-        "unitHolderName": "althing",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 82.0,
-                    "y": 85.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 142.0,
-                    "y": 120.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 87.0,
-                    "y": 112.0
-                },
-                {
-                    "x": 104.0,
-                    "y": 112.0
-                },
-                {
-                    "x": 121.0,
-                    "y": 112.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 89.0,
-                    "y": 41.0
-                },
-                {
-                    "x": 107.0,
-                    "y": 41.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 101.0,
-                    "y": 82.0
-                },
-                {
-                    "x": 68.0,
-                    "y": 82.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 45.0,
-                    "y": 74.0
-                },
-                {
-                    "x": 53.0,
-                    "y": 43.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
-    },
     "contrastColor": "orange",
     "flavourText": "*When the Thing is called all clans must answer.*",
     "source": "goose"

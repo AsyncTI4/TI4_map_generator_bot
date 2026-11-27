@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
@@ -366,6 +367,9 @@ public class PromissoryNoteHelper {
         }
         if ("bepnxyrix".equalsIgnoreCase(id)) {
             XyrixPromissoryHandler.offerDarkMatterSpawningStationTarget(game, player);
+        }
+        if ("aopnvaettir".equalsIgnoreCase(id)) {
+            VaettirPromissoryHandler.offerRatatoskrsGuidance(game, player);
         }
         if ("thpnxytheris".equalsIgnoreCase(id)) {
             XytherisPromissoryHandler.activateSwarmSpawn(game, player);

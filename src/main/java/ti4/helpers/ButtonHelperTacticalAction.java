@@ -42,6 +42,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -135,6 +137,7 @@ import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.VaettirAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
@@ -179,6 +182,8 @@ public final class ButtonHelperTacticalAction {
         TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
         JotunnBreakthroughHandler.offerGlacialDrift(game, player);
         BrynfolkAgent.offerAtEndOfTacticalAction(game, player);
+        VaettirAgent.offerAtEndOfTacticalAction(game, player);
+        VaettirAbilityHandler.offerTakeRoot(game);
         if (player.getPlanets().contains("petraunleashed")
                 && !player.getExhaustedPlanetsAbilities().contains("petraunleashed")) {
             List<Button> buttons = new ArrayList<>();
@@ -978,6 +983,7 @@ public final class ButtonHelperTacticalAction {
         ThirtyKSecretHooks.onSystemActivated(game, player);
         FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        VaettirUnitHandler.offerGrovewardenDeploy(game, player, tile);
         CrystellumTechHandler.offerResonanceDrive(player);
         if (RefractureRulesService.canUseFenrir(game, player)) {
             MessageHelper.sendMessageToChannelWithButton(

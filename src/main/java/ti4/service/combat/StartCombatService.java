@@ -58,6 +58,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -743,6 +745,18 @@ public class StartCombatService {
                             threadChannel,
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
+                }
+                if (VaettirUnitHandler.getMimisBoughCombatBonus(player2, tile) > 0) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _The Mímis-Bough_ in a system containing a Root token, so your ships cannot retreat.");
+                }
+                if (VaettirUnitHandler.getMimisBoughCombatBonus(player1, tile) > 0) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _The Mímis-Bough_ in a system containing a Root token, so your ships cannot retreat.");
                 }
                 if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player2, tile) && opponentHasTwoMechsInSystem) {
                     MessageHelper.sendMessageToChannel(
@@ -2016,6 +2030,10 @@ public class StartCombatService {
         NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
         if (!game.isFowMode() && p2 != p1) {
             NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
+        }
+        VaettirRootCardHandler.addHazardousRootCardButton(buttons, game, p1, tile);
+        if (!game.isFowMode() && p2 != p1) {
+            VaettirRootCardHandler.addHazardousRootCardButton(buttons, game, p2, tile);
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

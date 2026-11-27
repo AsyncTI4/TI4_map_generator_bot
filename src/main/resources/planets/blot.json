@@ -3,8 +3,8 @@
         "unitHolderName": "blot",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 225,
-            "y": 175
+            "x": 203,
+            "y": 210
         }
     },
     "id": "blot",
@@ -14,8 +14,8 @@
         "blot"
     ],
     "positionInTile": {
-        "x": 225.0,
-        "y": 175.0
+        "x": 203.0,
+        "y": 210.0
     },
     "resources": 0,
     "influence": 0,
@@ -26,68 +26,6 @@
     "legendaryAbilityName": "Blot",
     "legendaryAbilityText": "This planet's influence value is increased by 1 for each of your control tokens on this card, and its resource value is increased by 1 for each control token on this card that belongs to another player. This card cannot have more than 6 control tokens on it.",
     "legendaryAbilityFlavourText": "The record of those we have deemed worthy.",
-    "unitPositions": {
-        "unitHolderName": "blot",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 187.0,
-                    "y": 165.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 247.0,
-                    "y": 200.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 192.0,
-                    "y": 192.0
-                },
-                {
-                    "x": 209.0,
-                    "y": 192.0
-                },
-                {
-                    "x": 226.0,
-                    "y": 192.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 194.0,
-                    "y": 121.0
-                },
-                {
-                    "x": 212.0,
-                    "y": 121.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 206.0,
-                    "y": 162.0
-                },
-                {
-                    "x": 173.0,
-                    "y": 162.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 257.0,
-                    "y": 154.0
-                },
-                {
-                    "x": 249.0,
-                    "y": 123.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
-    },
     "contrastColor": "orange",
     "flavourText": "*Even the record of our conquest shall one day be consumed.*",
     "source": "goose"

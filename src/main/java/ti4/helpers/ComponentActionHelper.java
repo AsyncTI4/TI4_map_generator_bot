@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -109,6 +110,12 @@ public class ComponentActionHelper {
                     && game.isConventionsOfWarAbandonedMode()
                     && !ButtonHelper.getButtonsForConventions(p1, game).isEmpty();
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
+                if ("aovaettirys".equalsIgnoreCase(tech)) {
+                    if (VaettirTechHandler.canUseYggdrasilsSacrifice(game, p1)) {
+                        compButtons.add(VaettirTechHandler.getSacrificeButton(p1));
+                    }
+                    continue;
+                }
                 if ("tharcanumbg".equalsIgnoreCase(tech) && !ArcanumTechHandler.canUseSealOfRevelation(game)) {
                     continue;
                 }
@@ -690,6 +697,7 @@ public class ComponentActionHelper {
                 // DEPRECATED: uses the "exhaustTech_" stack of ButtonListener: `else if
                 // (buttonID.startsWith("exhaustTech_"))`
             }
+            case "vaettirSacrifice" -> VaettirTechHandler.offerYggdrasilsSacrifice(event, game, p1);
             case "leader" -> {
                 if (!Mapper.isValidLeader(buttonID)) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve leader.");

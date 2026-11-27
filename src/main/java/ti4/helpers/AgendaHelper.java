@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
@@ -1575,7 +1576,9 @@ public final class AgendaHelper {
             }
             if (missedStellarAtomics(game, player)) return "stellar atomics";
         }
-        if (!isRepresentativeGovernmentInEffect(game) && getVoteCountFromPlanets(game, player) == 0) {
+        if (!isRepresentativeGovernmentInEffect(game)
+                && getVoteCountFromPlanets(game, player) == 0
+                && !player.getExhaustedAbilities().contains("cultural_root_card")) {
             return "no planet votes";
         }
         return null;
@@ -1779,6 +1782,7 @@ public final class AgendaHelper {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
                 ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
+                VaettirRootCardHandler.offerCulturalRootCard(event, game, player, planet);
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null) {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
@@ -2530,6 +2534,13 @@ public final class AgendaHelper {
         int atokeraVotes = AtokeraAgent.getVotes(player, game);
         if (atokeraVotes > 0) {
             additionalVotesAndSources.put(FactionEmojis.atokera + " _Magruda, the Atokera Agent_", atokeraVotes);
+        }
+
+        if (player.getExhaustedAbilities().contains("cultural_root_card")) {
+            int culturalRootVotes = VaettirRootCardHandler.getControlledRootTokenCount(game, player, "cultural") * 2;
+            if (culturalRootVotes > 0) {
+                additionalVotesAndSources.put(FactionEmojis.vaettir + " _Cultural Root Card_", culturalRootVotes);
+            }
         }
 
         if (getVoteCountFromPlanets(game, player) == 0) {

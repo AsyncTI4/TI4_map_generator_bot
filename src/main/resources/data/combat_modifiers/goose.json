@@ -13,5 +13,35 @@
                 "alias": "brynfolk_flagship"
             }
         ]
+    },
+    {
+        "alias": "vaettir_flagship_root_tokens",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "root_tokens_in_system",
+        "scope": "fs",
+        "persistenceType": "ALWAYS",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "vaettir_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "vaettir_hazardous_root_card",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "hazardous_root_tokens_controlled",
+        "scope": "",
+        "persistenceType": "ONE_ROUND",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "vaettir_root_card",
+                "alias": "hazardous_root_card"
+            }
+        ]
     }
 ]

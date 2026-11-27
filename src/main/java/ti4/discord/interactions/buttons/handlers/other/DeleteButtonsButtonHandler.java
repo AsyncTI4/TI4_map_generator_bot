@@ -18,6 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.Ch
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
@@ -260,12 +262,14 @@ class DeleteButtonsButtonHandler {
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
                 ThirtyKRelicHooks.afterProduction(game, player);
                 ThirtyKExploreHooks.afterProduction(event, game, player);
+                VaettirAbilityHandler.offerCommunion(game, player, tile);
                 TheIconService.checkAndSendIconButton(event, game, player, buttonID);
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true, false);
                 cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
                 cost = IronBreakthroughHandler.applyHyperstaticRelayProductionDiscount(game, player, cost);
                 cost = MigoHarvestHandler.applyYellowHarvestProductionDiscount(game, player, cost);
+                cost = VaettirRootCardHandler.applyIndustrialRootProductionDiscount(game, player, cost);
                 cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :
