@@ -178,6 +178,7 @@ public class MutagenService {
             }
             case "commander" -> {
                 player.addLeader(id);
+                game.addFakeCommander(id);
                 UnlockLeaderService.unlockLeader(id, game, player);
             }
             default -> {

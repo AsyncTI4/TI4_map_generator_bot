@@ -56,6 +56,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.J
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirRootCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
@@ -411,6 +414,18 @@ public class CombatRollService {
         return zelianFakeUnit;
     }
 
+    public static UnitModel getVaettirPlanetUnit(Player player, String planetName) {
+        UnitModel vaettirFakeUnit = new UnitModel();
+        vaettirFakeUnit.setCombatDieCount(1);
+        vaettirFakeUnit.setCombatHitsOn(8);
+        vaettirFakeUnit.setName("Vaettir Planet " + planetName);
+        vaettirFakeUnit.setAsyncId("vaettirplanet");
+        vaettirFakeUnit.setId("vaettirplanet");
+        vaettirFakeUnit.setBaseType("dd");
+        vaettirFakeUnit.setFaction(player.getFaction());
+        return vaettirFakeUnit;
+    }
+
     public static UnitModel getCharonCombatUnit(Player player) {
         UnitModel charonUnit = new UnitModel();
         charonUnit.setCombatDieCount(4);
@@ -557,6 +572,16 @@ public class CombatRollService {
                                     getZelianPlanetUnit(player, Helper.getPlanetName(uH.getName()), 10 - resource),
                                     combatOnHolder),
                             1);
+                }
+            }
+        }
+        if (rollType == CombatRollType.combatround && player.hasUnlockedBreakthrough("vaettirbt")) {
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (player.getPlanets().contains(uH.getName())
+                        && VaettirAbilityHandler.hasRootToken((Planet) uH)
+                        && uH.getName().equalsIgnoreCase(unitHolderName)) {
+                    playerUnitsByQuantity.put(
+                            new ImmutablePair<>(getVaettirPlanetUnit(player, uH.getName()), combatOnHolder), 1);
                 }
             }
         }
@@ -941,6 +966,7 @@ public class CombatRollService {
         }
 
         if (round2 > round && rollType == CombatRollType.combatround && !supplementalCombatRoll) {
+            VaettirRootCardHandler.clearHazardousRootCardModifiers(game);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "## __Start of Combat Round #" + round2 + "__");
         }
@@ -1388,6 +1414,9 @@ public class CombatRollService {
                 return h;
             }
             if (BrynfolkBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
+                return h;
+            }
+            if (VaettirTechHandler.resolveYggdrasilsWrath(event, game, player, opponent, tile, bombardPlanet, h)) {
                 return h;
             }
             if (h > 0) {

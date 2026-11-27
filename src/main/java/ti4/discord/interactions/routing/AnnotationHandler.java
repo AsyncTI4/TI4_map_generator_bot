@@ -367,8 +367,10 @@ public class AnnotationHandler {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
                     .setUrls(ClasspathHelper.forJavaClassPath())
                     .setScanners(new SubTypesScanner(false)));
-            reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                    .filter(c -> c.getPackageName().startsWith("ti4"))
+            reflections
+                    .get(SubTypes.of(Object.class)
+                            .filter(name -> name.startsWith("ti4."))
+                            .asClass())
                     .forEach(classes::add);
         }
         return classes;

@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.vaettir.VaettirPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
@@ -73,6 +75,8 @@ public final class StatusHelper {
 
     public static void announceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
+        VaettirLeadersHandler.resolveCommander(game);
+        VaettirPromissoryHandler.returnRatatoskrsGuidance(game);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner(
                     "status", game.getRound(), game.getActionsChannel(), game.isOmegaPhaseMode() ? "omega" : null);
