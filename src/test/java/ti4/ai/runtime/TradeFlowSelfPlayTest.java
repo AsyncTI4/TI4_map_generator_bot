@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
@@ -24,11 +25,14 @@ import ti4.testUtils.BaseTi4Test;
 // AI seats trade with each other end to end: six AI seats play in-process on the fake Discord, every offer is built,
 // sent, answered and carried out by pressing the bot's real transaction buttons, and the test forces only the
 // starting state of each scenario once the first action phase begins.
+@Tag("selfplay")
 class TradeFlowSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final int MAX_TICKS = 3000;
+    // Passing games took 20 to 305 ticks (wash 63 to 305, Trade and Convoys under 30); the limit was 3,000 until
+    // 2026-11-26.
+    private static final int MAX_TICKS = 1000;
     private static final int TRADE = 5;
     private static final int WASHED = 3;
     private static final int HACAN_TRADE_GOODS = 2;

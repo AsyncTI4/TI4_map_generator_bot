@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,6 +18,7 @@ import ti4.testUtils.BaseTi4Test;
 
 // Six AI seats play in-process on the fake Discord. When the first action phase begins each seat is handed a legendary
 // planet, and the test follows the games until the seats have exhausted the abilities through the bot's real buttons.
+@Tag("selfplay")
 class LegendarySelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
@@ -26,7 +28,8 @@ class LegendarySelfPlayTest extends BaseTi4Test {
     private static final Set<String> EXPECTED = Set.of("mallice", "hopesend", "primor", "ordinian");
     private static final Set<String> ANSWERS = Set.of("mallice", "placeOneNDone");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final int MAX_TICKS = 4000;
+    // Passing games took 610 to 651 ticks, all in round 1; the limit was 4,000 until 2026-11-26.
+    private static final int MAX_TICKS = 1800;
     private static final String ACTION = "action";
 
     @Test

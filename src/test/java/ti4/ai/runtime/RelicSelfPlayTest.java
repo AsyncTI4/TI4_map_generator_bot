@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -22,11 +23,14 @@ import ti4.testUtils.BaseTi4Test;
 // what they need: a planet for the Nano-Forge, a frontier token for the Circlet, discarded action cards for the Codex,
 // three fragments of one kind), and the test follows the game until the seats have used them through the bot's
 // real buttons.
+@Tag("selfplay")
 class RelicSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final int MAX_TICKS = 6000;
+    // Passing games took 627 to 707 ticks, all ending in the round-1 status phase; the limit was 6,000 until
+    // 2026-11-26.
+    private static final int MAX_TICKS = 2000;
     private static final String ACTION = "action";
     private static final Set<String> EXPECTED_HANDLERS =
             Set.of("componentActionRes", "drawRelicFromFrag", "purge", "nanoforgePlanet", "codexCardPick");

@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import ti4.ai.AiSettings;
@@ -26,11 +27,15 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
+    // Passing first rounds took 575 to 721 ticks; a game at about 4 ticks a second that cannot reach
+    // round 2 fails within minutes at this limit instead of running for 20 (the limit was 5,000 until 2026-11-26).
+    private static final int FIRST_ROUND_MAX_TICKS = 2000;
 
     @Test
+    @Tag("selfplay")
     void sixAiSeatsPlayTheirFirstRound() throws Exception {
         ti4.ai.brain.TickMemo.resetVerification();
-        SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, 5000);
+        SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, FIRST_ROUND_MAX_TICKS);
         if (ti4.ai.brain.TickMemo.verifying()) {
             ti4.ai.brain.TickMemo.verificationLines().forEach(System.out::println);
         }

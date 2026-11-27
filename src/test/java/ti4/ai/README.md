@@ -262,7 +262,7 @@ Trackers read hidden information (for example `ObjectiveTracker` measures how fa
 
 ### Batch drivers
 
-- **[AiSelfPlayTest](/src/test/java/ti4/ai/runtime/AiSelfPlayTest.java).** `sixAiSeatsPlayTheirFirstRound` (not gated: runs in every `mvn test`, including CI) plays the six `AiSettings.DEFAULT_FACTIONS` (nekro, sardakk, hacan, letnev, sol, xxcha) until round 2 within one virtual day and 5,000 ticks and asserts `STOP_CONDITION`. `sixAiSeatsPlayFullGames` (`-Dai.selfplay.full=true`) plays `ai.selfplay.games` (default 1) games of up to 14 virtual days and 100,000 ticks on `ai.selfplay.threads` threads (default processors / 2, clamped to 1..games), prints per-game lines and batch statistics (leader and table VP, final round, points per round, endings, trading, promissory notes, relics, action cards and their per-draw rate against `ActionCardPrior.firstPlayRateOfName` with a flag below half the human rate, Overrule, secrets, objectives, plan kinds, Mecatol, expeditions, Fracture, expansion zones, tactical actions and follows per seat per round, round-start token/planet/tech averages, A/B, agenda report, faction component batch), and asserts no game ended unfinished. Names: `aiab<seed mod 1e6>a|b` in A/B runs, `aiseed<…>` with a fixed seed, else `aiselfplay<random>`. Clock start: `1_790_000_000_000` with a fixed seed, else the wall clock, plus `slot` (or `slot / 2` in A/B). Faction choice: `-Dai.selfplay.factions` or a rotating window of 6 from `-Dai.selfplay.factionpool` moving 3 per game.
+- **[AiSelfPlayTest](/src/test/java/ti4/ai/runtime/AiSelfPlayTest.java).** `sixAiSeatsPlayTheirFirstRound` (not gated: runs in every `mvn test`, including CI) plays the six `AiSettings.DEFAULT_FACTIONS` (nekro, sardakk, hacan, letnev, sol, xxcha) until round 2 within one virtual day and 2,000 ticks and asserts `STOP_CONDITION`. `sixAiSeatsPlayFullGames` (`-Dai.selfplay.full=true`) plays `ai.selfplay.games` (default 1) games of up to 14 virtual days and 100,000 ticks on `ai.selfplay.threads` threads (default processors / 2, clamped to 1..games), prints per-game lines and batch statistics (leader and table VP, final round, points per round, endings, trading, promissory notes, relics, action cards and their per-draw rate against `ActionCardPrior.firstPlayRateOfName` with a flag below half the human rate, Overrule, secrets, objectives, plan kinds, Mecatol, expeditions, Fracture, expansion zones, tactical actions and follows per seat per round, round-start token/planet/tech averages, A/B, agenda report, faction component batch), and asserts no game ended unfinished. Names: `aiab<seed mod 1e6>a|b` in A/B runs, `aiseed<…>` with a fixed seed, else `aiselfplay<random>`. Clock start: `1_790_000_000_000` with a fixed seed, else the wall clock, plus `slot` (or `slot / 2` in A/B). Faction choice: `-Dai.selfplay.factions` or a rotating window of 6 from `-Dai.selfplay.factionpool` moving 3 per game.
 - **[RoundOneSelfPlayTest](/src/test/java/ti4/ai/runtime/RoundOneSelfPlayTest.java)** (`-Dai.selfplay.roundone=true`, default 6 games on 6 threads, `-Dai.selfplay.rounds`, default 1): seating rotated by slot; "own area" weights (LANE/SLICE planets 1.0, BORDER 0.5, only planets nobody controls and without custodians) taken against planets held at the end; points; picked cards; `ScoringDiagnostic` report; optional `-Dai.selfplay.probe=<faction>`.
 - **[RoundTwoSelfPlayTest](/src/test/java/ti4/ai/runtime/RoundTwoSelfPlayTest.java)** (`-Dai.selfplay.roundtwo=true`): plays `ai.selfplay.roundtwo.rounds` rounds (default 2); skips every agenda phase (deletes every live button message in the fake, readies cards with `RefreshCardsService`, starts the strategy phase) unless `.playagenda`; `.forceagenda`/`.playagenda` score the custodians for the first seat before round 1; `.topagendas=id[@N]` and `.keeptop` stack agendas; `.sardakkleaders` unlocks Sardakk's commander and hero and counts presses whose reason names G'hom Sek'kus or Sh'val; reports points per seat ± standard error over games, points by source, distribution, territory, per-faction, per-objective and per-pick lines; agenda and A/B reports.
 
@@ -278,6 +278,35 @@ Each plays a six-seat game in-process on the fake Discord and forces a starting 
 | [FractureSelfPlayTest](/src/test/java/ti4/ai/runtime/FractureSelfPlayTest.java) | `FractureService.spawnFracture`; a fleet beside the Fracture (8 dreadnoughts, 4 carriers, 16 infantry for Styx; 2/1/4 for Cocytus; optional Flank Speed) | Styx taken with +1 VP (Shard of the Throne point excluded) and one relic; with Flank Speed from frac2, taken in the same round; Cocytus taken with a relic. Up to 3 attempts with seeds `BASE_SEED + attempt` when the fleet died in the Fracture or its ground forces all died on the planet with the ships still there |
 | [TradeFlowSelfPlayTest](/src/test/java/ti4/ai/runtime/TradeFlowSelfPlayTest.java) (read partly) | three scenarios: neighbours with 3 commodities each; a non-Hacan Trade holder with no tactic token; a non-Hacan holder of Trade Convoys | a 1:1 commodity wash between the active seat and its neighbour through `transaction`, `transactWith`, `newTransact`, `sendOffer`, `acceptOffer`; every follower settled with the holder, some by debt, no items left; Convoys played as a component action followed by `turnEnd` |
 | [HumanSeatSetupTest](/src/test/java/ti4/ai/runtime/HumanSeatSetupTest.java) | `Table.withHuman` | see SelfPlaySetup above |
+
+### Running the tests
+
+The scenario self-play tests above and `AiSelfPlayTest.sixAiSeatsPlayTheirFirstRound` carry the JUnit tag `selfplay`. Each plays a whole AI game for one to several minutes; together they are about 95% of the time of `ti4.ai`.
+
+| What | Command |
+| --- | --- |
+| Quick loop: every `ti4.ai` test except the games | `mvn -o test -Dtest='ti4.ai.**,!ti4.ai.runtime.*SelfPlayTest'` |
+| Everything in `ti4.ai` | `mvn -o test -Dtest='ti4.ai.**'` |
+| One scenario, or a replay of a failure | `mvn -o test -Dtest=LegendarySelfPlayTest -Dai.selfplay.seed=<seed from the report header>` |
+| The whole repository, as CI does | `mvn verify` |
+
+- **Two surefire executions** ([pom.xml](/pom.xml)). `default-test` runs every test without the `selfplay` tag in one JVM, one class after another, as before. `self-play` then runs the tagged tests (`**/*SelfPlayTest.java`) in `ai.selfplay.forks` JVMs (default 6, `reuseForks`), one class per JVM at a time, so the games play side by side and the wall time is about the slowest class rather than the sum. `-Dai.selfplay.forks=1` plays them one after another in one JVM.
+- **Why separate JVMs, not JUnit parallel execution.** `BaseTi4Test` puts its mock JDA back into `JdaService.jda` before every test, which would replace the `DiscordRouter` proxy under a game running in another thread; `GameManager`, `AiRuntime` and system properties (for example `AiSettingsTest`) are shared by the whole JVM, and about 180 test classes do not extend `BaseTi4Test`. Forks share none of it. On disk each game keeps its storage in its own temporary folder; a full run changed no file under `src/test/resources` or elsewhere in the worktree outside `target`. Classes the `self-play` execution filters out write no report, so the XML reports of the two executions do not overwrite each other.
+- **A `-Dtest` pattern reaches both executions**, so one of them may match nothing. The pom sets `surefire.failIfNoSpecifiedTests` to false, so a mistyped pattern runs 0 tests instead of failing: check the `Tests run` line.
+- **Gated tests are not tagged.** An A/B or batch run (`-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames`, `RoundTwoSelfPlayTest`, …) runs in `default-test` exactly as before; the `self-play` execution then finds nothing to run.
+- **Output.** The forks print their reports to the console as each game ends; with `-Dsurefire.redirectTestOutputToFile=true` each class writes them to `target/surefire-reports/<class>-output.txt` instead. A failed assertion carries the whole report as its message either way.
+- **Tick limits.** A scenario that cannot reach its stop condition runs to its tick limit, at about 4 ticks a second on an idle machine. The limits were cut on 2026-11-26 from what passing games took (three random seeds, every passing game ends in round 1, the first-round test at the start of round 2):
+
+| Test | Passing games (ticks) | Limit (was) |
+| --- | --- | --- |
+| `AiSelfPlayTest.sixAiSeatsPlayTheirFirstRound` | 575 to 721 | 2,000 (5,000) |
+| `LegendarySelfPlayTest` | 610 to 651 | 1,800 (4,000) |
+| `RelicSelfPlayTest` | 627 to 707 | 2,000 (6,000) |
+| `FractureSelfPlayTest` | Styx about 60, Flank Speed about 57, Cocytus 42 to 377 | 1,000 per attempt (1,500) |
+| `TradeFlowSelfPlayTest` | wash 63 to 305, Trade and Convoys under 30 | 1,000 (3,000) |
+| `SabotageSelfPlayTest` | 18 | 300 (3,000) |
+
+A game that would have passed between the new limit and the old one now fails. None of the sampled games came within a factor of 2.5 of the new limits.
 
 ### Gated self-play tests (skipped by default)
 
@@ -396,7 +425,7 @@ The "scenarios" in this scope are situations the harness meets while it runs a g
 - **Trigger:** the stop predicate of each test sees the first action phase with an active player, sets a flag, and calls `SelfPlayGame.force(game, change)`, which saves the game (and re-stamps the turn if it changed).
 - **Responsible component:** the production AI decides everything after the forced state; the test only observes `pressedHandlers`, game stats and the board.
 - **Selection logic:** none in the harness.
-- **Outcome / fallback:** the predicate returns true when the expected state is seen (`STOP_CONDITION`); otherwise the run hits its tick budget (`LIMIT`, 1,500 to 6,000 ticks) or stalls, and the assertion on `ending()` fails with the full report as the message. `FractureSelfPlayTest` alone retries: if the attacking fleet is gone from the Fracture with no unit in transit (`fleetLost`), it plays a fresh game with the next seed, up to 3 attempts, because neutral dice are real.
+- **Outcome / fallback:** the predicate returns true when the expected state is seen (`STOP_CONDITION`); otherwise the run hits its tick budget (`LIMIT`, 300 to 2,000 ticks, see "Running the tests") or stalls, and the assertion on `ending()` fails with the full report as the message. `FractureSelfPlayTest` alone retries: if the attacking fleet is gone from the Fracture with no unit in transit (`fleetLost`), it plays a fresh game with the next seed, up to 3 attempts, because neutral dice are real.
 - **Limitations:** the scenario tests draw a new seed each run (`BASE_SEED`, from `System.nanoTime()` unless `-Dai.selfplay.seed` is set). Every game is named after its seed and starts its clock at `SelfPlayGame.CLOCK_START`, so a failure replays with the seed printed in the report header. `HumanSeatSetupTest` is the exception: it uses fixed seeds (11 and 12), a fixed clock, and plays no game.
 
 ### Round-two runs and skipped agenda phases
@@ -533,8 +562,8 @@ Not resampled: promissory notes, relic fragments' identities, anything already r
 | Thinking retry after an abort | 5 min | `AiSettings.THINKING_RETRY` |
 | Pending edit wait after a press | 15 s (real time) | `AiActuator.PENDING_EDIT_TIMEOUT` |
 | Full game budget | 14 virtual days, 100,000 ticks | `AiSelfPlayTest.playFullGame` |
-| First-round test budget | 1 virtual day, 5,000 ticks | `AiSelfPlayTest.sixAiSeatsPlayTheirFirstRound` |
-| Scenario tests | 1 virtual day, 1,500 to 6,000 ticks | each test's `MAX_TICKS` |
+| First-round test budget | 1 virtual day, 2,000 ticks | `AiSelfPlayTest.sixAiSeatsPlayTheirFirstRound` |
+| Scenario tests | 1 virtual day, 300 to 2,000 ticks | each test's `MAX_TICKS` |
 | Agenda wait budget (report only) | 30 virtual min | `-Dai.selfplay.agenda.waitbudget` |
 | Fracture scenario retries | 3 attempts; relic wait 25 harness steps | `FractureSelfPlayTest` |
 

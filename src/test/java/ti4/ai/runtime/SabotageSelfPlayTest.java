@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,11 +16,14 @@ import ti4.testUtils.BaseTi4Test;
 // Six AI seats play in-process on the fake Discord. Once the first action phase begins the test plays one card for the
 // active seat, the way a human player would through the bot, and the AI seats answer its Sabotage window with the
 // bot's real buttons.
+@Tag("selfplay")
 class SabotageSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("hacan", "sol", "jolnar", "xxcha", "letnev", "yin");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final int MAX_TICKS = 3000;
+    // Passing games took 18 ticks: the window opens on the first action; the limit was 3,000 until
+    // 2026-11-26.
+    private static final int MAX_TICKS = 300;
     private static final int CARD_INDEX = 9701;
     private static final int SABOTAGE_INDEX = 9702;
     private static final String OVERRULE = "Overrule";
