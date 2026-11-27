@@ -54,6 +54,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
@@ -591,6 +593,9 @@ public class StartCombatService {
         // Start of Space Combat Buttons
         if (isSpaceCombat) {
             sendStartOfSpaceCombatButtonsToThread(threadChannel, game, player1, player2, tile);
+        }
+        if (isGroundCombat) {
+            sendStartOfGroundCombatButtonsToThread(threadChannel, game, player1, player2, tile, unitHolderName);
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
@@ -1138,6 +1143,20 @@ public class StartCombatService {
         }
     }
 
+    private static void sendStartOfGroundCombatButtonsToThread(
+            ThreadChannel threadChannel, Game game, Player player1, Player player2, Tile tile, String unitHolderName) {
+        List<Button> startOfGroundCombatButtons = new ArrayList<>();
+        BrynfolkUnitHandler.addTitheEaterDeployButton(startOfGroundCombatButtons, game, player1, tile, unitHolderName);
+        if (player2 != player1) {
+            BrynfolkUnitHandler.addTitheEaterDeployButton(
+                    startOfGroundCombatButtons, game, player2, tile, unitHolderName);
+        }
+        if (!startOfGroundCombatButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    threadChannel, "Buttons for start of ground combat abilities.", startOfGroundCombatButtons);
+        }
+    }
+
     private static void sendDaxciveAnimatorsStartGroundCombatButton(
             GenericInteractionCreateEvent event, Player player, String planet, Game game) {
         if (!player.hasTech("dxa_br") || !player.hasTechReady("dxa_br")) {
@@ -1611,6 +1630,16 @@ public class StartCombatService {
                                 + ", a reminder that you have _Völundr Protocol_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
+            if (player.hasAbility("gald_tithe") && BrynfolkAbilityHandler.hasBlotCapacity(player)) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that if you win this combat you may place 1 of your opponent's control tokens on the Blot legendary ability card. If you lost the combat, place one of your own.",
+                        BrynfolkAbilityHandler.selectBlotPlayer(player, game));
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasAbility("thrall_conscription")) {
+                BrynfolkAbilityHandler.offerThrallConscription(player, game, unitHolderName);
+            }
         }
         if (mentakFound) {
             Button steal = Buttons.gray(
@@ -2041,6 +2070,20 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
+            }
+        }
+        if (p1.hasTechReady("aobrynfolkrg") || (!game.isFowMode() && p2.hasTechReady("aobrynfolkrg"))) {
+            if (p1.hasTechReady("aobrynfolkrg")) {
+                buttons.add(Buttons.red(
+                        p1.factionButtonChecker() + "exhaustTech_aobrynfolkrg",
+                        "Use Roar of the Gjallarhorn",
+                        FactionEmojis.brynfolk));
+            }
+            if (!game.isFowMode() && p2.hasTechReady("aobrynfolkrg")) {
+                buttons.add(Buttons.red(
+                        p2.factionButtonChecker() + "exhaustTech_aobrynfolkrg",
+                        "Use Roar of the Gjallarhorn",
+                        FactionEmojis.brynfolk));
             }
         }
         checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);

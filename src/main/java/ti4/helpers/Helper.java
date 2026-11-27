@@ -1305,6 +1305,12 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "althingBarristers" ->
+                    msg.append("Used _Althing Barristers_ for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
                 case "letnevMonument" ->
                     msg.append("Used **Palatine Obelisk** for ")
                             .append(count)

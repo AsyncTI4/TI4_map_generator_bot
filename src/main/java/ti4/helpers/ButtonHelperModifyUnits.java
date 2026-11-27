@@ -5,6 +5,7 @@ import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1469,6 +1470,14 @@ public final class ButtonHelperModifyUnits {
             skilledS += "feint";
         }
         Set<String> positions = Adjacency.of(game, player).forMovement().from(pos1);
+        if (pos1.equals(game.getActiveSystem())
+                && game.playerHasLeaderUnlockedOrAlliance(player, "brynfolkcommander")) {
+            Set<String> adjacentPositions = new HashSet<>(positions);
+            for (String adjacentPosition : adjacentPositions) {
+                positions.addAll(Adjacency.of(game, player).forMovement().from(adjacentPosition));
+            }
+            positions.remove(pos1);
+        }
         Tile helheimTile = game.getTileFromPlanet("helheim");
         if (player.hasPlanet("helheim")
                 && helheimTile != null

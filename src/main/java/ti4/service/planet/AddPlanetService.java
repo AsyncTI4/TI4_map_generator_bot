@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.Mig
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
@@ -371,6 +372,9 @@ public class AddPlanetService {
             }
         }
         ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
+        if (alreadyOwned && !doubleCheck && !setup) {
+            BrynfolkAbilityHandler.offerWarSpoils(player, previousOwner, unitHolder, game);
+        }
         if (!doubleCheck && !setup) {
             MigoAbilityHandler.onPlanetGained(player, planet);
             MigoUnitHandler.syncNevermen(game);
