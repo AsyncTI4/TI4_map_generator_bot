@@ -355,7 +355,7 @@
     "faction": "ponthous",
     "baseUpgrade": "dd2",
     "source": "theodisi",
-    "text": ""
+    "text": "Cost 1, Combat 8, Move 2, Capacity 1\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 6(x3)"
   },
   {
     "alias": "thvanguardr",
@@ -417,7 +417,6 @@
     "types": [
         "BIOTIC"
     ],
-    "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
     "text": "After you draw an exploration card: You may exhaust this card to reveal cards from that exploration deck until you reveal a relic fragment. Gain that relic fragment, then shuffle the remaining revealed cards into that exploration deck."
@@ -441,7 +440,6 @@
         "UNITUPGRADE"
     ],
     "baseUpgrade": "dn2",
-    "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
     "text": "DEPLOY: Once per turn, at the end of your turn: You may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."

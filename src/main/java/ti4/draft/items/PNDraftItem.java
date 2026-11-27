@@ -92,4 +92,10 @@ public class PNDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getPn().getNotes();
+    }
 }

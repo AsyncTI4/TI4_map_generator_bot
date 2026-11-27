@@ -412,7 +412,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "cv2" -> output.append(UnitEmojis.carrier);
                         case "dn2" -> output.append(UnitEmojis.dreadnought);
                         case "ws" -> output.append(UnitEmojis.warsun);
-                        default -> output.append(UnitEmojis.flagship);
+                        default -> output.append(upgradedUnitEmoji());
                     }
                 }
                 case GENERICTF -> output.append(TechEmojis.GenericTF);
@@ -421,6 +421,11 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             if (single) return output.toString();
         }
         return output.toString();
+    }
+
+    private TI4Emoji upgradedUnitEmoji() {
+        UnitModel unit = Mapper.getUnitModelByTechUpgrade(alias);
+        return unit == null ? UnitEmojis.flagship : unit.getUnitEmoji();
     }
 
     public String getRequirementsEmoji() {

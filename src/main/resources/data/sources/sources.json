@@ -415,5 +415,13 @@
         "subcanal": "lil homebrew",
         "credits": "Community",
         "description": "A collection of small factions and components meant only for franken."
+    },
+    {
+        "source": "stellar_tiles",
+        "name": "Stellar Tiles",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Community",
+        "description": "Alternate art for nebula, asteroid field, supernova and gravity rift systems. Same rules as the base anomalies."
     }
 ]

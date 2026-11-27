@@ -48,7 +48,8 @@ class TurnEndButtonHandler {
                 "lunarium",
                 "zephyrion",
                 "vyserix",
-                "deep");
+                "deep",
+                "jotunn");
         if (VanaheimLegendaryButtonHandler.offerEndTurnRepair(event, game, player)) {
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;

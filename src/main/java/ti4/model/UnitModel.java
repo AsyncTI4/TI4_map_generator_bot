@@ -165,6 +165,71 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return unitString;
     }
 
+    @JsonIgnore
+    public String getRulesText() {
+        StringBuilder sb = new StringBuilder(getStatsText());
+        if (getAbility().isPresent()) sb.append(getAbility().get()).append(' ');
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public String getStatsText() {
+        StringBuilder sb = new StringBuilder();
+        if (getCost() > 0) {
+            sb.append("Cost: ");
+            float cost = getCost();
+            if (cost == 0.5f) {
+                sb.append("1(x2)");
+            } else {
+                sb.append(cost == (int) cost ? "" + (int) cost : "" + cost);
+            }
+        }
+        if (getCombatHitsOn() > 0) {
+            sb.append(" Combat: ")
+                    .append(rollText(getCombatHitsOn(), getCombatDieCount()))
+                    .append(' ');
+        }
+
+        if (getSustainDamage()) {
+            sb.append("SUSTAIN DAMAGE ");
+        }
+        if (getAfbDieCount() > 0) {
+            sb.append("ANTI-FIGHTER BARRAGE ")
+                    .append(rollText(getAfbHitsOn(), getAfbDieCount()))
+                    .append(' ');
+        }
+        if (getSpaceCannonDieCount() > 0) {
+            sb.append("SPACE CANNON ")
+                    .append(rollText(getSpaceCannonHitsOn(), getSpaceCannonDieCount()))
+                    .append(' ');
+        }
+        if (getBombardDieCount() > 0) {
+            sb.append("BOMBARDMENT ")
+                    .append(rollText(getBombardHitsOn(), getBombardDieCount()))
+                    .append(' ');
+        }
+        if (getProductionValue() > 0) {
+            sb.append("PRODUCTION ");
+            sb.append(getProductionValue());
+            sb.append(' ');
+        }
+        if (getCapacityValue() > 0) {
+            sb.append("Capacity ");
+            sb.append(getCapacityValue());
+            sb.append(' ');
+        }
+        if (getMoveValue() > 0) {
+            sb.append("Move ");
+            sb.append(getMoveValue());
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+
+    private static String rollText(int hitsOn, int dieCount) {
+        return dieCount > 1 ? hitsOn + "x" + dieCount : String.valueOf(hitsOn);
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }

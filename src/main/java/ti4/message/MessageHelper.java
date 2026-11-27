@@ -43,6 +43,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -429,6 +430,13 @@ public class MessageHelper {
                     .addFiles(fileUpload)
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static void sendEphemeralFilesInResponse(List<FileUpload> fileUploads, GenericInteractionCreateEvent event) {
+        if (fileUploads.isEmpty() || !(event instanceof IReplyCallback callback)) {
+            return;
+        }
+        callback.getHook().sendFiles(fileUploads).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendEphemeralFileInResponseToButtonPressComplete(

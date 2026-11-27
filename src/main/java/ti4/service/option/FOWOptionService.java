@@ -142,7 +142,7 @@ public class FOWOptionService {
         GHOST_HEXES(
                 FOWOptionCategory.MAP,
                 "Ghost hexes",
-                "Faint numbered rings on unexplored hexes next to known space; players can hide them with /user fog_ghost_hexes"),
+                "Faint numbered rings on unexplored hexes next to known space; players can hide them with /user fog_view"),
 
         NEW_TRANSACTIONS(
                 FOWOptionCategory.FLOW,
@@ -166,6 +166,11 @@ public class FOWOptionService {
                 FOWOptionCategory.FLOW,
                 "Disable Fracture",
                 "The Fracture can never enter play. Same setting as /game weird_game_setup no_fracture"),
+        BLIND_ACTIVATION(
+                FOWOptionCategory.FLOW,
+                "Blind activation",
+                "Activate only systems you can see; Blind Tile for others, empty space sends ships into The Void."
+                        + " No removing command tokens from systems you cannot see"),
 
         FOW_PLUS(
                 null, "FoW+", "Harder fog: forces stricter options, its own explore deck and blind activations", false),
@@ -404,6 +409,7 @@ public class FOWOptionService {
 
     public static boolean isEnabled(Game game, FOWOption option) {
         if (option == FOWOption.DISABLE_FRACTURE) return game.isNoFractureMode();
+        if (option == FOWOption.BLIND_ACTIVATION) return FOWPlusService.blindActivationActive(game);
         return game.getFowOption(option);
     }
 

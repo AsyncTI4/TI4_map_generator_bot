@@ -13,6 +13,7 @@ import ti4.spring.context.SpringContext;
 public class TourneyWinnerService {
 
     private TournamentWinnerRepository tournamentWinnerRepository;
+    private TournamentWinnerTitleService tournamentWinnerTitleService;
 
     public static TourneyWinnerService getBean() {
         return SpringContext.getBean(TourneyWinnerService.class);
@@ -26,11 +27,13 @@ public class TourneyWinnerService {
     public void add(String userId, String userName, String tourneyName) {
         if (DatabasePersistenceGate.isDisabled()) return;
         tournamentWinnerRepository.save(new TournamentWinner(userId, userName, tourneyName));
+        tournamentWinnerTitleService.grant(userId, userName, tourneyName);
     }
 
     public void remove(String userId, String tourneyName) {
         if (DatabasePersistenceGate.isDisabled()) return;
         tournamentWinnerRepository.deleteByUserIdAndTourneyName(userId, tourneyName);
+        tournamentWinnerTitleService.revoke(userId, tourneyName);
     }
 
     public String allWinnersToString() {

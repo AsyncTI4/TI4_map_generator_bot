@@ -39,6 +39,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.Ch
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.brynfolk.BrynfolkPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
@@ -1764,7 +1765,10 @@ public final class AgendaHelper {
 
         boolean prevoting =
                 !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        if (!thing.contains("hacan") && !thing.contains("kyro") && !thing.contains("allPlanets")) {
+        if (!thing.contains("hacan")
+                && !thing.contains("kyro")
+                && !thing.contains("allPlanets")
+                && !thing.contains("xanTransform")) {
             if (!finalRes) {
                 player.addSpentThing(thing);
                 if (thing.startsWith("planet_")) {
@@ -1820,6 +1824,16 @@ public final class AgendaHelper {
                             player.getRepresentation()
                                     + " please remove 1 infantry to pay for Silas Deriga, the Kyro commander.",
                             ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "infantry"));
+                }
+            }
+            if (thing.contains("xanTransform")) {
+                List<Button> transformButtons = XanAbilityHandler.getTransformationProtocolButtons(player, game);
+                if (!prevoting && !transformButtons.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " choose a ship to damage for 4 votes via _Transformation Protocol_.",
+                            transformButtons);
                 }
             }
             if (thing.contains("allPlanets")) {
@@ -2043,7 +2057,15 @@ public final class AgendaHelper {
                         "Silly Ghoti Tech Votes (" + fleetCC + ")",
                         FactionEmojis.ghoti));
             }
+
+            if (player.hasAbility("transformation_protocol")) {
+                Button xanTransformButton = XanAbilityHandler.getTransformationProtocolTriggerButton(player, game);
+                if (xanTransformButton != null) {
+                    planetButtons.add(xanTransformButton);
+                }
+            }
         }
+        planetButtons.addAll(BrynfolkPromissoryHandler.getAgendaVotingButtons(player, game));
         planetButtons.add(Buttons.gray(
                 "exhaustForVotes_allPlanets_" + totalPlanetVotes,
                 "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));

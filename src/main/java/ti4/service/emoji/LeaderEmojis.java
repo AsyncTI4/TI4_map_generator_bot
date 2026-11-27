@@ -280,6 +280,19 @@ public enum LeaderEmojis implements TI4Emoji {
     ChoirCommander,
     ChoirHero,
 
+    BrynfolkAgent,
+    BrynfolkCommander,
+    BrynfolkHero,
+    JotunnAgent,
+    JotunnCommander,
+    JotunnHero,
+    VaettirAgent,
+    VaettirCommander,
+    VaettirHero,
+    ValdyrjurAgent,
+    ValdyrjurCommander,
+    ValdyrjurHero,
+
     // Lost Legacies (Theodisi)
     ArdentiaAgent,
     ArdentiaCommander,

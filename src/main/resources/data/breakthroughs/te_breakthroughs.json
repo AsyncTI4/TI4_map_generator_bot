@@ -193,7 +193,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of Cruiser II.\nCorsair [Cost 2, Combat 6, Move 3, Capacity 2] If the active system contains another player's non-fighter ships, this unit can move through systems that contain other players' ships.",
+        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of Cruiser II.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mentakbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -314,7 +314,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area.",
+        "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.",
         "notes": "The Eidolon Maximum will participate in space combat even while on a planet if its owner has ships in the system. Async is currently ruling it can be moved around with transit diodes, and is unaffected by the agenda Articles of War.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/naazbt.png?raw=true",
         "source": "thunders_edge"

@@ -1,0 +1,19 @@
+{
+    "tileBack": "green",
+    "id": "ao10",
+    "name": "Utgardar/Jotunn - Jötunn",
+    "aliases": [
+        "ao10",
+        "utgardar",
+        "jotunn",
+        "jotunnhs",
+        "jotunn_hs"
+    ],
+    "imagePath": "ao10_jotunnhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "utgardar"
+    ],
+    "source": "goose"
+}

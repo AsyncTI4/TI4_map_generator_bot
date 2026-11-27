@@ -450,7 +450,9 @@ public class PlayStrategyCardService {
 
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             for (Player sacrificialPlayer : playersToFollow) {
-                OnyxxaTechHandler.serveSacrificialCommandButtons(game, sacrificialPlayer, scToPlay);
+                if (sacrificialPlayer.hasTech(OnyxxaTechHandler.SACRIFICIAL_COMMAND)) {
+                    OnyxxaTechHandler.serveSacrificialCommandButtons(game, sacrificialPlayer, scToPlay);
+                }
             }
             String sillySpelling = RelicHelper.sillySpelling();
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + sillySpelling);

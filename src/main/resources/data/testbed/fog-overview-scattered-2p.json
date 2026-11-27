@@ -1,0 +1,31 @@
+{
+  "name": "fog-overview-scattered-2p",
+  "description": "Fog, two galaxies. Sol (home 301) remembers ring 2 of the main map one empty hex apart (203-211), the outpost sector (a000, a102, a104) and three far-apart hexes of map A (a201, a205, a209); for the overview island gap, segment grouping and codes.",
+  "fog": true,
+  "you": {
+    "faction": "sol",
+    "home": "301",
+    "fogMemory": ["203", "205", "207", "209", "211", "a000", "a102", "a104", "a201", "a205", "a209"]
+  },
+  "seats": [
+    { "faction": "hacan", "home": "310" }
+  ],
+  "defaults": { "tg": 2, "ccs": "3/3/2" },
+  "start": "action",
+  "tiles": {
+    "a000": "39",
+    "a101": "19",
+    "a102": "20",
+    "a103": "21",
+    "a104": "22",
+    "a105": "24",
+    "a106": "25",
+    "a201": "26",
+    "a203": "27",
+    "a205": "28",
+    "a207": "29",
+    "a209": "30",
+    "a211": "31"
+  },
+  "stored": { "fowMapSegments": "core=000:1;outpost=a000:1" }
+}

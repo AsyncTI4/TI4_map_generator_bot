@@ -157,6 +157,7 @@ public final class Constants {
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
     public static final String SHOW_GAME_INFO = "show_game_info";
+    public static final String SHOW_MONUMENT = "show_monument";
     public static final String GAME_NAME = "game_name";
     public static final String SCENARIO = "scenario";
     public static final String CONTROL_GAME_CREATION = "control_game_creation";
@@ -184,6 +185,9 @@ public final class Constants {
     public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String MAP_SEGMENT = "map_segment";
+    public static final String SHOW_AS = "show_as";
+    public static final String SHOW_AS_DISTANCE = "show_as_distance";
+    public static final String SHOW_AS_WHOLE_MAP = "show_as_whole_map";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
@@ -556,7 +560,10 @@ public final class Constants {
     public static final String FOW = "fow";
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
-    public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String FOG_VIEW = "fog_view";
+    public static final String FOG_OVERVIEW_BOXES = "fog_overview_boxes";
+    public static final String FOG_OVERVIEW_REACH = "fog_overview_reach";
+    public static final String FOG_OVERVIEW_CODES = "fog_overview_codes";
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "system";

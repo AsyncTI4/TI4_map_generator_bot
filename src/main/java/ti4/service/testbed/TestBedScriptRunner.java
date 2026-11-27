@@ -35,6 +35,7 @@ import ti4.model.TestBedScript.Expect;
 import ti4.model.TestBedScript.Step;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.LoreService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.testbed.TestBedPress.PressResult;
@@ -57,7 +58,8 @@ public final class TestBedScriptRunner {
             "stackAgenda",
             "removeToken",
             "setGameOption",
-            "placeTile");
+            "placeTile",
+            "fogView");
 
     private enum Status {
         PASS,
@@ -513,6 +515,15 @@ public final class TestBedScriptRunner {
                 String problem = TestBedComponentService.placeTile(game, step.getKey(), step.getValue());
                 if (problem != null) problems.add(problem);
             }
+            case "setLore" -> LoreService.replaceLore(game, TestBedScriptService.loreEntries(step.getValue()));
+            case "fogView" -> {
+                Player seat = seat(game, step.getAs());
+                if (seat == null) {
+                    problems.add("no seat `" + step.getAs() + "`");
+                    return;
+                }
+                TestBedComponentService.setFogView(seat, step.getKey(), step.getValue());
+            }
             case "setActivePlayer" -> {
                 Player seat = seat(game, step.getAs());
                 if (seat == null) {
@@ -793,6 +804,9 @@ public final class TestBedScriptRunner {
             }
             case "gm" -> {
                 return game.isFowMode() ? GMService.getGMChannel(game) : null;
+            }
+            case TestBedScriptService.GM_ACTIVITY_SCOPE -> {
+                return game.isFowMode() ? GMService.activityThreadOrNull(game) : null;
             }
             default -> {
                 int colon = scope.indexOf(':');

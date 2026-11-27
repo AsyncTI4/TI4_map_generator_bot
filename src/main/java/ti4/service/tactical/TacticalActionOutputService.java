@@ -297,7 +297,7 @@ public class TacticalActionOutputService {
             Set<UnitKey> allMovingUnits,
             int distance,
             int riftDistance) {
-        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
+        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits);
         if (moveValue == 0) return "";
 
         StringBuilder output = new StringBuilder();
@@ -321,12 +321,21 @@ public class TacticalActionOutputService {
                     .append(moveValue)
                     .append(")");
 
+            boolean tempestaAvailable = canApplyTempestaMoveBonus(game, player);
+            if (tempestaAvailable) {
+                maxBonus++;
+            }
             if (player.hasTech("gd")) {
                 maxBonus++;
-                output.append(", may have used _Gravity Drive_)");
+                output.append(
+                        tempestaAvailable
+                                ? ", may have used _Gravity Drive_ or _Tempesta_)"
+                                : ", may have used _Gravity Drive_)");
             } else if (BlueReverieTechHelper.consumeGravityDriveBonus(game, player)) {
                 maxBonus++;
                 output.append(", used _Gravity Drive_)");
+            } else if (tempestaAvailable) {
+                output.append(", may have used _Tempesta_)");
             } else if (!player.hasTech("gd_br") && !game.isTwilightsFallMode()) {
                 output.append(", __does not have _Gravity Drive___)");
             }
@@ -432,6 +441,9 @@ public class TacticalActionOutputService {
                     .append(battlecruiserDistance)
                     .append(")");
         }
+        if (player.getFaction().equals(game.getStoredValue("hearthcallMoveBonus"))) {
+            output.append(" (Receives +1 from _Hearthcall Beacon_)");
+        }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
         }
@@ -447,8 +459,40 @@ public class TacticalActionOutputService {
         return output.toString();
     }
 
-    private int getUnitMoveValue(
-            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
+    private boolean canApplyTempestaMoveBonus(Game game, Player player) {
+        if (!player.hasPlanet("tempesta")) return false;
+        return !player.getExhaustedPlanetsAbilities().contains("tempesta")
+                || player.getFaction().equals(game.getStoredValue("tempestaUsed"));
+    }
+
+    int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits) {
+        int ownMoveValue = getUnitMoveValueBeforeGravleash(game, player, tile, unit, allMovingUnits);
+        if (ownMoveValue == 0 || !isRaisedByGravleash(player, unit)) return ownMoveValue;
+        return Math.max(ownMoveValue, gravleashPace(game, player, tile, allMovingUnits));
+    }
+
+    private boolean isRaisedByGravleash(Player player, UnitKey unit) {
+        return player.hasUnlockedBreakthrough("letnevbt")
+                && unit.unitType() != UnitType.Fighter
+                && isOwnShip(player, unit);
+    }
+
+    private int gravleashPace(Game game, Player player, Tile tile, Set<UnitKey> allMovingUnits) {
+        if (allMovingUnits == null) return 0;
+        return allMovingUnits.stream()
+                .filter(key -> isOwnShip(player, key))
+                .mapToInt(key -> getUnitMoveValueBeforeGravleash(game, player, tile, key, allMovingUnits))
+                .max()
+                .orElse(0);
+    }
+
+    private boolean isOwnShip(Player player, UnitKey unit) {
+        UnitModel model = player.getPriorityUnitByAsyncID(unit.asyncID(), null);
+        return model != null && model.getIsShip() && player.unitBelongsToPlayer(unit);
+    }
+
+    private int getUnitMoveValueBeforeGravleash(
+            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits) {
 
         UnitModel model = player.getPriorityUnitByAsyncID(unit.asyncID(), null);
         // player.getUnitFromUnitKey(unit);
@@ -491,17 +535,8 @@ public class TacticalActionOutputService {
         if (model.getIsShip() && HydromorphicCardHandler.hasRiptideRush(game, player)) {
             baseMoveValue++;
         }
-        if (skipBonus) return baseMoveValue;
-
         // Calculate bonus move value
         int bonusMoveValue = 0;
-        if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
-            int maxBase = allMovingUnits.stream()
-                    .map(key -> getUnitMoveValue(game, player, tile, key, null, true))
-                    .max(Integer::compare)
-                    .orElse(baseMoveValue);
-            bonusMoveValue = maxBase - baseMoveValue;
-        }
         if (model.getIsShip() && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
             bonusMoveValue++;
         }
@@ -586,6 +621,9 @@ public class TacticalActionOutputService {
         if (model.getIsShip()
                 && player.hasAbility("sacred_passage")
                 && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
+            bonusMoveValue++;
+        }
+        if (player.getFaction().equals(game.getStoredValue("hearthcallMoveBonus"))) {
             bonusMoveValue++;
         }
 

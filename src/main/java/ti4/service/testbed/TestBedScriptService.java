@@ -27,6 +27,7 @@ import ti4.model.TestBedScript.Expect;
 import ti4.model.TestBedScript.Shortcut;
 import ti4.model.TestBedScript.Step;
 import ti4.model.TileHelper;
+import ti4.service.fow.LoreService;
 import tools.jackson.core.JacksonException;
 
 @UtilityClass
@@ -35,7 +36,9 @@ public class TestBedScriptService {
     public static final String SCRIPT_FOLDER = TestBedPresetService.PRESET_FOLDER + "/scripts";
     public static final String ALL_SEATS = "all";
     public static final String YOU = "you";
-    public static final Set<String> SHARED_SCOPES = Set.of("main", "actions", "gm");
+    public static final String GM_ACTIVITY_SCOPE = "gm:activity";
+    public static final String NO_LORE = "none";
+    public static final Set<String> SHARED_SCOPES = Set.of("main", "actions", "gm", GM_ACTIVITY_SCOPE);
     public static final Set<String> SEAT_SCOPES = Set.of("private", "cards-info", "combat", "comms-inbox");
     public static final String VIRTUAL_SEAT_NAME = "seat";
     private static final int BUTTON_ID_LIMIT = 100;
@@ -334,6 +337,22 @@ public class TestBedScriptService {
                     errors.add(label + ": unknown tile `" + step.getValue() + "`.");
                 }
             }
+            case "setLore" -> {
+                requireValue(step.getValue(), "value", label, errors);
+                for (String entry : loreEntries(step.getValue())) {
+                    String problem = LoreService.storedEntryProblem(entry);
+                    if (problem != null) errors.add(label + ": " + problem);
+                }
+            }
+            case "fogView" -> {
+                requireSeat(step, label, errors);
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+                if (step.getKey() != null && step.getValue() != null) {
+                    String problem = TestBedComponentService.fogViewProblem(step.getKey(), step.getValue());
+                    if (problem != null) errors.add(label + ": " + problem);
+                }
+            }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {
                 requireSeat(step, label, errors);
@@ -353,6 +372,11 @@ public class TestBedScriptService {
             }
             default -> {}
         }
+    }
+
+    static List<String> loreEntries(@Nullable String value) {
+        if (value == null || value.isBlank() || NO_LORE.equals(value)) return List.of();
+        return List.of(value.split("\\|"));
     }
 
     private static void requireValue(@Nullable String value, String field, String label, List<String> errors) {

@@ -41,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -76,7 +77,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
@@ -131,6 +134,7 @@ import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.goose.BrynfolkAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
@@ -173,6 +177,8 @@ public final class ButtonHelperTacticalAction {
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
         TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
+        JotunnBreakthroughHandler.offerGlacialDrift(game, player);
+        BrynfolkAgent.offerAtEndOfTacticalAction(game, player);
         if (player.getPlanets().contains("petraunleashed")
                 && !player.getExhaustedPlanetsAbilities().contains("petraunleashed")) {
             List<Button> buttons = new ArrayList<>();
@@ -653,6 +659,7 @@ public final class ButtonHelperTacticalAction {
     public static void tacticalActionSpaceCannonOffenceStep(
             Game game, Player player, List<Player> playersWithPds2, Tile tile) {
         if (game.isFowMode()) {
+            ZephyrionAbilityHandler.offerMercenaryShipCount(game, playersWithPds2);
             String title = "### Space Cannon Offence " + UnitEmojis.pds + "\n";
             if (playersWithPds2.size() > 1 || !playersWithPds2.contains(player)) {
                 MessageHelper.sendMessageToChannel(
@@ -749,6 +756,7 @@ public final class ButtonHelperTacticalAction {
     public static void resetStoredValuesForTacticalAction(Game game) {
         ValhavnAbilityHandler.clearBloodlustActionUse(game);
         MigoTechHandler.clearLaghMetalAttractorsMovementBonus(game);
+        ZephyrionAbilityHandler.clearMercenaryDefenseContract(game);
         VanguardUnitHandler.clearBulwarkSustain(game);
         VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
@@ -782,6 +790,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         game.removeStoredValue("gyraxisActive");
+        game.removeStoredValue("hearthcallMoveBonus");
         RiggedExplosivesLLButtonHandler.clearRiggedExplosives(game);
         TacticalRetreatLLButtonHandler.clearTacticalRetreat(game);
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
@@ -994,6 +1003,7 @@ public final class ButtonHelperTacticalAction {
         BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
         TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
         IxthLegendaryButtonHandler.onSystemActivated(game, player);
+        ArvaxiUnitHandler.offerWrathOfTheCovenantDiscard(game, player, tile);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);
@@ -1050,6 +1060,19 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentation() + ", you must spend 1 influence to activate this system.",
                         buttons);
             }
+        }
+        if (player.hasTechReady("aobrynfolkhb") && tile.containsPlayersUnits(player)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "exhaustTech_aobrynfolkhb",
+                    "Use Hearthcall Beacon",
+                    FactionEmojis.brynfolk));
+            buttons.add(Buttons.DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you may exhaust _Hearthcall Beacon_ to apply +1 to the move value of each of your ships during this tactical action.",
+                    buttons);
         }
         if (game.isMonumentsMode()) {
             BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);
@@ -1522,6 +1545,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
+        game.removeStoredValue("tempestaUsed");
         ButtonHelper.deleteMessage(event);
     }
 

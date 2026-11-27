@@ -1,0 +1,17 @@
+[
+    {
+        "alias": "brynfolk_flagship_modifier",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "blot_other_players_tokens",
+        "scope": "",
+        "persistenceType": "ALWAYS",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "brynfolk_flagship"
+            }
+        ]
+    }
+]

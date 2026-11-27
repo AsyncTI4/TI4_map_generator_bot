@@ -601,8 +601,9 @@
         "combatDieCount": 1,
         "bombardHitsOn": 4,
         "bombardDieCount": 1,
+        "canBeDirectHit": false,
         "isShip": true,
-        "ability": "After you win a space combat, you may produce 1 dreadnought in the active system."
+        "ability": "This unit cannot be destroyed by 'Direct Hit' action cards.\nAfter you win a space combat, you may produce 1 dreadnought in the active system."
     },
     {
         "id": "industries_flagship",

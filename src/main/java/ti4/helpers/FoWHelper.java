@@ -977,9 +977,7 @@ public final class FoWHelper {
         // get players adjacent
         for (Player player_ : game.getRealPlayers()) {
 
-            if (message.toLowerCase().contains(player_.getColor().toLowerCase())
-                    && !message.toLowerCase()
-                            .contains("split" + player_.getColor().toLowerCase())) {
+            if (isNamedInPing(player_, message)) {
                 continue; // skip pinging players if their color is mentioned in the message
             }
             if (getTilePositionsToShow(game, player_).contains(position)) {
@@ -992,6 +990,12 @@ public final class FoWHelper {
                         player_.getPrivateChannel(), playerMessage, refreshButton);
             }
         }
+    }
+
+    public static boolean isNamedInPing(Player player, String message) {
+        String text = message.toLowerCase();
+        String color = player.getColor().toLowerCase();
+        return text.contains(color) && !text.contains("split" + color);
     }
 
     public static void pingAllPlayersWithFullStats(

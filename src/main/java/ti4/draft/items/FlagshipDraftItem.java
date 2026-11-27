@@ -129,4 +129,10 @@ public class FlagshipDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getUnit().getNotes();
+    }
 }

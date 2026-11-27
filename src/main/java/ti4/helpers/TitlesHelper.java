@@ -7,9 +7,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.ManagedGameService;
+import ti4.spring.service.persistence.EarnedTitle;
+import ti4.spring.service.persistence.StandaloneTitleEntity;
 import ti4.spring.service.title.PlayerTitleService;
 
 @UtilityClass
@@ -26,7 +31,7 @@ public class TitlesHelper {
                 .forEach(earned -> addTitle(titles, gameHistory, earned.title(), earned.source()));
         playerTitleService
                 .getStandaloneTitles(userId)
-                .forEach(earned -> addTitle(titles, gameHistory, earned.title(), earned.source()));
+                .forEach(earned -> addTitle(titles, gameHistory, withEmoji(earned), earned.source()));
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
@@ -55,6 +60,13 @@ public class TitlesHelper {
         }
 
         return sb;
+    }
+
+    private static String withEmoji(EarnedTitle earned) {
+        String emojiName = StringUtils.defaultIfBlank(earned.emoji(), StandaloneTitleEntity.DEFAULT_EMOJI);
+        CachedEmoji emoji = ApplicationEmojiService.getApplicationEmoji(emojiName);
+        if (emoji == null) return earned.title();
+        return emoji.getFormatted() + " " + earned.title() + " " + emoji.getFormatted();
     }
 
     private static void addTitle(

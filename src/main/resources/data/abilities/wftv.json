@@ -138,7 +138,8 @@
         "id": "marked_prey",
         "name": "Marked Prey",
         "faction": "zephyrion",
-        "permanentEffect": "You have 3 bounty tokens. At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ faction sheets. You can have a maximum of 1 bounty token on each unit space.",
+        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ faction sheets. You can have a maximum of 1 bounty token on each unit space.",
+        "notes": "You have 3 bounty tokens.",
         "source": "wftv"
     },
     {

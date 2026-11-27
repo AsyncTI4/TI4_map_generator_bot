@@ -216,7 +216,8 @@ public class SystemPickerService {
     }
 
     private static Predicate<Tile> selectableFor(Game game, Player player) {
-        Set<String> visible = FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
+        Set<String> visible =
+                FOWPlusService.blindActivationActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Predicate<Tile> activatable = tile -> ButtonHelper.canActivateTile(game, player, tile, visible);
         if (!isSegmented(game)) {
             return activatable;

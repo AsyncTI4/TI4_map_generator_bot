@@ -43,65 +43,7 @@ public class UnitDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
-        StringBuilder sb = new StringBuilder();
-        if (unit.getCost() > 0) {
-            sb.append("Cost: ");
-            float cost = unit.getCost();
-            if (cost == 0.5f) {
-                sb.append("1(x2)");
-            } else {
-                sb.append(cost == (int) cost ? "" + (int) cost : "" + cost);
-            }
-        }
-        if (unit.getCombatHitsOn() > 0) {
-            sb.append(" Combat: ");
-            sb.append(unit.getCombatHitsOn());
-            if (unit.getCombatDieCount() > 1) {
-                sb.append("x").append(unit.getCombatDieCount());
-            }
-            sb.append(' ');
-        }
-
-        if (unit.getSustainDamage()) {
-            sb.append("SUSTAIN DAMAGE ");
-        }
-        if (unit.getAfbDieCount() > 0) {
-            sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x")
-                    .append(unit.getAfbDieCount())
-                    .append(' ');
-        }
-        if (unit.getSpaceCannonDieCount() > 0) {
-            sb.append("SPACE CANNON ")
-                    .append(unit.getSpaceCannonHitsOn())
-                    .append("x")
-                    .append(unit.getSpaceCannonDieCount())
-                    .append(' ');
-        }
-        if (unit.getBombardDieCount() > 0) {
-            sb.append("BOMBARDMENT ")
-                    .append(unit.getBombardHitsOn())
-                    .append("x")
-                    .append(unit.getBombardDieCount())
-                    .append(' ');
-        }
-        if (unit.getProductionValue() > 0) {
-            sb.append("PRODUCTION ");
-            sb.append(unit.getProductionValue());
-            sb.append(' ');
-        }
-        if (unit.getCapacityValue() > 0) {
-            sb.append("Capacity ");
-            sb.append(unit.getCapacityValue());
-            sb.append(' ');
-        }
-        if (unit.getMoveValue() > 0) {
-            sb.append("Move ");
-            sb.append(unit.getMoveValue());
-            sb.append(' ');
-        }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(' ');
+        StringBuilder sb = new StringBuilder(unit.getRulesText());
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: ").append(unit.getFaction().get());
         }
@@ -140,5 +82,16 @@ public class UnitDraftItem extends DraftItem {
             allItems.add(generate(DraftCategory.UNIT, id));
         }
         return allItems;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getUnit().getNotes();
+    }
+
+    @Override
+    protected String getPlainDescription(Game game) {
+        return getUnit().getRulesText();
     }
 }

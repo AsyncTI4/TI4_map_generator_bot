@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -19,7 +18,6 @@ import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
-import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
@@ -80,8 +78,6 @@ class ShowGameButtonHandler {
         if (!mayRenderHere(game, event)) return;
         boolean inChannel = postsInChannel(event);
         GenericInteractionCreateEvent renderEvent = ShowGameService.renderEventFor(game, event);
-        GenericInteractionCreateEvent viewEvent = Objects.requireNonNullElse(renderEvent, event);
-        boolean foggedView = renderEvent != null && MapSegmentService.isFoggedView(game, renderEvent);
         MapRenderPipeline.queue(game, renderEvent, part, segment, fileUpload -> {
             if (!inChannel) {
                 MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
@@ -90,10 +86,7 @@ class ShowGameButtonHandler {
             MessageChannel channel = ShowGameService.privateChannelOrEventChannel(game, event);
             List<Button> mapButtons = new ArrayList<>();
             if (part != DisplayType.stats) {
-                mapButtons.addAll(
-                        MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
-                MapOverviewService.overviewButton(game, viewEvent).ifPresent(mapButtons::add);
-                MapOverviewService.gmOverviewButton(game, event, channel).ifPresent(mapButtons::add);
+                mapButtons.addAll(ShowGameService.mapViewButtons(game, event, channel));
             }
             if (mapButtons.isEmpty()) {
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);

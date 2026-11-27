@@ -9,7 +9,7 @@
         "faction": "xan",
         "baseUpgrade": "ws",
         "source": "wftv",
-        "text": "During space combat, this unit rolls 1 additional die for each space dock in this system. Other players' units in this system lose PLANETARY SHIELD. SUSTAIN DAMAGE BOMBARDMENT 3 (3) Cost 12 Combat 3*** Move 2 Capacity 8"
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 8\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nDuring space combat, this unit rolls 1 additional die for each space dock in this system. Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "alias": "baxansd",
@@ -55,7 +55,7 @@
         "faction": "kalora",
         "baseUpgrade": "dn2",
         "source": "wftv",
-        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s ground forces, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
     },
     {
         "alias": "bakalor",
@@ -78,7 +78,7 @@
         "faction": "lunarium",
         "baseUpgrade": "cv2",
         "source": "wftv",
-        "text": "At the end of a tactical action in this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. Cost 3 Combat 9 Move 2 Capacity X"
+        "text": "At the end of a tactical action in this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives. Cost 3 Combat 9 Move 2 Capacity 6"
     },
     {
         "alias": "balunag",
@@ -135,7 +135,7 @@
         "faction": "tyris",
         "baseUpgrade": "inf2",
         "source": "wftv",
-        "text": "This unit counts as 1/2 capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control, or in the space area of a system that contains 1 or more of your ships. Combat 7"
+        "text": "Cost 1(x2), Combat 7\nThis unit counts as 1/2 capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control, or in the space area of a system that contains 1 or more of your ships."
     },
     {
         "alias": "bavyseb",
@@ -158,7 +158,7 @@
         "faction": "vyserix",
         "baseUpgrade": "pds2",
         "source": "wftv",
-        "text": "SPACE CANNON: 5 ANTI-FIGHTER BARRAGE: 7** PLANETARY SHIELD You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system. This unit cannot lose its PLANETARY SHIELD ability."
+        "text": "PLANETARY SHIELD, SPACE CANNON 5, ANTI-FIGHTER BARRAGE 7(x2)\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system. This unit cannot lose its PLANETARY SHIELD ability."
     },
     {
         "alias": "bazephy",

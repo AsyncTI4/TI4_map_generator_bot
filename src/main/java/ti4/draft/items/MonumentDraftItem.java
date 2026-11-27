@@ -108,4 +108,10 @@ public class MonumentDraftItem extends DraftItem {
     private static boolean isMonument(UnitModel unit) {
         return unit != null && unit.getSource() == ComponentSource.monuments && unit.getIsMonument();
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getMonument().getNotes();
+    }
 }

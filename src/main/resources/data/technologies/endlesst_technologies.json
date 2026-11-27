@@ -294,7 +294,7 @@
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "riftborn",
+        "faction": "hissho",
         "source": "endlesst",
         "text": "You may have any number of structures on planets you control. Planets you control with structures on them cannot be the target of action cards or elected as part of agendas. You can produce ships at Space Docks even if they are blockaded. If you produce ships at a SPace Dock that is blockaded, immediately resolve space combat after production is done."
     },

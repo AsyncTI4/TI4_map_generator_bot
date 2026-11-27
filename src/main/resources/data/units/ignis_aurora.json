@@ -200,6 +200,6 @@
     "canBeDirectHit": false,
     "isShip": true,
     "homebrewReplacesID": "muaat_warsun",
-    "ability": "Other players units' in this system lose PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards."
+    "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards."
   }
 ]

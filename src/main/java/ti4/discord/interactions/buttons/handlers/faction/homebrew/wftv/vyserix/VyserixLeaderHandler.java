@@ -125,6 +125,7 @@ public class VyserixLeaderHandler {
         tile.addToken("attachment_cybernetic.png", planet);
         tile.addToken("attachment_propulsion.png", planet);
         tile.addToken("attachment_warfare.png", planet);
+        VyserixAbilityHandler.ignoreScatteredLegionsOn(game, planet);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " attached _Triangulation_ to "

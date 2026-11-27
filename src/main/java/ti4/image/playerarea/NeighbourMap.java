@@ -13,12 +13,18 @@ public final class NeighbourMap {
 
     private static final int EQUIVALENTS_PLAYER_LIMIT = 30;
 
+    private final Game game;
     private final List<Player> realPlayers;
     private final Map<Player, Set<Player>> direct = new HashMap<>();
     private final Map<Player, Set<Player>> withEquivalents = new HashMap<>();
 
     public NeighbourMap(Game game) {
+        this.game = game;
         this.realPlayers = game.getRealPlayers();
+    }
+
+    public Set<Player> guildShipPartners(Player player) {
+        return GuildShipPartners.of(game, player, withEquivalents(player));
     }
 
     public Set<Player> direct(Player player) {
@@ -30,7 +36,7 @@ public final class NeighbourMap {
         return cached;
     }
 
-    Set<Player> withEquivalents(Player player) {
+    public Set<Player> withEquivalents(Player player) {
         Set<Player> cached = withEquivalents.get(player);
         if (cached == null) {
             cached = inGameOrder(collectWithEquivalents(player));

@@ -253,6 +253,18 @@ For the most part, all raw data files are in `TI4_map_generator_bot/src/main/res
 
 # Testing your Changes
 
+## Running Tests from the Terminal
+
+```bash
+mvn -o test -Dspotless.check.skip=true -Dtest=MyClassTest   # one test class
+mvn -o test -Dspotless.check.skip=true                      # every test
+mvn verify                                                  # what CI runs: tests, then SpotBugs
+```
+
+- `-o` skips the remote repository checks once your dependencies are downloaded, and `-Dspotless.check.skip=true` skips the formatting check (run `mvn spotless:apply` before you push).
+- Without `clean`, Maven recompiles only when a source changed since the last build. Keep one top-level class per file, named after the file: a file holding only classes with other names makes Maven rebuild the whole project on every run (`SourceFileNamesTest` fails the build if one appears).
+- After you edit a main source, Maven still recompiles the whole module (about a minute). For a quick loop, `-Dmaven.compiler.useIncrementalCompilation=false` compiles only the changed files instead. It does not recompile the files that depend on them, so after changing a signature, a constant or an enum, or deleting a class, run once without it (or with `clean`) before trusting the results.
+
 ## VSCode Test
 
 To run Java tests in VSCode - make sure you add a test configuration your .vscode/settings.json file to pass the enviroment variables in. Paths below are just examples.

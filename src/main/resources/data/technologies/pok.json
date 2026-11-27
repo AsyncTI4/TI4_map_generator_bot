@@ -508,7 +508,7 @@
         "faction": "muaat",
         "baseUpgrade": "ws",
         "source": "base",
-        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.",
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose the PLANETARY SHIELD ability.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/prototype_war_sun_2.jpg?raw=true"
     },
     {
@@ -636,7 +636,7 @@
         "requirements": "GBY",
         "faction": "nomad",
         "source": "pok",
-        "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3)\nYou may treat this unit as if it were adjacent to systems that contain one or more of your mechs.",
+        "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3)\nYou may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/memoria_2.jpg?raw=true"
     },
     {
@@ -1092,7 +1092,7 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",
-        "text": "Once per action, when you resolve a unit's PRODUCTION ability, you may resolve another of your unit's PRODUCTION abilities in any system.",
+        "text": "When you resolve a unit's PRODUCTION ability, you may resolve another of your unit's PRODUCTION abilities in any system; this ability can be used only once per action.",
         "shortName": "Agency\nSupply Net.",
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network_te.jpg?raw=true"
