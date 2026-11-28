@@ -1,0 +1,206 @@
+# AI lookahead and thinking-time plan
+
+Tracks the work toward the AI thinking further ahead: gathering a fleet over several turns, weighing the ships a
+command token locks in, and using the longer thinking time an async game allows. Each step sits behind an
+`AiExperiments` flag or a debug switch, and stops if its check fails. Tick a step when its check has run, and write
+the result next to it.
+
+## Where this comes from
+
+Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data; no new game code was run for them):
+
+- Chess or Go style search is not feasible here. A real-engine 3-round playout costs about 1,200 CPU-s, two
+  continuations of one position differ by about 1.8 VP after 3 rounds, and telling options 0.25 VP apart needs about
+  207 paired playouts per option (138 CPU-hours per decision). There is no score for a whole position. A playout run
+  with today's policy can't discover gathering, because that policy never gathers.
+- The two gaps (gathering, token lock) are missing planner features, not missing search depth.
+- Real pace: at 6-seat tables the median table averages about 101 minutes per stored turn (p10 41, p90 241; overnight
+  gaps included). Under 1% of tables average under 15 minutes.
+- Today's limits: `AiSettings.DECIDE_TIMEOUT` is 20 s and a decision over it is discarded; self-play turns the limit
+  off; all AI games share 2 worker threads (`AiRuntime.WORKER_THREADS`); a press checks only that its button still
+  exists, not that the game is unchanged.
+- Testing is the binding constraint, not hosting: every budget level and every feature needs its own A/B run.
+
+## Steps
+
+- [ ] **1. Measure.** Debug timing over the major flows (perception, each brain rule, planner rankings, defense, win
+  odds, pricing, game loads and saves, actuation) with a batch summary of where time goes and the decision-time tail.
+  Also: production core count and memory (`nproc`, `free -h` on the host), how often decisions exceed 20 s without
+  contention, the margin between the planner's top two plans, how often the six rules ahead of the tactical rule decide
+  the turn, and the cost of a cold ranking.
+  - Check: if a cold ranking costs about 6x a warm one, round-level search (about 333 CPU-s) does not fit a
+    2-minute budget.
+  - Timing report (built 2026-11-11): add `-Dai.timing=true` to a self-play batch. The end of the batch prints
+    `TIMING` lines: decision wall and CPU percentiles, buckets, how many decisions would pass the live 20 s limit,
+    time by outcome and by the rule that decided, every span by self time (calls, mean, longest call), and time outside
+    decisions (`ai.tick`, `ai.load`, `ai.seat`, `ai.perceive`, `ai.actuate`, `harness.observe`). Timing spans use
+    `Thinking.measure`, which never cuts a decision short and does not count toward the depth limit, so turning the
+    report on cannot change a decision. Each brain rule shows as `rule.<Class>.<method>`.
+    - Done: timing report.
+    - Still to do: host cores and memory, the top-two plan margin, a cold-ranking cost.
+  - First measurement, 2026-11-11: 6 full games, 6 threads on 16 cores (uncontended), seed 9300.
+    - Game shape: final round 6.2, leader 10.2 VP, table 46.0.
+    - Decisions: 166,820, about 2,400 CPU-s per game, nearly all of it AI thinking. Median 1 ms, p90 19 ms, p99
+      2.6 s, p99.9 7.6 s, max 32 s.
+    - Uncontended, only 6 decisions passed 20 s (0.004%), so step 2's check says leave the limit alone. Contention,
+      not the limit, made decisions slow in the 14-thread batches.
+    - Where it goes (self time, share of all decision time):
+      | Span | Share | Calls |
+      | --- | --- | --- |
+      | `winOdds.compute` | 12.7% | 791k |
+      | `strike.estimate` | 11.3% | 2.4M |
+      | `defense.space` | 9.6% | 5.7M |
+      | `tactical.for.attack` | 8.9% | — |
+      | `incoming.force` | 8.4% | 59M |
+      | `defense.threat` | 8.0% | 21M |
+      | `secrets.keepValue` | 4.1% | — |
+
+      `tactical.rank.base` (35k rankings, 330 ms mean) contains 76% of all decision time; only 10.8k of those
+      rankings are the seat's own `takeTurn`.
+    - Idle decisions (no rule fired) are 65% of decisions and 28% of decision time (38 ms mean). Polls of an
+      unchanged game re-run rules that find nothing to do. A cache keyed on the save's revision, not the `Game`
+      instance (each tick reloads it), is the obvious first optimization.
+    - Idle-poll cache, checked and dropped 2026-11-11 (3 games, seed 9300, run alongside other work, so shares
+      only). The report now tags each decision with what changed since the seat's last decision ended (`saved`,
+      `same save`, `unchanged`) and whether a rule read `context.now()`. Idle decisions on an unchanged game are only
+      3.3% of decision time, and 99.5% of them read the clock, so a timer could change their answer and skipping them
+      is not safe. Idle decisions after a save are 13.8%. The seat's own turn on a fresh save (`press, saved`) is
+      66.6%, with `StandardBrain.takeTurn` alone at 46.5%; `TradeRules.startDeals` is 10.0% and
+      `StrategyCardRules.gainTokens` 7.8%. The earlier 28% idle share was inflated by idles that now cost less.
+      Next candidate: share seat-independent work (win odds, threats, incoming forces) across seats and decisions on
+      the same save.
+    - Other heavy nested paths: `trade.votePromises` (8.2k calls, 3,856 s total), `agenda.forecast` (3,740 s total),
+      `strategy.planInputs` (4,141 s total), `production.plan` (3,890 s total).
+    - This run used the first build, in which timing frames still counted toward the depth limit; no decision was cut
+      short.
+- [ ] **2. Stop discarding slow decisions.** Give the AI's own turn about 60 s, count calls for the logic limits, and
+  keep wall clock only as a backstop.
+  - Check: if under 1% of decisions exceed 20 s without contention, leave the limit at 20 s.
+- [x] **3. Joint win threat.** Five rivals at 0.40 each pass the per-rival 0.5 test, yet one of them finishes first 92%
+  of the time (`WinOdds`, `WinRace`). Use the combined chance, as `DenialMap` already does.
+  - Check: a 48-game shadow run that changes under 5% of triggered decisions means drop it.
+  - Dropped 2026-11-15. `-Dai.shadow=true` (`ShadowCheck`) plays the current answer and counts the decisions the
+    candidate would change. 48 games, seed 9500, 8 threads, contended (one stall in round 1 on seed 9508, so 47 games
+    finished; final round 5.7, leader 9.9 VP, table 42.3). Of 82,965 decisions that reached a joint check, 542 would
+    change (0.7%). Nearly all of them came from the spend reserve's "is the field likely first" test, which changed
+    5,333 of 5.4M calls. The extortion / Support for the Throne check (164 decisions) and the reserve-still-wins
+    check (4,850 decisions) changed none. Rivals rarely sit just under 0.5 each in numbers large enough for the
+    combined chance to matter. The experiment code was removed; `ShadowCheck` stays for the shadow checks of
+    steps 5 and 7.
+- [ ] **4. Cheaper testing.** Paired continuations from snapshots with `decisionOverride`; randomized flags per seat.
+  - Check: if the standard error is well above 0.08 VP at a one-round horizon, go back to whole-game A/B.
+  - Harness built 2026-11-20, not yet run: `ContinuationAbExperimentTest` (`-Dai.selfplay.continuation=true`,
+    `.flags=...`). Snapshots at the start of rounds 2-4, two arms per continuation seed with the treated half
+    swapped, common random numbers, one-round horizon; see the test README. Flags are switched through the seats'
+    stored values, so `decisionOverride` is not needed.
+  - With common random numbers an A/A run scores exactly 0, so the check reads the standard error of a real flag's
+    run; `crn=false` gives the unpaired noise.
+  - First run, 2026-11-21, DESPERATION_ACTION_SECRET (8 games, 96 pairs, 7 h 20 min wall on 8 threads): void.
+    Restoring the round-2 snapshot dropped Discord messages posted after it, and restoring a later snapshot never
+    brought them back, so round-3 arms and most round-4 arms stalled in the strategy phase with no pick prompt
+    (92% of pairs untouched, -0.007 +/- 0.012 VP from games that barely moved). `FakeDiscord` snapshots now keep the
+    channel and message objects; a one-game repro then finished all 4 arms at their stop round. Each arm that misses
+    its stop round now prints the stall report, and the summary counts arm endings.
+  - Rerun (2026-11-21) also void: after 17 h, with about 190 of 192 arms done and no stalled arm, another session
+    rebuilt this worktree's classes and a late arm hit `NoClassDefFoundError`. Pairs printed only at the end, so
+    none survived. The harness now prints each pair as it lands (`CONTPAIR-LIVE`) and keeps the other games when
+    one fails.
+  - Next: rerun the same flag (needs a yes) from its own detached worktree so no other build can touch its classes,
+    then compare sign and standard error with the whole-game -0.5 VP.
+  - Follow-up required: the harness is pushed unproven. Test it as above, then decide whether to keep it or throw
+    it away (delete `ContinuationAb*` and its README section) if it cannot match whole-game A/B at lower cost.
+- [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
+  fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
+  - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.
+- [ ] **6. Token lock and gathering as planner features** (independent of step 5).
+  - Token lock: score a plan with what the remaining tokens can still do this round; add a candidate that attacks with
+    the smallest force that wins.
+  - Gathering: credit `computeFuture` with all ships in reach for a next-round strike, save the strike intent between
+    turns and re-check it every turn, price a next-round Diplomacy block and defender production.
+  - Check: a census showing packing changes few activations, then a 120-pair A/B (about 13.6 h) judged against a bar
+    set in advance.
+- [ ] **7. Final-round win race.** Own immediate points and rival removals only, with closed-form odds, from goal
+  minus 2-3.
+  - Check: under 5% of triggered decisions change, or no better calibrated than the simple VP-short lookup, means drop.
+- [ ] **8. Round-level plan search**, only if 5 or 6 show a gain: typed result (tile, card, component, pass), its own
+  1-thread pool, a game-version check before pressing.
+  - Check: about 33 h of A/B; power is poor (29% at a true +0.125 VP), so decide the acceptance bar in advance.
+- [ ] **9. Pace-scaled budget and the middle tier** (multi-round strike plans, more hidden-card samples), only if 8
+  gains. Store pace in the save, not in memory.
+- [ ] **10. Real-engine playouts, offline only**, for tuning and calibration (endgame first, from round 4).
+
+## Done along the way
+
+- 2026-11-11: three harness leaks fixed (commit 7a9b10daf7): rollouts saw the next objectives, snapshots left the
+  attack ledger's picture behind, copying a game stamped the live game as modified.
+
+- 2026-11-15: incoming-force scans are shared within a tick (`TickMemo`, opened by `AiTickRunner` for the game object
+  it loaded; every press ends the tick). A shared answer is keyed by enemy, tile, horizon and the three "assume"
+  thread-locals (flank-speed boost, no fleet limit, antimass). `-Dai.tickmemo.verify=true` recomputes every shared
+  answer without sharing: 2 games, seed 9400, 8,177,860 forces and 4,531,747 reach maps checked, none differed. Time
+  in incoming-force scans fell from 5.1 ms to 2.3 ms per decision (3 games, seed 9300, contended), about 3-4% of
+  thinking time. The audit found the other heavy board facts (defense, rankings, win odds) read the deciding seat's
+  hidden hand or perspective, so they are not shared across seats.
+
+- 2026-11-23: `EnemyIntent` keeps a rival's predicted plans for every seat that asks on the same save, but the
+  imagined turn ran with the asking seat as the decider, so the READY_PUBLIC_POINTS and PROMISE_DEALS flags of
+  whichever seat asked first decided the plan for all of them (in an A/B, control seats reused treated predictions).
+  The imagined turn now decides as the rival itself: the rival's own flags apply and nobody's hand is known
+  (`EnemyIntentTest`). Imagined turns also hide the rival's promissory notes, as they hide its secrets and action
+  cards, so a defender's Ceasefire is no longer read from a hand the asker cannot see. An imagined rival still gets
+  no desperation boost. `TradeValue` imagines a partner the same way without sharing the answer; it was left as is.
+- 2026-11-23: `-Dai.sharecensus=true` (`ShareCensus`) counts the shareable answers that were worked out again, by
+  who asked and when, with keys that hold the asker's hidden hand and flags. It decides what to share next.
+- 2026-11-24: census of 2 full games (about 7,200 CPU-s, queue job 20261123-191140-share-census-2games). Work
+  repeated with the same key: win.odds 1,131 of 1,298 s (881 s same seat, same tick), secret.readiness 800 of 851 s
+  (largely inside win.odds), enemy.intent 449 of 3,140 s (379 s same seat, later tick: cache misses, since the
+  256-entry cache was emptied whenever it filled), combat.odds 295 of 300 s, incoming.force 40 of 133 s. Ceiling
+  about 1,500 to 1,900 CPU-s (20 to 25%); timings nest, so not additive.
+- 2026-11-24: acted on it. `WinOdds` keeps its answers for the rest of the tick in `TickMemo`, keyed on the deciding
+  seat and imagined seat as well as viewer, rival and loss, so no seat reuses an answer worked out from another
+  seat's hand or flags (`WinOddsTickMemoTest`; `-Dai.tickmemo.verify` on a round-one game: 1,526 shared answers,
+  0 differed). `EnemyIntent` now holds 4,096 answers and, when full, drops only those for older saves. Not yet
+  measured on full games. PlanInputs, SpendOutlook and DiplomacyUse keyed only on the seat, so an answer worked out
+  inside an imagined turn (hand hidden) was reused when that seat really decided, and the reverse: which one a seat
+  got depended on what was computed first. They now add `ImaginedTurn.cacheMark`; on trade seed 2894249192 the
+  new caches without it changed the game (failed `TradeFlowSelfPlayTest`), with it they replay the old game.
+- 2026-11-24: census after those caches (2 games, 7 rounds each, queue job 20261124-184311): about 539 CPU-s per
+  round against about 602 before (two games a side, rough). win.odds fell from 1,298 to 635 s (same-tick repeats
+  881 to 167 s), secret.readiness from 851 to 554 s. Left: secret.readiness 498 s repeated (329 s same seat, same
+  tick), combat.odds 340 of 343 s, enemy.intent 528 of 3,170 s (mostly later ticks). Acted on: `SecretOdds` keeps a
+  rival's per-secret readiness in `TickMemo` for every seat (round-one verify: 183,184 shared, 0 differed), and
+  `CombatOdds` keeps answers across saves.
+- 2026-11-25: census after those (2 games, rounds 6 and 8, queue job 20261124-211125): about 505 CPU-s per round
+  (539 before, 602 at the first census; two games a side, rough). combat.odds fell from 343 to 6 s, secret.readiness
+  from 554 to 140 s. Left: enemy.intent 3,185 s (443 s repeated, mostly later ticks), win.odds 534 s (385 s repeated,
+  221 s same seat, same tick: mostly other viewers, whose answers can differ through the Custodians race and
+  Mecatol take, so left alone).
+- 2026-11-25: a JFR profile of a two-round game put 19% of all CPU in `Territory.distancesFrom`, rebuilt for every
+  seat on each `Hostility.observe` (15%), and 8% in `TechnologyFollowReserve.of` from production planning. Hex
+  distances now stay cached per start position for good, and the follow reserve is kept per decision. The
+  `tactical.for.attack` time in the census is mostly this work, reached through enemy.intent.
+- 2026-11-26: same-seed speed check (seed 7700, 4 full games, queue jobs 20261125-135241 new at c042ffb893 and
+  20261125-135242 baseline with every cache commit reverted): game thread CPU 7,766 s over 22 rounds against
+  11,357 s over 23, about 353 against 494 CPU-s per round (-29%). Game 3 ended on the same scores both ways
+  (1,566 against 2,307 s, -32%); games 1, 2 and 4 drifted. Both jobs predate the seat-id fix 3379860e70, whose
+  collisions moved seeded random streams between games of one batch, so the drift is not yet evidence against the
+  caches. Exact equality needs a rerun of both sides from 3379860e70 onward.
+- 2026-11-26: rerun with the seat-id fix (jobs 20261126-092213/092214): 4,367 against 6,647 CPU-s (-34%). Games
+  1-3 identical, game 4 split in round 2. A game 4 replay with the follow reserve keyed on the token-purchase
+  estimating mode still split in round 2 and then left the cache run in round 4, so that key gap changes play
+  but is not the round-2 split.
+- 2026-11-27: rerun after the isolated harness memo 2dd825c0eb (jobs 20261127-115501): 6,302 against 9,522
+  CPU-s over 22 rounds each, 286 against 433 per round (-34%). No game is identical now, but every split is late:
+  turn order first differs in round 5, 5, 3 and 5. The follow reserve key gap is still open on this side, so
+  the next check waits for the cache-key fixes from the Styx session.
+- 2026-11-28: with those fixes (52134360c2, jobs 20261127-180926; baseline 703556b100 drops only the caches and
+  keeps every key fix): all 4 games identical, same scores and same turns. 17,230 against 26,046 game-thread
+  CPU-s (-34%). Game CPU still ranges 1,513 to 6,368 s: agenda phases took 37% of thinking in the fast game and
+  53% in the slowest, at up to 6 s per tick.
+
+## Unknowns
+
+- Production vCPU count, RAM and heap headroom.
+- True per-turn durations (no per-turn timestamps are stored).
+- Model bias of lookahead and search, which is what really limits them.
+- How humans pace and play with an AI seat at the table.

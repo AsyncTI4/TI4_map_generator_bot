@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.ai.AiSeats;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -88,6 +89,7 @@ public class TestBedService {
     public static Player findNonDeveloper(@Nullable Guild guild, Collection<Player> players) {
         return players.stream()
                 .filter(player -> !isVirtualSeat(player)
+                        && !AiSeats.isAiSeat(player)
                         && !isBot(guild, player.getUserID())
                         && !isDeveloperId(guild, player.getUserID()))
                 .findFirst()

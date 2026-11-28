@@ -1,0 +1,27 @@
+{
+  "id": "20261117-desperation-public",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Desperation on public objectives only (other desperation experiments off).",
+  "date": "2026-11-17",
+  "code": {
+    "commit": "c94304b0b5..c1cb4e5e70",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 24,
+    "baseSeed": 9700,
+    "experimentsUnderTest": [
+      "DESPERATION_PUBLIC"
+    ]
+  },
+  "estimate": {
+    "completePairs": 12,
+    "pointDifference": "-0.13 ± 0.27",
+    "treatmentWinShare": null
+  },
+  "batch": null,
+  "verdict": "Neutral; off by default since c1cb4e5e70.",
+  "notes": ""
+}

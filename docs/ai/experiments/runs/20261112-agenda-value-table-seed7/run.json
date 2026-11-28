@@ -1,0 +1,27 @@
+{
+  "id": "20261112-agenda-value-table-seed7",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Does the expert agenda value table vote better? Measured on per-seat agenda utility.",
+  "date": "2026-11-12",
+  "code": {
+    "commit": "unknown (before the agenda trace fixes)",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "RoundTwoSelfPlayTest#playTwoRounds (playagenda, 3 rounds)",
+    "games": 24,
+    "baseSeed": 7,
+    "experimentsUnderTest": [
+      "AGENDA_VALUE_TABLE"
+    ]
+  },
+  "estimate": {
+    "completePairs": 12,
+    "pointDifference": "-0.19",
+    "treatmentWinShare": null
+  },
+  "batch": null,
+  "verdict": "Inconclusive: agenda utility +0.087 ± 0.089 TG (A/A noise ±0.096 TG at 12 pairs).",
+  "notes": "Utility is graded on the expert table itself, which favours the treatment. Final points are noise at this size."
+}

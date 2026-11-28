@@ -119,27 +119,39 @@ public final class FakeDiscord {
     }
 
     // The channels, messages and id counters at one moment. Restoring drops what was created since and puts every
-    // older channel and message back as it was, so a game can be played on from the same Discord more than once.
+    // channel and message of that moment back as it was, so a game can be played on from the same Discord more than
+    // once, and snapshots of different moments can be restored in any order. The objects are kept, not just their
+    // states: restoring an earlier snapshot drops what a later one needs back.
     public record Snapshot(
-            Map<Long, FakeChannel.State> channels,
-            Map<Long, FakeMessage.State> messages,
+            Map<Long, SavedChannel> channels,
+            Map<Long, SavedMessage> messages,
             long lastMillis,
             int sequence,
             int nextComponentId) {}
 
+    public record SavedChannel(FakeChannel channel, FakeChannel.State state) {}
+
+    public record SavedMessage(FakeMessage message, FakeMessage.State state) {}
+
     public synchronized Snapshot snapshot() {
-        Map<Long, FakeChannel.State> channelStates = new LinkedHashMap<>();
-        channels.forEach((id, channel) -> channelStates.put(id, channel.state()));
-        Map<Long, FakeMessage.State> messageStates = new LinkedHashMap<>();
-        messages.forEach((id, message) -> messageStates.put(id, message.state()));
-        return new Snapshot(channelStates, messageStates, lastMillis, sequence, nextComponentId);
+        Map<Long, SavedChannel> savedChannels = new LinkedHashMap<>();
+        channels.forEach((id, channel) -> savedChannels.put(id, new SavedChannel(channel, channel.state())));
+        Map<Long, SavedMessage> savedMessages = new LinkedHashMap<>();
+        messages.forEach((id, message) -> savedMessages.put(id, new SavedMessage(message, message.state())));
+        return new Snapshot(savedChannels, savedMessages, lastMillis, sequence, nextComponentId);
     }
 
     public synchronized void restore(Snapshot snapshot) {
-        channels.keySet().retainAll(snapshot.channels().keySet());
-        channels.forEach((id, channel) -> channel.restore(snapshot.channels().get(id)));
-        messages.keySet().retainAll(snapshot.messages().keySet());
-        messages.forEach((id, message) -> message.restore(snapshot.messages().get(id)));
+        channels.clear();
+        snapshot.channels().forEach((id, saved) -> {
+            saved.channel().restore(saved.state());
+            channels.put(id, saved.channel());
+        });
+        messages.clear();
+        snapshot.messages().forEach((id, saved) -> {
+            saved.message().restore(saved.state());
+            messages.put(id, saved.message());
+        });
         lastMillis = snapshot.lastMillis();
         sequence = snapshot.sequence();
         nextComponentId = snapshot.nextComponentId();

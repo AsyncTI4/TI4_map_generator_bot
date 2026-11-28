@@ -1548,11 +1548,21 @@ public final class ButtonHelperTacticalAction {
         if (!game.isL1Hero()) {
             resolveMagenOnActivation(game, tile);
         }
+        clearActivationBoosts(game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearActivationBoosts(Game game) {
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
+        clearMovementEnablers(game);
         game.removeStoredValue("baldrickGDboost");
         game.removeStoredValue("tempestaUsed");
-        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearMovementEnablers(Game game) {
+        game.removeStoredValue("lostStarChart");
+        game.removeStoredValue("navSuite");
     }
 
     private static void resolveMagenOnActivation(Game game, Tile activeSystem) {

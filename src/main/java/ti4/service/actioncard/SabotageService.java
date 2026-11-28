@@ -30,6 +30,10 @@ public class SabotageService {
     private static final String DISABLE_TITLE = "Disable";
     private static final String FLANK_SPEED_TITLE = "Flank Speed";
     private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
+    private static final String LOST_STAR_CHART_TITLE = "Lost Star Chart";
+    private static final String LOST_STAR_CHART_PLAYED = "lostStarChart";
+    private static final String NAV_SUITE_TITLE = "Nav Suite";
+    private static final String NAV_SUITE_PLAYED = "navSuite";
     private static final String CANCELED_WINDOWS = "canceledActionCardWindows";
     private static final String CANCELED_WINDOW_SEPARATOR = "_";
     private static final Set<String> ALL_SABOTAGE_CARD_ALIASES = Set.of(
@@ -179,6 +183,8 @@ public class SabotageService {
     public static void undoEffectsOfCanceledCard(Game game, @Nullable Player cardPlayer, String title) {
         if (WAR_MACHINE_TITLE.equals(title) && cardPlayer != null) cardPlayer.removeSpentThing(WAR_MACHINE_SPENT);
         if (FLANK_SPEED_TITLE.equals(title)) game.removeStoredValue(FLANK_SPEED_BOOST);
+        if (LOST_STAR_CHART_TITLE.equals(title)) game.removeStoredValue(LOST_STAR_CHART_PLAYED);
+        if (NAV_SUITE_TITLE.equals(title)) game.removeStoredValue(NAV_SUITE_PLAYED);
         if (DISABLE_TITLE.equals(title)) DisableService.clear(game);
     }
 

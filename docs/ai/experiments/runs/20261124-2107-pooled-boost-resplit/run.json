@@ -1,0 +1,117 @@
+{
+  "id": "20261124-2107-pooled-boost-resplit",
+  "kind": "ab",
+  "question": "Does POOLED_BOOST_RESPLIT change points or win share?",
+  "started": "2026-11-25T02:07:23.326184300Z",
+  "finished": "2026-11-25T12:43:00Z",
+  "status": "interrupted",
+  "code": {
+    "commit": "b2ff2c28e2fdc86dfb09fee57eb481f98ceff3fc",
+    "commitSubject": "Merge origin/claude/ai-agenda-expert into claude/ai-styx-take",
+    "commitDate": "2026-11-24T20:48:49-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261124-210550-pooled-boost-resplit",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "threads": 10,
+    "baseSeed": 9800,
+    "seedFixed": true,
+    "experimentsUnderTest": [
+      "POOLED_BOOST_RESPLIT"
+    ],
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "POOLED_BOOST_RESPLIT"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.ab": "POOLED_BOOST_RESPLIT",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "48",
+      "ai.selfplay.queue.id": "20261124-210550-pooled-boost-resplit",
+      "ai.selfplay.record": "true",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-styx\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "pooled-boost-resplit",
+      "ai.selfplay.record.question": "Does POOLED_BOOST_RESPLIT change points or win share?",
+      "ai.selfplay.seed": "9800",
+      "ai.selfplay.threads": "10"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "verdict": "pending",
+  "results": {
+    "source": "scored by hand from the queue log; the PC restarted at 07:47 local and killed the batch",
+    "gamesFinished": 43,
+    "missingSlots": [
+      37,
+      40,
+      44,
+      46,
+      47
+    ],
+    "completePairs": 20,
+    "pointDifference": {
+      "mean": 0.158,
+      "standardError": 0.206,
+      "null": 0
+    },
+    "treatmentWinShare": {
+      "mean": 0.55,
+      "standardError": 0.08,
+      "null": 0.5
+    },
+    "averageRound": 5.93,
+    "averageLeaderPoints": 10.14,
+    "averageTablePoints": 45.53
+  }
+}

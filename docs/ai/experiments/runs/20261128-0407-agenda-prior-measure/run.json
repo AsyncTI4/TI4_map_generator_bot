@@ -1,0 +1,172 @@
+{
+  "id": "20261128-0407-agenda-prior-measure",
+  "kind": "ab",
+  "question": "What is the average full agenda deck spread a kept vote is priced from, per seat and round? Replays the 12 styx-take-ab games (seed 9900, STYX_TAKE A/B, Fracture, 12 threads; batch at d9f34394a1, 2.2 h) with only the AGENDAPRIOR probe added, which runs in an isolated memo, so every game should match styx-take-ab exactly.",
+  "started": "2026-11-28T09:07:01.827788100Z",
+  "finished": "2026-11-28T11:22:26.734552100Z",
+  "status": "finished",
+  "code": {
+    "commit": "41c3811714554e6d2f7011a5083a9f89f0611334",
+    "commitSubject": "Probe the full agenda deck look-ahead a kept vote is priced from",
+    "commitDate": "2026-11-27T18:34:45-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261127-183501-agenda-prior-measure",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 12,
+    "threads": 12,
+    "baseSeed": 9900,
+    "seedFixed": true,
+    "experimentsUnderTest": [
+      "STYX_TAKE"
+    ],
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "POOLED_BOOST_RESPLIT",
+      "STYX_TAKE",
+      "TECH_FOLLOW_KEEP",
+      "DIPLOMACY_READIED_PLANNING",
+      "XXCHA_LEADER_READIES"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.ab": "STYX_TAKE",
+      "ai.selfplay.agendaprior": "true",
+      "ai.selfplay.fracture": "true",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "12",
+      "ai.selfplay.queue.id": "20261127-183501-agenda-prior-measure",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\agenda-prior-average\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "agenda-prior-measure",
+      "ai.selfplay.record.question": "What is the average full agenda deck spread a kept vote is priced from, per seat and round? Replays the 12 styx-take-ab games (seed 9900, STYX_TAKE A/B, Fracture, 12 threads; batch at d9f34394a1, 2.2 h) with only the AGENDAPRIOR probe added, which runs in an isolated memo, so every game should match styx-take-ab exactly.",
+      "ai.selfplay.seed": "9900",
+      "ai.selfplay.threads": "12"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "batch": {
+    "games": 12,
+    "batchWallSeconds": 8123,
+    "endings": {
+      "VICTORY_POINTS": 12
+    },
+    "averageFinalRound": 5.917,
+    "averageLeaderPoints": 10.083,
+    "averageTablePoints": 45.75,
+    "averageGameWallSeconds": 5431.667,
+    "wallMillisPerTick": 1084.905
+  },
+  "estimate": {
+    "finishedGames": 12,
+    "completePairs": 6,
+    "unfinishedGames": 0,
+    "pointDifference": {
+      "mean": 0.417,
+      "standardError": 0.521,
+      "t": 0.799,
+      "n": 6,
+      "null": 0
+    },
+    "treatmentWinShare": {
+      "mean": 0.667,
+      "standardError": 0.167,
+      "t": 1,
+      "n": 6,
+      "null": 0.5
+    },
+    "treatmentAveragePoints": 7.833,
+    "controlAveragePoints": 7.417
+  },
+  "data": "games.csv",
+  "verdict": "pending",
+  "queue": {
+    "id": "20261127-183501-agenda-prior-measure",
+    "submittedBy": "agenda-prior-session",
+    "sourceWorktree": "C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/agenda-prior-average",
+    "sourceBranch": "claude/ai-agenda-prior-average",
+    "submittedAt": "2026-11-27T23:35:01.440Z",
+    "approvedAt": "2026-11-27T23:35:41.028Z",
+    "startedAt": "2026-11-28T09:05:20.823Z",
+    "finishedAt": "2026-11-28T11:22:29.426Z",
+    "waitHours": 9.49,
+    "runHours": 2.29,
+    "estimateHours": 2.5,
+    "exitCode": 0,
+    "status": "done",
+    "load": {
+      "samples": 28,
+      "cpuPercentAverage": 75,
+      "cpuPercentMax": 100,
+      "samplesWithOtherBuilds": 0,
+      "otherBuildWorktrees": [],
+      "otherJavaProcessesMax": 1
+    },
+    "mavenArguments": [
+      "-o",
+      "test",
+      "-Dspotless.skip=true",
+      "-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames",
+      "-Dsurefire.failIfNoSpecifiedTests=false",
+      "-Dai.selfplay.full=true",
+      "-Dai.selfplay.games=12",
+      "-Dai.selfplay.threads=12",
+      "-Dai.selfplay.seed=9900",
+      "-Dai.selfplay.fracture=true",
+      "-Dai.selfplay.ab=STYX_TAKE",
+      "-Dai.selfplay.agendaprior=true",
+      "-Dai.selfplay.record.dir=C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\agenda-prior-average\\docs\\ai\\experiments",
+      "-Dai.selfplay.record.label=agenda-prior-measure",
+      "-Dai.selfplay.record.question=What is the average full agenda deck spread a kept vote is priced from, per seat and round? Replays the 12 styx-take-ab games (seed 9900, STYX_TAKE A/B, Fracture, 12 threads; batch at d9f34394a1, 2.2 h) with only the AGENDAPRIOR probe added, which runs in an isolated memo, so every game should match styx-take-ab exactly.",
+      "-Dai.selfplay.queue.id=20261127-183501-agenda-prior-measure"
+    ]
+  }
+}

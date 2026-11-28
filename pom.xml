@@ -29,6 +29,11 @@
     <spotbugs-maven-plugin.version>4.10.5.0</spotbugs-maven-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <sb-contrib.version>7.7.4</sb-contrib.version>
+    <!-- Self-play tests (JUnit tag "selfplay") run after the other tests, each test class in its own JVM, this many
+         at once. 1 plays them one after another. -->
+    <ai.selfplay.forks>6</ai.selfplay.forks>
+    <!-- A -Dtest pattern selects classes for both surefire executions, so one of them can find nothing to run. -->
+    <surefire.failIfNoSpecifiedTests>false</surefire.failIfNoSpecifiedTests>
   </properties>
 
   <dependencyManagement>
@@ -180,6 +185,31 @@
             <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
           </environmentVariables>
         </configuration>
+        <executions>
+          <execution>
+            <id>default-test</id>
+            <configuration>
+              <excludedGroups>selfplay</excludedGroups>
+            </configuration>
+          </execution>
+          <!-- Each self-play test plays a whole AI game for one to two minutes. Separate JVMs share no static state
+               (GameManager, AiRuntime, JdaService, system properties), and the games keep their storage in temporary
+               folders, so the classes can run side by side. See src/test/java/ti4/ai/README.md. -->
+          <execution>
+            <id>self-play</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*SelfPlayTest.java</include>
+              </includes>
+              <groups>selfplay</groups>
+              <forkCount>${ai.selfplay.forks}</forkCount>
+              <reuseForks>true</reuseForks>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

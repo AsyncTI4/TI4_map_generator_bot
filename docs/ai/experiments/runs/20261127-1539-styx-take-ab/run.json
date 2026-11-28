@@ -1,0 +1,174 @@
+{
+  "id": "20261127-1539-styx-take-ab",
+  "kind": "ab",
+  "question": "Does STYX_TAKE raise the Styx take rate and points? (6 pairs, Fracture in every game)",
+  "started": "2026-11-27T20:39:53.595443100Z",
+  "finished": "2026-11-27T22:50:05.317669700Z",
+  "status": "finished",
+  "code": {
+    "commit": "d9f34394a1e4328b5a9765593d1b4eb5f64220d3",
+    "commitSubject": "Put the Styx take behind the STYX_TAKE experiment",
+    "commitDate": "2026-11-27T15:37:53-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261127-153813-styx-take-ab",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 12,
+    "threads": 12,
+    "baseSeed": 9900,
+    "seedFixed": true,
+    "experimentsUnderTest": [
+      "STYX_TAKE"
+    ],
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "POOLED_BOOST_RESPLIT",
+      "STYX_TAKE",
+      "TECH_FOLLOW_KEEP",
+      "DIPLOMACY_READIED_PLANNING",
+      "XXCHA_LEADER_READIES"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.ab": "STYX_TAKE",
+      "ai.selfplay.fracture": "true",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "12",
+      "ai.selfplay.queue.id": "20261127-153813-styx-take-ab",
+      "ai.selfplay.record": "true",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-styx\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "styx-take-ab",
+      "ai.selfplay.record.question": "Does STYX_TAKE raise the Styx take rate and points? (6 pairs, Fracture in every game)",
+      "ai.selfplay.seed": "9900",
+      "ai.selfplay.threads": "12"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "batch": {
+    "games": 12,
+    "batchWallSeconds": 7811,
+    "endings": {
+      "VICTORY_POINTS": 12
+    },
+    "averageFinalRound": 5.917,
+    "averageLeaderPoints": 10.083,
+    "averageTablePoints": 45.75,
+    "averageGameWallSeconds": 5122.5,
+    "wallMillisPerTick": 1023.153
+  },
+  "estimate": {
+    "finishedGames": 12,
+    "completePairs": 6,
+    "unfinishedGames": 0,
+    "pointDifference": {
+      "mean": 0.417,
+      "standardError": 0.521,
+      "t": 0.799,
+      "n": 6,
+      "null": 0
+    },
+    "treatmentWinShare": {
+      "mean": 0.667,
+      "standardError": 0.167,
+      "t": 1,
+      "n": 6,
+      "null": 0.5
+    },
+    "treatmentAveragePoints": 7.833,
+    "controlAveragePoints": 7.417
+  },
+  "data": "games.csv",
+  "verdict": "pending",
+  "queue": {
+    "id": "20261127-153813-styx-take-ab",
+    "submittedBy": "ai-styx-session",
+    "sourceWorktree": "C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/ai-styx",
+    "sourceBranch": "claude/ai-styx-take",
+    "submittedAt": "2026-11-27T20:38:13.150Z",
+    "approvedAt": "2026-11-27T20:38:13.150Z",
+    "startedAt": "2026-11-27T20:38:13.727Z",
+    "finishedAt": "2026-11-27T22:50:08.543Z",
+    "waitHours": 0,
+    "runHours": 2.2,
+    "estimateHours": 4,
+    "exitCode": 0,
+    "status": "done",
+    "load": {
+      "samples": 27,
+      "cpuPercentAverage": 73,
+      "cpuPercentMax": 94,
+      "samplesWithOtherBuilds": 2,
+      "otherBuildWorktrees": [
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/ai-faction-usage"
+      ],
+      "otherJavaProcessesMax": 0
+    },
+    "mavenArguments": [
+      "-o",
+      "test",
+      "-Dspotless.skip=true",
+      "-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames",
+      "-Dsurefire.failIfNoSpecifiedTests=false",
+      "-Dai.selfplay.full=true",
+      "-Dai.selfplay.games=12",
+      "-Dai.selfplay.threads=12",
+      "-Dai.selfplay.seed=9900",
+      "-Dai.selfplay.fracture=true",
+      "-Dai.selfplay.ab=STYX_TAKE",
+      "-Dai.selfplay.record=true",
+      "-Dai.selfplay.record.label=styx-take-ab",
+      "-Dai.selfplay.record.question=Does STYX_TAKE raise the Styx take rate and points? (6 pairs, Fracture in every game)",
+      "-Dai.selfplay.record.dir=C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-styx\\docs\\ai\\experiments",
+      "-Dai.selfplay.queue.id=20261127-153813-styx-take-ab"
+    ]
+  }
+}

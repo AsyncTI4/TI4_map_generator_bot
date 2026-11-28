@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -912,256 +911,259 @@ public class TransactionHelper {
         return trans.toString();
     }
 
-    private static final List<String> nothingMessages = Arrays.asList(
-            "Nothing",
-            "Nothing",
-            "Nothing",
-            "Nothing",
-            "Nothing",
-            "Nothing But Respect And Good Will",
-            "Some Pocket Lint",
-            "Sunshine And Rainbows",
-            "A Sense Of Pride And Accomplishment",
-            "A Crisp High Five",
-            "A Well Written Thank-You Note",
-            "Heartfelt Thanks",
-            "The Best Vibes",
-            "A Blessing",
-            "Good Karma",
-            "A Mewling Kitten",
-            "A Lost Virtual Puppy",
-            "A Fortune Cookie",
-            "A Firm Handshake",
-            "A Friendly Wave",
-            "Well Wishes",
-            "A Home-Cooked Meal",
-            "$1000 In Monopoly Money",
-            "Forgiveness For Past Mistakes",
-            "A Lucky Rock",
-            "A Warm Cup Of Tea",
-            "A Poorly Drawn But Deeply Meaningful Picture",
-            "An Unexpected Hug",
-            "A Magic Trick",
-            "A Pair Of Comfy Socks",
-            "A Whiff Of Fresh Cookies",
-            "A Charming Smile",
-            "A Promise To Call Later",
-            "A Supportive Cheer",
-            "A Playful Joke",
-            "A Chance To See A Beautiful Sunset",
-            "A Treasure Map",
-            "A Song",
-            "A Book Recommendation",
-            "A Cozy Blanket",
-            "A Cheery Greeting",
-            "A Bucket Of Joy",
-            "A Gentle Reminder",
-            "A Heartwarming Story",
-            "A Whisper Of Kindness",
-            "An Expired Gift Certificate",
-            "A Free Trial CD For AOL",
-            "Compost For Your Garden",
-            "A Tupperware Party Invitation",
-            "A Picture Of A Sandwich",
-            "Thoughtful Advice About Your Current Situation",
-            "Zip; Zilch; Nada",
-            String.format(
-                    "Approximately %,d Unique Snow Globes",
-                    5 * ThreadLocalRandom.current().nextInt(200, 2000)
-                            + ThreadLocalRandom.current().nextInt(1, 5)),
-            "Forgiveness For Future Mistakes (Terms And Conditions Apply)",
-            "A Token Labelled \"Traid Gud\"",
-            "A Hill Of Beans",
-            "This Small Portrait Of Benjamin Franklin, Done In Oil Paints",
-            "Favourable Timing On Bureaucracy",
-            "A Comfortable Sinecure, When I'm Galactic Emperor",
-            "This Box Of One Dozen Starving, Crazed Weasels",
-            "A jpeg Depicting A Cartoon Monkey",
-            "A Somewhat Rare Beanie Baby",
-            "Some Good News About Our Lord And Saviour, Harrugh Gefhara",
-            "No Spoilers For That TV Show You're Watching",
-            "Payment In Exposure",
-            "A VHS Recording Of An Episode Of _Bill Nye The Science Guy_",
-            "A Short But Comprehensive Lecture On Medieval Siege Weaponry",
-            "An _E.T. the Extra-Terrestrial_ Cartridge For The Atari 2600",
-            "A Nice Solid Thumbs Up",
-            "A Handful Of Dog Treats",
-            "One (1) Peppercorn",
-            "Poutine",
-            "The Deputy Speakership",
-            "Half A Slice Of Pizza, With Or Without Pineapple",
-            "The Wi-Fi Password",
-            "A Second-Hand Toothbrush",
-            "A Lamp That Might Contain A Genie, But Probably Doesn't",
-            "An Acoustic Rendition Of _Wonderwall_",
-            "As Many Spiders As You Desire",
-            "Fruit Salad (yummy, yummy)",
-            "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins",
-            "Invoking The A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋",
-            "Some Perfunctory Laughter At Your Next Attempt At A Joke",
-            "The Front Half Of Our Pantomime Horse",
-            "~~False~~ Reassurances",
-            "A Big Mouth Billy Bass",
-            "More Cowbell",
-            "Some Subpar Macaroni Art",
-            "A Chocolate Teapot",
-            "Some Week-Old Sushi",
-            "My Second Finest Bottle Of Wine Drink™",
-            "A Riddle, Wrapped In A Mystery, Inside An Enigma, Coated In Chocolate",
-            "A Brand-New Luxury Car, Missing Only Fuel, Tires And Car",
-            "Either \"Peace\" Or \"Peas\"; The Ambassador Failed To Elaborate",
-            "A Year's Supply Of Brussels Sprouts",
-            "A Nintendo Power Glove; ***Now You're Playing With Power***",
-            "A Wooden Spoon",
-            "An Ingot Of Pyrite",
-            "A White Elephant",
-            "Ennui",
-            "A Smurf TV Tray",
-            "A Creepy Doll",
-            "A Ziploc Bag Of Ranch Dressing",
-            "Nothing. And Furthermore, Carthage Must Be Destroyed!",
-            "All The Goulash",
-            "Waldo's Location",
-            "A Billet Of Ea-nāṣir's Finest Copper",
-            "All The Silver In Fort Knox",
-            "A Controlling Share Of The Bereg Jet Ski Company",
-            "A Handful Of Specially Marked Cereal Boxtops",
-            "An Aperture Science Thing We Don't Know What It Does",
-            "Nothing, Because I'm A Cheapskate",
-            "A Brick, Delivery Speed TBD",
-            "An Inanimate Carbon Rod",
-            "A Set Of Left-Handed Sarween Tools",
-            "A Bridge That's For Sale",
-            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // For that thing that I want, yes indeed!",
-            "The Chameleon's Dish",
-            "The Sound Of One Hand Clapping",
-            "An Unpaired Sock",
-            "\"101 Ways To Make Toast\"",
-            "A Chess Set With 31 Missing Pieces",
-            "Your Horoscope Reading",
-            "Just Deserts",
-            "Surprise And Delight",
-            "`//Could somebody get ChatGPT to generate a few more messages - Dev`",
-            "Some Free Candy, From My Windowless Van",
-            "A Phial Of Dihydrogen Monoxide",
-            "A Gizmo, A Doohickey, Or Perhaps Even A Whatchamacallit",
-            "Nothing (Don't Spend It All At Once)",
-            "Industrial Quantities Of Glitter",
-            "Potent Potables",
-            "A Succulent Chinese Meal?",
-            "The Cheap Plastic Imitation Of The Amulet Of Yendor",
-            "A Millstone",
-            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 4) + ": A Goat!",
-            "A Runcible Spoon",
-            "_Nullam Rem Natam_",
-            "A Jubba Cloak",
-            "The Pretence That Your Secrets Are Unscorable",
-            "Double Nothing",
-            "A First-Born Child",
-            "The Opportunity To Be Your Own Boss",
-            "Artisanal, Hand-Crafted Nothing",
-            "Reticulating Splines",
-            "ADDITIONAL PYLONS",
-            "A State-of-the-Art Turbo Encabulator",
-            "Help! I'm Trapped In A Transaction Factory!",
-            "Emotional Support For The Throne",
-            "My Frayed Agreement",
-            "A Rock-Shaped Rock",
-            "Not Attacking You Through The Samekh Wormhole",
-            "A Thneed",
-            "Smashing That Like Button",
-            "A Sickle Of Leather",
-            "A Fish's Bicycle",
-            "One Red Paperclip",
-            "ACME Bird Seed",
-            "Your Choice Of Mountain Dew Or Crab Juice",
-            // generates a Sidereal Confluence trade offer in the form of
-            // "Two Food/Life Support Cubes And One Biotechnology Cube"
-            String.format(String.format(
-                    String.format(
-                            "%s And %s",
-                            switch (Math.min(
-                                    ThreadLocalRandom.current().nextInt(5),
-                                    ThreadLocalRandom.current().nextInt(5))) {
-                                case 0 -> "One %s Cube";
-                                case 1 -> "Two %s Cubes";
-                                case 2 -> "Three %s Cubes";
-                                case 3 -> "Four %s Cubes";
-                                default -> "Five %s Cubes";
-                            },
-                            switch (Math.min(
-                                    ThreadLocalRandom.current().nextInt(5),
-                                    ThreadLocalRandom.current().nextInt(5))) {
-                                case 0 -> "One %s Cube";
-                                case 1 -> "Two %s Cubes";
-                                case 2 -> "Three %s Cubes";
-                                case 3 -> "Four %s Cubes";
-                                default -> "Five %s Cubes";
-                            }),
-                    switch (ThreadLocalRandom.current().nextInt(3)) {
-                        case 0 -> "Food/Life Support";
-                        case 1 -> "Culture";
-                        default -> "Industry";
-                    },
-                    switch (ThreadLocalRandom.current().nextInt(3)) {
-                        case 0 -> "Information";
-                        case 1 -> "Biotechnology";
-                        default -> "Power/Electrical";
-                    })),
-            "The Golden Skull of Rauhl",
-            "This Defective Postage Stamp, Which Has The Aeroplane Printed Upside-Down",
-            "A Flanian Pobble Bead",
-            "A Red Herring",
-            "∅", // empty set
-            switch (ThreadLocalRandom.current().nextInt(0, 30)) {
-                case 0 -> "Asgjë (As They Would Say In Albania)";
-                case 1 -> "Нищо (As They Would Say In Bulgaria)";
-                case 2 -> "Ništa (As They Would Say In Croatia)";
-                case 3 -> "Intet (As They Would Say In Denmark)";
-                case 4 -> "Niets (As They Would Say In The Netherlands)";
-                case 5 -> "Mitte Midagi (As They Would Say In Estonia)";
-                case 6 -> "Rien (As They Would Say In France)";
-                case 7 -> "არაფერი (As They Would Say In Georgia)";
-                case 8 -> "Nichts (As They Would Say In Germany)";
-                case 9 -> "Τίποτα (As They Would Say In Greece)";
-                case 10 -> "ʻAʻOhe Mea (As They Would Say In Hawaii)";
-                case 11 -> "कुछ नहीं (As They Would Say In India)";
-                case 12 -> "Ekkert (As They Would Say In Iceland)";
-                case 13 -> "Niente (As They Would Say In Italy)";
-                case 14 -> "아무것도 아님 (As They Would Say In Korea)";
-                case 15 -> "Nekas (As They Would Say In Latvia)";
-                case 16 -> "Nieko (As They Would Say In Lithuania)";
-                case 17 -> "Näischt (As They Would Say In Luxembourg)";
-                case 18 -> "Ништо (As They Would Say In Macedonia)";
-                case 19 -> "Kaore He Mea (As They Would Say In New Zealand)";
-                case 20 -> "Юу Ч Биш (As They Would Say In Mongolia)";
-                case 21 -> "केही छैन (As They Would Say In Nepal)";
-                case 22 -> "Ikke Noe (As They Would Say In Norway)";
-                case 23 -> "Chan Eil Dad (As They Would Say In Scotland)";
-                case 24 -> "Ништа (As They Would Say In Serbia)";
-                case 25 -> "Hakuna Kitu (As They Would Say In Tanzania)";
-                case 26 -> "Ingenting (As They Would Say In Sweden)";
-                case 27 -> "Нічого (As They Would Say In Ukraine)";
-                case 28 -> "Không Có Gì (As They Would Say In Vietnam)";
-                default -> "Dim Byd (As They Would Say In Wales)";
-            },
-            "An Air Freshener To Hang On Your Dreadnought's Rear View Mirror",
-            "A Participation Trophy",
-            "Second-Hand Nothing",
-            "A Promissory Vibe",
-            "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
-            "||Surprise Nothing||",
-            "A Witty Pop Culture Reference",
-            "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
+    private static List<String> nothingMessages() {
+        return Arrays.asList(
+                "Nothing",
+                "Nothing",
+                "Nothing",
+                "Nothing",
+                "Nothing",
+                "Nothing But Respect And Good Will",
+                "Some Pocket Lint",
+                "Sunshine And Rainbows",
+                "A Sense Of Pride And Accomplishment",
+                "A Crisp High Five",
+                "A Well Written Thank-You Note",
+                "Heartfelt Thanks",
+                "The Best Vibes",
+                "A Blessing",
+                "Good Karma",
+                "A Mewling Kitten",
+                "A Lost Virtual Puppy",
+                "A Fortune Cookie",
+                "A Firm Handshake",
+                "A Friendly Wave",
+                "Well Wishes",
+                "A Home-Cooked Meal",
+                "$1000 In Monopoly Money",
+                "Forgiveness For Past Mistakes",
+                "A Lucky Rock",
+                "A Warm Cup Of Tea",
+                "A Poorly Drawn But Deeply Meaningful Picture",
+                "An Unexpected Hug",
+                "A Magic Trick",
+                "A Pair Of Comfy Socks",
+                "A Whiff Of Fresh Cookies",
+                "A Charming Smile",
+                "A Promise To Call Later",
+                "A Supportive Cheer",
+                "A Playful Joke",
+                "A Chance To See A Beautiful Sunset",
+                "A Treasure Map",
+                "A Song",
+                "A Book Recommendation",
+                "A Cozy Blanket",
+                "A Cheery Greeting",
+                "A Bucket Of Joy",
+                "A Gentle Reminder",
+                "A Heartwarming Story",
+                "A Whisper Of Kindness",
+                "An Expired Gift Certificate",
+                "A Free Trial CD For AOL",
+                "Compost For Your Garden",
+                "A Tupperware Party Invitation",
+                "A Picture Of A Sandwich",
+                "Thoughtful Advice About Your Current Situation",
+                "Zip; Zilch; Nada",
+                String.format(
+                        "Approximately %,d Unique Snow Globes",
+                        5 * RandomHelper.current().nextInt(200, 2000)
+                                + RandomHelper.current().nextInt(1, 5)),
+                "Forgiveness For Future Mistakes (Terms And Conditions Apply)",
+                "A Token Labelled \"Traid Gud\"",
+                "A Hill Of Beans",
+                "This Small Portrait Of Benjamin Franklin, Done In Oil Paints",
+                "Favourable Timing On Bureaucracy",
+                "A Comfortable Sinecure, When I'm Galactic Emperor",
+                "This Box Of One Dozen Starving, Crazed Weasels",
+                "A jpeg Depicting A Cartoon Monkey",
+                "A Somewhat Rare Beanie Baby",
+                "Some Good News About Our Lord And Saviour, Harrugh Gefhara",
+                "No Spoilers For That TV Show You're Watching",
+                "Payment In Exposure",
+                "A VHS Recording Of An Episode Of _Bill Nye The Science Guy_",
+                "A Short But Comprehensive Lecture On Medieval Siege Weaponry",
+                "An _E.T. the Extra-Terrestrial_ Cartridge For The Atari 2600",
+                "A Nice Solid Thumbs Up",
+                "A Handful Of Dog Treats",
+                "One (1) Peppercorn",
+                "Poutine",
+                "The Deputy Speakership",
+                "Half A Slice Of Pizza, With Or Without Pineapple",
+                "The Wi-Fi Password",
+                "A Second-Hand Toothbrush",
+                "A Lamp That Might Contain A Genie, But Probably Doesn't",
+                "An Acoustic Rendition Of _Wonderwall_",
+                "As Many Spiders As You Desire",
+                "Fruit Salad (yummy, yummy)",
+                "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins",
+                "Invoking The A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋",
+                "Some Perfunctory Laughter At Your Next Attempt At A Joke",
+                "The Front Half Of Our Pantomime Horse",
+                "~~False~~ Reassurances",
+                "A Big Mouth Billy Bass",
+                "More Cowbell",
+                "Some Subpar Macaroni Art",
+                "A Chocolate Teapot",
+                "Some Week-Old Sushi",
+                "My Second Finest Bottle Of Wine Drink™",
+                "A Riddle, Wrapped In A Mystery, Inside An Enigma, Coated In Chocolate",
+                "A Brand-New Luxury Car, Missing Only Fuel, Tires And Car",
+                "Either \"Peace\" Or \"Peas\"; The Ambassador Failed To Elaborate",
+                "A Year's Supply Of Brussels Sprouts",
+                "A Nintendo Power Glove; ***Now You're Playing With Power***",
+                "A Wooden Spoon",
+                "An Ingot Of Pyrite",
+                "A White Elephant",
+                "Ennui",
+                "A Smurf TV Tray",
+                "A Creepy Doll",
+                "A Ziploc Bag Of Ranch Dressing",
+                "Nothing. And Furthermore, Carthage Must Be Destroyed!",
+                "All The Goulash",
+                "Waldo's Location",
+                "A Billet Of Ea-nāṣir's Finest Copper",
+                "All The Silver In Fort Knox",
+                "A Controlling Share Of The Bereg Jet Ski Company",
+                "A Handful Of Specially Marked Cereal Boxtops",
+                "An Aperture Science Thing We Don't Know What It Does",
+                "Nothing, Because I'm A Cheapskate",
+                "A Brick, Delivery Speed TBD",
+                "An Inanimate Carbon Rod",
+                "A Set Of Left-Handed Sarween Tools",
+                "A Bridge That's For Sale",
+                "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // For that thing that I want, yes indeed!",
+                "The Chameleon's Dish",
+                "The Sound Of One Hand Clapping",
+                "An Unpaired Sock",
+                "\"101 Ways To Make Toast\"",
+                "A Chess Set With 31 Missing Pieces",
+                "Your Horoscope Reading",
+                "Just Deserts",
+                "Surprise And Delight",
+                "`//Could somebody get ChatGPT to generate a few more messages - Dev`",
+                "Some Free Candy, From My Windowless Van",
+                "A Phial Of Dihydrogen Monoxide",
+                "A Gizmo, A Doohickey, Or Perhaps Even A Whatchamacallit",
+                "Nothing (Don't Spend It All At Once)",
+                "Industrial Quantities Of Glitter",
+                "Potent Potables",
+                "A Succulent Chinese Meal?",
+                "The Cheap Plastic Imitation Of The Amulet Of Yendor",
+                "A Millstone",
+                "Behind Door #" + RandomHelper.current().nextInt(1, 4) + ": A Goat!",
+                "A Runcible Spoon",
+                "_Nullam Rem Natam_",
+                "A Jubba Cloak",
+                "The Pretence That Your Secrets Are Unscorable",
+                "Double Nothing",
+                "A First-Born Child",
+                "The Opportunity To Be Your Own Boss",
+                "Artisanal, Hand-Crafted Nothing",
+                "Reticulating Splines",
+                "ADDITIONAL PYLONS",
+                "A State-of-the-Art Turbo Encabulator",
+                "Help! I'm Trapped In A Transaction Factory!",
+                "Emotional Support For The Throne",
+                "My Frayed Agreement",
+                "A Rock-Shaped Rock",
+                "Not Attacking You Through The Samekh Wormhole",
+                "A Thneed",
+                "Smashing That Like Button",
+                "A Sickle Of Leather",
+                "A Fish's Bicycle",
+                "One Red Paperclip",
+                "ACME Bird Seed",
+                "Your Choice Of Mountain Dew Or Crab Juice",
+                // generates a Sidereal Confluence trade offer in the form of
+                // "Two Food/Life Support Cubes And One Biotechnology Cube"
+                String.format(String.format(
+                        String.format(
+                                "%s And %s",
+                                switch (Math.min(
+                                        RandomHelper.current().nextInt(5),
+                                        RandomHelper.current().nextInt(5))) {
+                                    case 0 -> "One %s Cube";
+                                    case 1 -> "Two %s Cubes";
+                                    case 2 -> "Three %s Cubes";
+                                    case 3 -> "Four %s Cubes";
+                                    default -> "Five %s Cubes";
+                                },
+                                switch (Math.min(
+                                        RandomHelper.current().nextInt(5),
+                                        RandomHelper.current().nextInt(5))) {
+                                    case 0 -> "One %s Cube";
+                                    case 1 -> "Two %s Cubes";
+                                    case 2 -> "Three %s Cubes";
+                                    case 3 -> "Four %s Cubes";
+                                    default -> "Five %s Cubes";
+                                }),
+                        switch (RandomHelper.current().nextInt(3)) {
+                            case 0 -> "Food/Life Support";
+                            case 1 -> "Culture";
+                            default -> "Industry";
+                        },
+                        switch (RandomHelper.current().nextInt(3)) {
+                            case 0 -> "Information";
+                            case 1 -> "Biotechnology";
+                            default -> "Power/Electrical";
+                        })),
+                "The Golden Skull of Rauhl",
+                "This Defective Postage Stamp, Which Has The Aeroplane Printed Upside-Down",
+                "A Flanian Pobble Bead",
+                "A Red Herring",
+                "∅", // empty set
+                switch (RandomHelper.current().nextInt(0, 30)) {
+                    case 0 -> "Asgjë (As They Would Say In Albania)";
+                    case 1 -> "Нищо (As They Would Say In Bulgaria)";
+                    case 2 -> "Ništa (As They Would Say In Croatia)";
+                    case 3 -> "Intet (As They Would Say In Denmark)";
+                    case 4 -> "Niets (As They Would Say In The Netherlands)";
+                    case 5 -> "Mitte Midagi (As They Would Say In Estonia)";
+                    case 6 -> "Rien (As They Would Say In France)";
+                    case 7 -> "არაფერი (As They Would Say In Georgia)";
+                    case 8 -> "Nichts (As They Would Say In Germany)";
+                    case 9 -> "Τίποτα (As They Would Say In Greece)";
+                    case 10 -> "ʻAʻOhe Mea (As They Would Say In Hawaii)";
+                    case 11 -> "कुछ नहीं (As They Would Say In India)";
+                    case 12 -> "Ekkert (As They Would Say In Iceland)";
+                    case 13 -> "Niente (As They Would Say In Italy)";
+                    case 14 -> "아무것도 아님 (As They Would Say In Korea)";
+                    case 15 -> "Nekas (As They Would Say In Latvia)";
+                    case 16 -> "Nieko (As They Would Say In Lithuania)";
+                    case 17 -> "Näischt (As They Would Say In Luxembourg)";
+                    case 18 -> "Ништо (As They Would Say In Macedonia)";
+                    case 19 -> "Kaore He Mea (As They Would Say In New Zealand)";
+                    case 20 -> "Юу Ч Биш (As They Would Say In Mongolia)";
+                    case 21 -> "केही छैन (As They Would Say In Nepal)";
+                    case 22 -> "Ikke Noe (As They Would Say In Norway)";
+                    case 23 -> "Chan Eil Dad (As They Would Say In Scotland)";
+                    case 24 -> "Ништа (As They Would Say In Serbia)";
+                    case 25 -> "Hakuna Kitu (As They Would Say In Tanzania)";
+                    case 26 -> "Ingenting (As They Would Say In Sweden)";
+                    case 27 -> "Нічого (As They Would Say In Ukraine)";
+                    case 28 -> "Không Có Gì (As They Would Say In Vietnam)";
+                    default -> "Dim Byd (As They Would Say In Wales)";
+                },
+                "An Air Freshener To Hang On Your Dreadnought's Rear View Mirror",
+                "A Participation Trophy",
+                "Second-Hand Nothing",
+                "A Promissory Vibe",
+                "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
+                "||Surprise Nothing||",
+                "A Witty Pop Culture Reference",
+                "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
+    }
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1_000_000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
-        int result = RandomHelper.current().nextInt(0, nothingMessages.size());
+        List<String> messages = nothingMessages();
+        int result = RandomHelper.current().nextInt(0, messages.size());
         try {
-            return nothingMessages.get(result);
+            return messages.get(result);
         } catch (Exception e) {
             return "Nothing";
         }

@@ -230,6 +230,7 @@ public class TacticalActionService {
 
         // Core logic block: movement, token placement, after-move effects, and state flags
         FinishMovementContext ctx = executeCoreFinishMovement(event, game, player, tile);
+        ButtonHelperTacticalAction.clearMovementEnablers(game);
         TeHelperGeneral.checkCoexistTransfer(game);
         // UI/message block: build message and buttons
         LoreService.showSystemLore(player, game, tile.getPosition(), LoreService.TRIGGER.MOVED);

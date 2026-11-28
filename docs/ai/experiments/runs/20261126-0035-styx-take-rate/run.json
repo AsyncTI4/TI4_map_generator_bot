@@ -1,0 +1,149 @@
+{
+  "id": "20261126-0035-styx-take-rate",
+  "kind": "benchmark",
+  "question": "Styx take rate with the Fracture in every game, after the movement model, Styx gathering and pooled boost re-split work plus the AI PR perf fixes (target 80%+, humans 87%; seed 9700 games 1-16 were 5/16 = 31% before)",
+  "started": "2026-11-26T05:35:50.940080300Z",
+  "finished": "2026-11-26T14:14:06.380553600Z",
+  "status": "finished",
+  "code": {
+    "commit": "513e5d1ce672c91cede95b0fde3eb2e85a8a073b",
+    "commitSubject": "Merge remote-tracking branch 'origin/claude/ai-player-nekro-72bbce' into claude/ai-styx-take",
+    "commitDate": "2026-11-25T23:03:31-05:00",
+    "branch": "HEAD",
+    "worktree": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ab-run-20261125-234612-styx-take-rate",
+    "dirty": false,
+    "uncommittedFiles": []
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 32,
+    "threads": 10,
+    "baseSeed": 9700,
+    "seedFixed": true,
+    "experimentsUnderTest": null,
+    "experimentsKnown": [
+      "READY_PUBLIC_POINTS",
+      "WIN_THREAT_FEASIBLE",
+      "WIN_AWARE_POINTS",
+      "AGENDA_SABOTAGE",
+      "IMPERIAL_POINTS",
+      "CANNON_COVER_RISK",
+      "BLOCKADE_GROUND",
+      "EXPLOIT_GUARDS",
+      "SPEAKER_SALE",
+      "WIN_BREAK_DENIAL",
+      "ATTACK_MEMORY",
+      "PROMISE_DEALS",
+      "AGENDA_VALUE_TABLE",
+      "GALACTIC_THREAT_COST",
+      "AGENDA_HELD_BALLOTS",
+      "CONDITIONAL_VOTE_DEALS",
+      "DISCARD_BOUNTIES",
+      "AGENDA_ABSTAIN_CHOICE",
+      "GALACTIC_THREAT_TIMING",
+      "RIVAL_RIDER_STAKES",
+      "RIDER_EXTORTION",
+      "IMPERIAL_RIDER_HOLD",
+      "GALACTIC_THREAT_BY_VOTERS",
+      "PAY_THE_ANSWERER",
+      "BOAT_FLOAT",
+      "AVOIDANCE_BRIBES",
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET",
+      "RELATIONS_ANGER",
+      "VOTE_ANGER",
+      "STRENGTH_WEIGHTED_ANGER",
+      "ANGER_SPREAD",
+      "POOLED_BOOST_RESPLIT",
+      "TECH_FOLLOW_KEEP",
+      "DIPLOMACY_READIED_PLANNING",
+      "XXCHA_LEADER_READIES"
+    ],
+    "experimentsOffByDefault": [
+      "DESPERATION_PUBLIC",
+      "DESPERATION_STATUS_SECRET",
+      "DESPERATION_ACTION_SECRET"
+    ],
+    "experimentsOffEverywhere": "",
+    "properties": {
+      "ai.selfplay.fracture": "true",
+      "ai.selfplay.full": "true",
+      "ai.selfplay.games": "32",
+      "ai.selfplay.queue.id": "20261125-234612-styx-take-rate",
+      "ai.selfplay.record": "true",
+      "ai.selfplay.record.dir": "C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-styx\\docs\\ai\\experiments",
+      "ai.selfplay.record.label": "styx-take-rate",
+      "ai.selfplay.record.question": "Styx take rate with the Fracture in every game, after the movement model, Styx gathering and pooled boost re-split work plus the AI PR perf fixes (target 80%+, humans 87%; seed 9700 games 1-16 were 5/16 = 31% before)",
+      "ai.selfplay.seed": "9700",
+      "ai.selfplay.threads": "10"
+    },
+    "machine": {
+      "processors": 16,
+      "maxHeapMb": 12080,
+      "java": "26.0.1",
+      "os": "Windows 11 10.0",
+      "jvmArguments": [
+        "-Duser.language=en",
+        "-Duser.country=US"
+      ]
+    }
+  },
+  "batch": {
+    "games": 32,
+    "batchWallSeconds": 31095,
+    "endings": {
+      "VICTORY_POINTS": 32
+    },
+    "averageFinalRound": 5.75,
+    "averageLeaderPoints": 10.188,
+    "averageTablePoints": 45.156,
+    "averageGameWallSeconds": 8447.906,
+    "wallMillisPerTick": 1722.546
+  },
+  "data": "games.csv",
+  "verdict": "pending",
+  "queue": {
+    "id": "20261125-234612-styx-take-rate",
+    "submittedBy": "ai-styx-session",
+    "sourceWorktree": "C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/ai-styx",
+    "sourceBranch": "claude/ai-styx-take",
+    "submittedAt": "2026-11-26T04:46:12.364Z",
+    "approvedAt": "2026-11-26T04:46:12.364Z",
+    "startedAt": "2026-11-26T05:34:09.134Z",
+    "finishedAt": "2026-11-26T14:14:09.066Z",
+    "waitHours": 0.8,
+    "runHours": 8.67,
+    "estimateHours": 7,
+    "exitCode": 0,
+    "status": "done",
+    "load": {
+      "samples": 104,
+      "cpuPercentAverage": 84,
+      "cpuPercentMax": 100,
+      "samplesWithOtherBuilds": 7,
+      "otherBuildWorktrees": [
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/ai-agenda",
+        "c:/users/willh/onedrive/documents/github/ti4_map_generator_bot/.claude/worktrees/det-turn-ranking"
+      ],
+      "otherJavaProcessesMax": 1
+    },
+    "mavenArguments": [
+      "-o",
+      "test",
+      "-Dspotless.skip=true",
+      "-Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames",
+      "-Dsurefire.failIfNoSpecifiedTests=false",
+      "-Dai.selfplay.full=true",
+      "-Dai.selfplay.games=32",
+      "-Dai.selfplay.threads=10",
+      "-Dai.selfplay.seed=9700",
+      "-Dai.selfplay.fracture=true",
+      "-Dai.selfplay.record=true",
+      "-Dai.selfplay.record.label=styx-take-rate",
+      "-Dai.selfplay.record.question=Styx take rate with the Fracture in every game, after the movement model, Styx gathering and pooled boost re-split work plus the AI PR perf fixes (target 80%+, humans 87%; seed 9700 games 1-16 were 5/16 = 31% before)",
+      "-Dai.selfplay.record.dir=C:\\Users\\willh\\OneDrive\\Documents\\GitHub\\TI4_map_generator_bot\\.claude\\worktrees\\ai-styx\\docs\\ai\\experiments",
+      "-Dai.selfplay.queue.id=20261125-234612-styx-take-rate"
+    ]
+  }
+}

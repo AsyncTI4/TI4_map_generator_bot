@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ai-ab-dashboard",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/ai-ab-dashboard.mjs", "--port", "4377"],
+      "port": 4377
+    }
+  ]
+}

@@ -30,6 +30,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.GameClock;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
@@ -131,8 +132,12 @@ class GameSaveService {
     }
 
     static void writeGame(Game game, Writer writer) throws IOException {
-        game.setLastModifiedDate(System.currentTimeMillis());
+        game.setLastModifiedDate(nextModifiedDate(game));
         writeSnapshot(game, writer);
+    }
+
+    private static long nextModifiedDate(Game game) {
+        return Math.max(GameClock.currentTimeMillis(), game.getLastModifiedDate() + 1);
     }
 
     static void writeSnapshot(Game game, Writer writer) throws IOException {

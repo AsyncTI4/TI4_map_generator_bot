@@ -22,9 +22,9 @@ public class FrankenUnitService {
     public static boolean isDuplicateUnitCombiningEnabled(Player player) {
         return player != null
                 && player.getGame() != null
-                && player.getGame().isFrankenGame()
+                && "true".equals(player.getGame().getStoredValue(COMBINE_DUPLICATE_UNIT_TYPES))
                 && !player.getGame().isTwilightsFallMode()
-                && "true".equals(player.getGame().getStoredValue(COMBINE_DUPLICATE_UNIT_TYPES));
+                && player.getGame().isFrankenGame();
     }
 
     public static boolean researchMatchingUnitUpgrades(Player player, String techID) {

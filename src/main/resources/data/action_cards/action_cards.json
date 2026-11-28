@@ -365,6 +365,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "During this tactical action, systems that contain alpha and beta wormholes are adjacent to each other.",
+        "automationID": "lost_star",
         "flavorText": "The ship's sensors showed that the ancient star-map had somehow led them beyond the Mahact plateau.",
         "source": "base"
     },
@@ -1222,6 +1223,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "During the \"Movement\" step of this tactical action, ignore the effect of anomalies.",
+        "automationID": "nav_suite",
         "flavorText": "\"The field is too thick!\" Sikosk gasped. Trrakan's plume flared. \"Not for me, and not for Iruth.\" A flick of his talon, and the destroyer flipped and dove for the asteroid field.",
         "source": "pok"
     },

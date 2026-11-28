@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -38,13 +37,14 @@ import ti4.service.fow.GMService;
 public final class AgendaWhensAftersHelper {
 
     private static final String WHEN_QUEUE_HELD_BY_VETO = "whenQueueHeldByVeto";
+    public static final String POLITICAL_SECRET_SILENCED = "politicalSecretSilenced";
 
     private AgendaWhensAftersHelper() {}
 
     static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
-            int result = ThreadLocalRandom.current().nextInt(0, 6);
+            int result = RandomHelper.current().nextInt(0, 6);
             if (playerDoesNotHaveShenanigans(player) && result != 5) {
                 String part2 = player.getFaction();
                 if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
@@ -71,6 +71,7 @@ public final class AgendaWhensAftersHelper {
         game.removeStoredValue("lastPlayerToPlayAnAfter");
         game.removeStoredValue("lastPlayerToPlayAWhen");
         game.removeStoredValue(WHEN_QUEUE_HELD_BY_VETO);
+        game.removeStoredValue(POLITICAL_SECRET_SILENCED);
         game.removeStoredValue("declinedWhens");
         game.removeStoredValue("declinedAfters");
         game.removeStoredValue("queuedWhens");
@@ -198,9 +199,25 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
     }
 
+    public static boolean canQuash(Player player) {
+        return player.hasAbility("quash")
+                && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))
+                && !silencedByPoliticalSecret(player);
+    }
+
+    public static boolean silencedByPoliticalSecret(Player player) {
+        return player.getGame().getStoredValue(POLITICAL_SECRET_SILENCED).contains(player.getFaction() + "_");
+    }
+
+    public static void silenceByPoliticalSecret(Game game, Player owner) {
+        if (silencedByPoliticalSecret(owner)) return;
+        game.setStoredValue(
+                POLITICAL_SECRET_SILENCED, game.getStoredValue(POLITICAL_SECRET_SILENCED) + owner.getFaction() + "_");
+    }
+
     public static List<String> getPossibleWhenNames(Player player) {
         List<String> names = new ArrayList<>();
-        if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
+        if (canQuash(player)) {
             names.add("Quash");
         }
         for (String acId : player.getPlayableActionCards()) {
@@ -243,7 +260,7 @@ public final class AgendaWhensAftersHelper {
 
     static List<Button> getPossibleWhenButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
+        if (canQuash(player)) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
         for (String acId : player.getPlayableActionCards()) {
@@ -1094,7 +1111,7 @@ public final class AgendaWhensAftersHelper {
                 Buttons.blue("no_when_persistent", "No \"When\"s (for this agenda)", MiscEmojis.NoWhens);
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         Player quasher = Helper.getPlayerFromAbility(game, "quash");
-        if (quasher != null && quasher.getStrategicCC() > 0) {
+        if (quasher != null && quasher.getStrategicCC() > 0 && !silencedByPoliticalSecret(quasher)) {
             String factionChecker = "FFCC_" + quasher.getFaction() + "_";
             Button quashButton = Buttons.red(factionChecker + "quash", "Quash Agenda", FactionEmojis.Xxcha);
             if (game.isFowMode()) {

@@ -565,7 +565,7 @@ public class PromissoryNoteHelper {
                 MessageHelper.sendMessageToChannel(
                         owner.getCorrectChannel(),
                         owner.getRepresentationUnfogged()
-                                + ", due to a play of your _Political Secret_, you will be unable to vote in agenda."
+                                + ", due to a play of your _Political Secret_, you will be unable to vote in agenda, play action cards, or use the abilities on your faction sheet."
                                 + " You have also been automatically passed on \"whens\" and \"afters\".");
             }
             game.setStoredValue(
@@ -576,6 +576,7 @@ public class PromissoryNoteHelper {
             game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters") + owner.getFaction() + "_");
             game.setStoredValue("queuedAftersLockedFor" + owner.getFaction(), "Yes");
             game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + owner.getFaction());
+            AgendaWhensAftersHelper.silenceByPoliticalSecret(game, owner);
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");

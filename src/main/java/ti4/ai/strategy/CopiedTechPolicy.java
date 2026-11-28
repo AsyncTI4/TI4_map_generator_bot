@@ -1,0 +1,90 @@
+package ti4.ai.strategy;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.Reentry;
+import ti4.ai.brain.Reentry.Traced;
+import ti4.ai.eval.DecidingSeat;
+import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MoveEnablers;
+import ti4.ai.eval.MovementAssumptions;
+import ti4.ai.scoring.WinOdds;
+import ti4.ai.tactical.SkippedSpaceCombat;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.model.Mapper;
+import ti4.model.TechnologyModel;
+
+@UtilityClass
+public class CopiedTechPolicy {
+
+    private static final Set<String> ASSIMILATORS = Set.of("vax", "vay");
+    private static final int ASSIMILATOR_TOKENS = 2;
+    private static final String DECISION_MEMO = "copied.tech.value";
+
+    public static Optional<String> best(Game game, Player seat, Collection<String> aliases) {
+        return aliases.stream()
+                .filter(alias -> allowed(seat, alias))
+                .max(Comparator.comparingDouble((String alias) -> value(game, seat, alias))
+                        .thenComparing(Comparator.naturalOrder()));
+    }
+
+    public static double value(Game game, Player seat, String alias) {
+        if (!allowed(seat, alias)) return 0;
+        List<Traced<Double>> kept = DecisionMemo.remember(
+                ArrayList::new,
+                DECISION_MEMO,
+                game,
+                game.getLastModifiedDate(),
+                seat,
+                alias,
+                ImaginedTurn.cacheMark(seat),
+                MovementAssumptions.key(),
+                MoveEnablers.inLaterActivation(),
+                SkippedSpaceCombat.assumedFaction(),
+                DecidingSeat.currentUserId(),
+                TokenPurchase.estimatingPlans(),
+                WinOdds.pricingMecatolTake());
+        for (Traced<Double> variant : kept) {
+            if (variant.servable()) return variant.reported();
+        }
+        Traced<Double> computed = Reentry.traced(() -> ResearchPolicy.value(game, seat, alias));
+        if (computed.keepable()) kept.add(computed);
+        return computed.reported();
+    }
+
+    public static double publicValue(Player seat, String alias) {
+        return allowed(seat, alias) ? copiedWorth(alias) : 0;
+    }
+
+    public static double copiedWorth(String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        return tech == null ? 0 : ResearchPolicy.TECH_TEMPO * ResearchPolicy.baseValue(tech);
+    }
+
+    private static boolean allowed(Player seat, String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        if (tech == null || seat.hasTech(alias)) return false;
+        if (!isFactionTech(tech)) return true;
+        return copiedFactionTechs(seat) < ASSIMILATOR_TOKENS;
+    }
+
+    private static long copiedFactionTechs(Player seat) {
+        return seat.getTechs().stream()
+                .filter(owned -> !ASSIMILATORS.contains(owned))
+                .map(Mapper::getTech)
+                .filter(model -> model != null && isFactionTech(model))
+                .filter(model -> !model.getFaction().orElse("").equals(seat.getFaction()))
+                .count();
+    }
+
+    private static boolean isFactionTech(TechnologyModel tech) {
+        return tech.getFaction().filter(faction -> !faction.isBlank()).isPresent();
+    }
+}

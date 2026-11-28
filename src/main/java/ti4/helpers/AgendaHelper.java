@@ -2859,7 +2859,7 @@ public final class AgendaHelper {
             channel = game.getMainGameChannel();
         }
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
-                && (System.currentTimeMillis() - Long.parseLong(game.getStoredValue("lastAgendaReactTime")))
+                && (GameClock.currentTimeMillis() - Long.parseLong(game.getStoredValue("lastAgendaReactTime")))
                         < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -3060,7 +3060,7 @@ public final class AgendaHelper {
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
 
-        game.setStoredValue("lastAgendaReactTime", "" + System.currentTimeMillis());
+        game.setStoredValue("lastAgendaReactTime", "" + GameClock.currentTimeMillis());
 
         List<Button> proceedButtons = new ArrayList<>();
         String msg;

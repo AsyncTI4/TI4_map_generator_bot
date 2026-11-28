@@ -1,0 +1,545 @@
+package ti4.ai.eval;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import javax.annotation.Nullable;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendCost;
+import ti4.ai.scoring.Wallet;
+import ti4.ai.winnu.BloodTies;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units.UnitType;
+import ti4.model.Mapper;
+import ti4.model.TechnologyModel;
+import ti4.service.strategycard.PickStrategyCardService;
+
+public final class CustodiansRace {
+
+    public enum Drive {
+        OWNED,
+        LIKELY
+    }
+
+    public enum Order {
+        KNOWN,
+        SEAT_FIRST,
+        UNKNOWN
+    }
+
+    private enum Mode {
+        OWNED,
+        LIKELY,
+        MIXED
+    }
+
+    public static final int COST = 6;
+    static final double TAKE_FIRST = 0.8;
+    private static final double BEATEN = 1 - TAKE_FIRST;
+    private static final double LIKELY_FIRST = 0.95;
+    private static final double COIN_FLIP = 0.5;
+    private static final int MAX_HOPS = 4;
+    private static final int UNREACHABLE = Integer.MAX_VALUE;
+    private static final String GRAVITY_DRIVE = "gd";
+    private static final String ACTION_PHASE = "action";
+
+    private CustodiansRace() {}
+
+    public static int cost(Player player) {
+        return BloodTies.waivesCustodiansInfluence(player) ? 0 : COST;
+    }
+
+    public static boolean open(Game game) {
+        return custodiansTile(game) != null;
+    }
+
+    public static Snapshot of(Game game, Player seat) {
+        return new Snapshot(game, seat);
+    }
+
+    @Nullable
+    private static Tile custodiansTile(Game game) {
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isMecatol(game) && tile.getPlanetUnitHolders().stream().anyMatch(BoardView::hasCustodians)) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public static final class Snapshot {
+
+        private record Transport(Tile tile, UnitType type) {}
+
+        private final Game game;
+        private final Player seat;
+        private final Tile mecatol;
+        private final Map<String, Map<String, Integer>> reaches = new HashMap<>();
+        private final Map<String, Integer> hops = new HashMap<>();
+        private final Map<String, List<Transport>> transports = new HashMap<>();
+        private final Map<String, OptionalInt> arrivals = new HashMap<>();
+        private final Map<String, OptionalInt> idleArrivals = new HashMap<>();
+        private final Map<String, Boolean> payable = new HashMap<>();
+        private final Map<String, Boolean> covered = new HashMap<>();
+        private final Map<String, Double> survivals = new HashMap<>();
+        private final Map<String, Integer> projections = new HashMap<>();
+        private final boolean coverOn;
+
+        private Snapshot(Game game, Player seat) {
+            this.game = game;
+            this.seat = seat;
+            this.coverOn = seat != null && AiExperiments.enabled(seat, Experiment.CANNON_COVER_RISK);
+            this.mecatol = custodiansTile(game);
+        }
+
+        public boolean isOpen() {
+            return mecatol != null;
+        }
+
+        public OptionalInt arrival(Player player) {
+            return arrivals.computeIfAbsent(player.getFaction(), faction -> mixedArrival(player));
+        }
+
+        public OptionalInt arrivalWith(Player player, Drive drive) {
+            Mode mode = drive == Drive.OWNED ? Mode.OWNED : Mode.LIKELY;
+            return earliest(player, transport -> pureArrival(player, transport, mode));
+        }
+
+        public OptionalInt idleArrival(Player player) {
+            return idleArrivals.computeIfAbsent(player.getFaction(), faction -> idle(player));
+        }
+
+        public OptionalInt arrivalFrom(Player player, Tile tile) {
+            if (mecatol == null || blockedByCover(player)) return OptionalInt.empty();
+            int needed = hopsFrom(player, tile, bestTransportType(player), Mode.LIKELY);
+            if (needed == UNREACHABLE) return OptionalInt.empty();
+            return OptionalInt.of(adjusted(player, baseRound() + Math.max(1, needed)));
+        }
+
+        public OptionalInt hopsToMecatol(Player player, Tile from) {
+            if (mecatol == null) return OptionalInt.empty();
+            int needed = hopsFrom(player, from, bestTransportType(player), Mode.LIKELY);
+            return needed == UNREACHABLE ? OptionalInt.empty() : OptionalInt.of(needed);
+        }
+
+        public boolean canLandThisRound(Player player) {
+            if (mecatol == null || blockedByCover(player)) return false;
+            return transportsOf(player).stream()
+                    .anyMatch(transport -> actsNow(player, transport.tile())
+                            && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1);
+        }
+
+        public boolean canLandThisRoundWithout(Player player, String stoppedPosition) {
+            if (mecatol == null || blockedByCover(player)) return false;
+            return transportsOf(player).stream()
+                    .filter(transport -> !transport.tile().getPosition().equals(stoppedPosition))
+                    .anyMatch(transport -> actsNow(player, transport.tile())
+                            && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1);
+        }
+
+        public double winChance(Player seatOfInterest, int arrival, Order order) {
+            return winChance(
+                    seatOfInterest,
+                    arrival,
+                    rival -> sameRound(seatOfInterest, rival, order),
+                    coverSurvival(seatOfInterest));
+        }
+
+        private double winChance(
+                Player seatOfInterest, int arrival, ToDoubleFunction<Player> sameRound, double seatSurvival) {
+            double chance = seatSurvival;
+            for (Player rival : game.getRealPlayers()) {
+                if (rival == seatOfInterest) continue;
+                OptionalInt theirs = arrival(rival);
+                if (theirs.isEmpty() || theirs.getAsInt() > arrival) continue;
+                double kept = theirs.getAsInt() < arrival ? BEATEN : sameRound.applyAsDouble(rival);
+                chance *= 1 - coverSurvival(rival) * (1 - kept);
+            }
+            return chance;
+        }
+
+        public double coverSurvival(Player player) {
+            if (mecatol == null || !coverOn) return 1.0;
+            return survivals.computeIfAbsent(player.getFaction(), faction -> survivalUnderCover(player));
+        }
+
+        public double coverSurvival(Player player, int hitPoints) {
+            if (mecatol == null || !coverOn) return 1.0;
+            List<Double> chances = CannonDice.againstShipsOf(game, player, mecatol);
+            if (chances.isEmpty()) return 1.0;
+            return 1 - DiceOdds.atLeast(chances, Math.max(1, hitPoints));
+        }
+
+        private double survivalUnderCover(Player player) {
+            int hitPoints = transportsOf(player).stream()
+                    .mapToInt(transport -> hitPoints(player, transport.tile()))
+                    .max()
+                    .orElse(1);
+            return coverSurvival(player, hitPoints);
+        }
+
+        private static int hitPoints(Player player, Tile tile) {
+            UnitHolder space = BoardView.space(tile);
+            Map<UnitType, Integer> ships = BoardView.ships(space, player);
+            Map<UnitType, Integer> damaged = new HashMap<>();
+            ships.keySet().forEach(type -> damaged.put(type, BoardView.damaged(space, player, type)));
+            return CannonDice.landingHitPoints(player, ships, damaged, BoardView.groundForces(space, player));
+        }
+
+        private boolean blockedByCover(Player player) {
+            if (!coverOn) return coveredByOthers(player);
+            return coverSurvival(player) <= 0;
+        }
+
+        public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order) {
+            return raceValue(seatOfInterest, arrival, order, coverSurvival(seatOfInterest));
+        }
+
+        public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order, double seatSurvival) {
+            if (mecatol == null || arrival.isEmpty()) return 0;
+            return prize(seatOfInterest)
+                    * winChance(
+                            seatOfInterest,
+                            arrival.getAsInt(),
+                            rival -> sameRound(seatOfInterest, rival, order),
+                            seatSurvival);
+        }
+
+        public double raceValueActingAt(Player seatOfInterest, OptionalInt arrival, int initiative) {
+            if (mecatol == null || arrival.isEmpty()) return 0;
+            Map<String, Integer> racersCards = racersCards(seatOfInterest, arrival.getAsInt(), initiative);
+            return prize(seatOfInterest)
+                    * winChance(
+                            seatOfInterest,
+                            arrival.getAsInt(),
+                            rival -> sameRoundActingAt(seatOfInterest, rival, initiative, racersCards),
+                            coverSurvival(seatOfInterest));
+        }
+
+        private Map<String, Integer> racersCards(Player seatOfInterest, int arrival, int initiative) {
+            List<Integer> open = new ArrayList<>(openCards(initiative));
+            open.sort(Integer::compare);
+            Map<String, Integer> cards = new HashMap<>();
+            for (Player rival : PickStrategyCardService.getSCPickOrder(game)) {
+                if (open.isEmpty()) break;
+                if (rival == null || rival == seatOfInterest || rival.hasTheZeroToken() || !stillPicking(rival))
+                    continue;
+                OptionalInt theirs = arrival(rival);
+                if (theirs.isEmpty() || theirs.getAsInt() != arrival) continue;
+                boolean holdsAnEarlierCard = !rival.getSCs().isEmpty() && rival.getLowestSC() < open.getFirst();
+                cards.put(rival.getFaction(), holdsAnEarlierCard ? rival.getLowestSC() : open.removeFirst());
+            }
+            return cards;
+        }
+
+        private double prize(Player seatOfInterest) {
+            return ObjectiveValue.VICTORY_POINT_VALUE
+                    + MecatolStake.holdValue(game, seatOfInterest)
+                    + mecatolPlanetValue()
+                    + IconStake.freeValue(game, seatOfInterest, mecatol);
+        }
+
+        private double sameRoundActingAt(
+                Player seatOfInterest, Player rival, int initiative, Map<String, Integer> racersCards) {
+            if (seatOfInterest.hasTheZeroToken()) return LIKELY_FIRST;
+            if (rival.hasTheZeroToken()) return BEATEN;
+            Integer expected = racersCards.get(rival.getFaction());
+            if (expected != null) return expected < initiative ? BEATEN : LIKELY_FIRST;
+            if (!rival.getSCs().isEmpty()) return rival.getInitiative() < initiative ? BEATEN : LIKELY_FIRST;
+            OptionalDouble earlier = chanceOfAnEarlierCard(initiative);
+            if (earlier.isEmpty()) return COIN_FLIP;
+            return earlier.getAsDouble() * BEATEN + (1 - earlier.getAsDouble()) * LIKELY_FIRST;
+        }
+
+        public boolean stillPicking(Player player) {
+            return player.getSCs().size() < Math.max(1, game.getStrategyCardsPerPlayer());
+        }
+
+        public List<Integer> openCards(int initiative) {
+            Set<Integer> taken = new HashSet<>();
+            game.getRealPlayers().forEach(player -> taken.addAll(player.getSCs()));
+            return game.getSCList().stream()
+                    .filter(card -> card != initiative && !taken.contains(card))
+                    .toList();
+        }
+
+        private OptionalDouble chanceOfAnEarlierCard(int initiative) {
+            List<Integer> open = openCards(initiative);
+            if (open.isEmpty()) return OptionalDouble.empty();
+            return OptionalDouble.of(
+                    open.stream().filter(card -> card < initiative).count() / (double) open.size());
+        }
+
+        private double sameRound(Player seatOfInterest, Player rival, Order order) {
+            if (seatOfInterest.hasTheZeroToken()) return LIKELY_FIRST;
+            if (rival.hasTheZeroToken()) return BEATEN;
+            return switch (order) {
+                case KNOWN -> rival.getInitiative() < seatOfInterest.getInitiative() ? BEATEN : LIKELY_FIRST;
+                case SEAT_FIRST -> LIKELY_FIRST;
+                case UNKNOWN -> COIN_FLIP;
+            };
+        }
+
+        private double mecatolPlanetValue() {
+            return mecatol.getPlanetUnitHolders().stream()
+                    .filter(BoardView::hasCustodians)
+                    .mapToDouble(BoardView::planetValue)
+                    .max()
+                    .orElse(0);
+        }
+
+        private OptionalInt mixedArrival(Player player) {
+            return earliest(player, transport -> mixedArrival(player, transport));
+        }
+
+        private int mixedArrival(Player player, Transport transport) {
+            int base = baseRound();
+            if (!actsNow(player, transport.tile())) {
+                return arrivingNextRound(player, transport, base, Mode.LIKELY);
+            }
+            if (hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1) return base;
+            int needed = hopsFrom(player, transport.tile(), transport.type(), Mode.MIXED);
+            return needed == UNREACHABLE ? UNREACHABLE : base + needed - 1;
+        }
+
+        private int pureArrival(Player player, Transport transport, Mode mode) {
+            int base = baseRound();
+            if (!actsNow(player, transport.tile())) return arrivingNextRound(player, transport, base, mode);
+            int needed = hopsFrom(player, transport.tile(), transport.type(), mode);
+            if (needed == UNREACHABLE) return UNREACHABLE;
+            return needed <= 1 ? base : base + needed - 1;
+        }
+
+        private int arrivingNextRound(Player player, Transport transport, int base, Mode mode) {
+            int needed = hopsFrom(player, transport.tile(), transport.type(), mode);
+            return needed == UNREACHABLE ? UNREACHABLE : base + Math.max(1, needed);
+        }
+
+        private OptionalInt idle(Player player) {
+            int base = baseRound();
+            return earliest(player, transport -> {
+                if (actsNow(player, transport.tile())
+                        && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1) {
+                    return base;
+                }
+                return arrivingNextRound(player, transport, base, Mode.LIKELY);
+            });
+        }
+
+        private OptionalInt earliest(Player player, ToIntFunction<Transport> arrivalOf) {
+            if (mecatol == null || blockedByCover(player)) return OptionalInt.empty();
+            int best = UNREACHABLE;
+            for (Transport transport : transportsOf(player)) {
+                best = Math.min(best, arrivalOf.applyAsInt(transport));
+            }
+            return best == UNREACHABLE ? OptionalInt.empty() : OptionalInt.of(adjusted(player, best));
+        }
+
+        private int adjusted(Player player, int raw) {
+            int base = baseRound();
+            int arrival = raw;
+            if (arrival == base && !canPayNow(player)) arrival = base + 1;
+            if (arrival > base && projectedInfluence(player) < cost(player)) arrival++;
+            return arrival;
+        }
+
+        private boolean canPayNow(Player player) {
+            return payable.computeIfAbsent(player.getFaction(), faction -> {
+                if (player == seat) {
+                    return ScoringReserve.planForCustodians(game, seat).isPresent()
+                            || IconStake.behindCustodians(game, seat)
+                                    && Wallet.of(game, seat).canPay(SpendCost.influence(cost(seat)));
+                }
+                return Wallet.of(game, player).canPay(SpendCost.influence(cost(player)));
+            });
+        }
+
+        private int projectedInfluence(Player player) {
+            return projections.computeIfAbsent(player.getFaction(), faction -> {
+                int owned = player.getPlanets().stream()
+                        .mapToInt(planet -> BoardView.planetInfluence(game, planet))
+                        .sum();
+                return owned + player.getTg() * Wallet.tradeGoodValue(player) + reachableFreeInfluence(player);
+            });
+        }
+
+        private int reachableFreeInfluence(Player player) {
+            Set<String> tiles = new HashSet<>();
+            for (Transport transport : transportsOf(player)) {
+                int move = hopMove(player, transport.type(), transport.tile(), null, Mode.LIKELY, 1);
+                tiles.addAll(reach(player, transport.tile().getPosition(), move).keySet());
+            }
+            int influence = 0;
+            for (String position : tiles) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null || BoardView.hasEnemyUnits(game, player, tile)) continue;
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    boolean free =
+                            BoardView.controller(game, planet.getName()) == null && !BoardView.hasCustodians(planet);
+                    if (free) influence += Math.max(0, planet.getInfluence());
+                }
+            }
+            return influence;
+        }
+
+        private boolean coveredByOthers(Player player) {
+            return covered.computeIfAbsent(
+                    player.getFaction(),
+                    faction -> ButtonHelper.getPlayersWithPds2Cover(player, game, mecatol.getPosition()).stream()
+                            .anyMatch(other -> other != player));
+        }
+
+        private boolean actsNow(Player player, Tile tile) {
+            if (!ACTION_PHASE.equals(game.getPhaseOfGame())) return true;
+            return !player.isPassed() && player.getTacticalCC() > 0 && !tile.hasPlayerCC(player);
+        }
+
+        private int baseRound() {
+            String phase =
+                    game.getPhaseOfGame() == null ? "" : game.getPhaseOfGame().toLowerCase();
+            boolean afterActionPhase = phase.startsWith("status") || phase.startsWith("agenda");
+            return game.getRound() + (afterActionPhase ? 1 : 0);
+        }
+
+        private List<Transport> transportsOf(Player player) {
+            return transports.computeIfAbsent(player.getFaction(), faction -> {
+                List<Transport> found = new ArrayList<>();
+                for (Tile tile : game.getTileMap().values()) {
+                    UnitType type = fastestTransport(player, tile);
+                    if (type != null && carriesGroundForces(player, tile)) found.add(new Transport(tile, type));
+                }
+                return found;
+            });
+        }
+
+        @Nullable
+        private UnitType fastestTransport(Player player, Tile tile) {
+            UnitType fastest = null;
+            int move = 0;
+            for (UnitType type : BoardView.ships(BoardView.space(tile), player).keySet()) {
+                if (!BoardView.MOVING_SHIPS.contains(type) || BoardView.capacity(player, type) <= 0) continue;
+                int speed = ShipSpeed.base(game, player, type, tile);
+                if (speed > move) {
+                    fastest = type;
+                    move = speed;
+                }
+            }
+            return fastest;
+        }
+
+        private static boolean carriesGroundForces(Player player, Tile tile) {
+            for (UnitHolder holder : tile.getUnitHolders().values()) {
+                if (BoardView.groundForces(holder, player) > 0) return true;
+            }
+            return false;
+        }
+
+        private UnitType bestTransportType(Player player) {
+            UnitType best = UnitType.Carrier;
+            int bestMove = 0;
+            for (Transport transport : transportsOf(player)) {
+                int move = ShipSpeed.printed(game, player, transport.type());
+                if (move > bestMove) {
+                    best = transport.type();
+                    bestMove = move;
+                }
+            }
+            return best;
+        }
+
+        private int hopsFrom(Player player, Tile from, UnitType type, Mode mode) {
+            String key = player.getFaction() + "|" + from.getPosition() + "|" + type + "|" + mode;
+            return hops.computeIfAbsent(key, ignored -> countHops(player, from, type, mode));
+        }
+
+        // TODO: intermediate layers may pass through systems holding enemy ships, where a real move would stop
+        private int countHops(Player player, Tile from, UnitType type, Mode mode) {
+            String target = mecatol.getPosition();
+            if (from.getPosition().equals(target)) return 0;
+            Set<String> layer = Set.of(from.getPosition());
+            for (int hop = 1; hop <= MAX_HOPS; hop++) {
+                if (landsFromLayer(player, layer, type, mode, hop)) return hop;
+                Set<String> next = new HashSet<>();
+                for (String position : layer) {
+                    Tile tile = game.getTileByPosition(position);
+                    if (tile == null) continue;
+                    int move = hopMove(player, type, tile, null, mode, hop);
+                    next.addAll(reach(player, position, move, hop).keySet());
+                }
+                layer = next;
+            }
+            return UNREACHABLE;
+        }
+
+        private boolean landsFromLayer(Player player, Set<String> layer, UnitType type, Mode mode, int hop) {
+            for (String position : layer) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null) continue;
+                int move = hopMove(player, type, tile, mecatol, mode, hop);
+                if (reach(player, position, move, hop).containsKey(mecatol.getPosition())) return true;
+            }
+            return false;
+        }
+
+        private int hopMove(Player player, UnitType type, Tile from, @Nullable Tile target, Mode mode, int hop) {
+            boolean assumeGravityDrive = assumesGravityDrive(player, mode, hop);
+            if (hop == 1) {
+                int speed = ShipSpeed.of(game, player, type, from, target);
+                return speed == 0 ? 0 : speed + MoveBudget.oneShip(game, player, target, assumeGravityDrive);
+            }
+            int speed = MoveEnablers.laterActivation(() -> MoveBudget.legBudget(game, player, type, from, null, false));
+            if (speed == 0) return 0;
+            return speed
+                    + ShipSpeed.arrivalBonus(game, player, target)
+                    + MoveBudget.oneShipInLaterRound(player, target, assumeGravityDrive);
+        }
+
+        private boolean assumesGravityDrive(Player player, Mode mode, int hop) {
+            boolean likely = player.hasTech(GRAVITY_DRIVE) || ownsPropulsionTech(player);
+            return switch (mode) {
+                case OWNED -> false;
+                case LIKELY -> likely;
+                case MIXED -> hop > 1 && likely;
+            };
+        }
+
+        private static boolean ownsPropulsionTech(Player player) {
+            for (String id : player.getTechs()) {
+                TechnologyModel tech = Mapper.getTech(id);
+                if (tech != null && tech.isPropulsionTech()) return true;
+            }
+            return false;
+        }
+
+        private Map<String, Integer> reach(Player player, String position, int move, int hop) {
+            if (hop == 1) return reach(player, position, move);
+            return reaches.computeIfAbsent(
+                    player.getFaction() + "|" + position + "|" + move + "|later",
+                    key -> move <= 0
+                            ? Map.of()
+                            : MoveEnablers.laterActivation(
+                                    () -> MovementGraph.distances(game, player, position, move)));
+        }
+
+        private Map<String, Integer> reach(Player player, String position, int move) {
+            return reaches.computeIfAbsent(
+                    player.getFaction() + "|" + position + "|" + move,
+                    key -> move <= 0 ? Map.of() : MovementGraph.distances(game, player, position, move));
+        }
+    }
+}
