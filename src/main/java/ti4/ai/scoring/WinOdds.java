@@ -92,6 +92,10 @@ public class WinOdds {
         }
     }
 
+    public static boolean pricingMecatolTake() {
+        return PRICING_MECATOL_TAKE.get();
+    }
+
     public static Odds of(Game game, Player viewer, Player rival) {
         return of(game, viewer, rival, 0);
     }

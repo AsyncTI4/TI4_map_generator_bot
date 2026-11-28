@@ -1,10 +1,21 @@
 package ti4.ai.strategy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.Reentry;
+import ti4.ai.brain.Reentry.Traced;
+import ti4.ai.eval.DecidingSeat;
+import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MoveEnablers;
+import ti4.ai.eval.MovementAssumptions;
+import ti4.ai.scoring.WinOdds;
+import ti4.ai.tactical.SkippedSpaceCombat;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.Mapper;
@@ -15,6 +26,7 @@ public class CopiedTechPolicy {
 
     private static final Set<String> ASSIMILATORS = Set.of("vax", "vay");
     private static final int ASSIMILATOR_TOKENS = 2;
+    private static final String DECISION_MEMO = "copied.tech.value";
 
     public static Optional<String> best(Game game, Player seat, Collection<String> aliases) {
         return aliases.stream()
@@ -24,7 +36,27 @@ public class CopiedTechPolicy {
     }
 
     public static double value(Game game, Player seat, String alias) {
-        return allowed(seat, alias) ? ResearchPolicy.value(game, seat, alias) : 0;
+        if (!allowed(seat, alias)) return 0;
+        List<Traced<Double>> kept = DecisionMemo.remember(
+                ArrayList::new,
+                DECISION_MEMO,
+                game,
+                game.getLastModifiedDate(),
+                seat,
+                alias,
+                ImaginedTurn.cacheMark(seat),
+                MovementAssumptions.key(),
+                MoveEnablers.inLaterActivation(),
+                SkippedSpaceCombat.assumedFaction(),
+                DecidingSeat.currentUserId(),
+                TokenPurchase.estimatingPlans(),
+                WinOdds.pricingMecatolTake());
+        for (Traced<Double> variant : kept) {
+            if (variant.servable()) return variant.reported();
+        }
+        Traced<Double> computed = Reentry.traced(() -> ResearchPolicy.value(game, seat, alias));
+        if (computed.keepable()) kept.add(computed);
+        return computed.reported();
     }
 
     public static double publicValue(Player seat, String alias) {
