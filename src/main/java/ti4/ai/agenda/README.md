@@ -740,9 +740,13 @@ Tested by `AgendaVotingTest.gilaSpendsJustEnoughTradeGoodsToSwingAPoint` and `gi
 - `VoteCapacity.shareSwing` = 1 / voters − own / total. Representative Government uses it.
 - `AgendaPrior.expected(agenda)`: each voter backs its own argmax-utility outcome, weighted by `VoteCapacity`. The
   value is the support-weighted mean of the seat's utility, or the plain mean when nobody has votes.
-- `deckExpected` and `deckSpread` average this over `remainingDeck`. The results are memoised by `SearchMemo`.
+- `deckExpected` and `fullDeckSpread` average this over `remainingDeck`. The results are memoised by `SearchMemo`.
+- `deckSpread` is `AVERAGE_DECK_SPREAD` = 4.1, the mean `fullDeckSpread` over 600 seat-agendas of the 12 styx-take-ab
+  games (20261128-0407-agenda-prior-measure; 3.0 in round 1 to 6.2 in round 6). `fullDeckSpread` only under
+  `AGENDA_DECK_LOOKAHEAD`, off by default: it cost about 10 s per seat-agenda under batch load, and it put 586 of those
+  600 kept votes at the 0.02 floor anyway.
 - `marginalVote` = clamp(0.25 × spread / table votes, 0.02, 1.0). Spread comes from the next known agenda
-  (`AgendaKnowledge.next`) or the deck average. It is `BallotPlanner.keptVote` and `VoteDeals.spentVotes`.
+  (`AgendaKnowledge.next`) or `deckSpread`. It is `BallotPlanner.keptVote` and `VoteDeals.spentVotes`.
 - `phaseVoteValue` = `perVote` of the first two known agendas. It is used by `MawOfWorldsRules`.
 - `AgendaPeek.keepOnTop`:
   - Expert: expected(agenda) ≥ deckExpected.
@@ -1099,8 +1103,8 @@ counts an extra source.
 **Selection logic:** value(o, v) = E[utility | the seat's v votes on o] − Galactic Threat cost − anger −
 keptVote × v − 0.5 if v uses the last planet.
 
-- keptVote = `AgendaPrior.marginalVote`: 0.25 × the spread of the next known agenda (or the deck average) / table
-  votes, clamped [0.02, 1.0].
+- keptVote = `AgendaPrior.marginalVote`: 0.25 × the spread of the next known agenda (or `deckSpread`, the measured
+  average 4.1) / table votes, clamped [0.02, 1.0].
 - With these costs, more votes only pay when they raise the win probability enough.
 - Among options within 0.3 TG of the best, on the same outcome and above the floor, it takes the fewest votes.
 

@@ -968,7 +968,7 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 ### AiExperiments
 
 - **Role:** informs (feature flags).
-- **Algorithm:** 38 experiments (`READY_PUBLIC_POINTS` … `XXCHA_LEADER_READIES`). Three split the spending on planets
+- **Algorithm:** 39 experiments (`READY_PUBLIC_POINTS` … `AGENDA_DECK_LOOKAHEAD`). Three split the spending on planets
   readied again (4b2988f8f6). `TECH_FOLLOW_KEEP` off: `TokenPurchase.technologyFollowToKeep` keeps nothing.
   `STYX_TAKE` off (per seat, `FractureCampaign.takesStyx`): Styx plans like the other Fracture prizes, as before
   92db32a718: three-step staging lead, no gathering credit below the landing gate, no later-landing term, no transport
@@ -977,7 +977,9 @@ descriptions for the classes outside `StandardBrain` belong to their own package
   `DIPLOMACY_READIED_PLANNING` off: `ExpectedReadying.plannedReadies` (used by `ScoringReserve.planAfterReserve`'s
   readied branch, `StrategyCardRules.readiedAgainCovers` and `StructurePolicy.spendableThisRound`) counts no Diplomacy
   readies; the Leadership purchase still counts its own Diplomacy (`ExpectedReadying.afterPaying`). `XXCHA_LEADER_READIES`
-  off: `ExpectedReadying.leaderReadies` is 0 and `StructurePolicy` uses raw planet resources instead of pooled values. `enabled(seat, x)` is false when
+  off: `ExpectedReadying.leaderReadies` is 0 and `StructurePolicy` uses raw planet resources instead of pooled values.
+  `AGENDA_DECK_LOOKAHEAD` is off by default, like the three `DESPERATION_*` experiments: `AgendaPrior.deckSpread` is the
+  measured `AVERAGE_DECK_SPREAD` (4.1) instead of the full look-ahead over the remaining agenda deck. `enabled(seat, x)` is false when
   `-Dai.experiments.off` lists it (or `all`), or when the seat's stored value `aiExperimentsOff` lists it; a value of
   `-` marks a control seat with nothing listed. Everything is on by default. `disable` and `abExperiments`
   (`-Dai.selfplay.ab`) are called only from tests (`SelfPlayGame` and unit tests), for paired A/B self-play;

@@ -52,7 +52,8 @@ public class AiExperiments {
         STYX_TAKE,
         TECH_FOLLOW_KEEP,
         DIPLOMACY_READIED_PLANNING,
-        XXCHA_LEADER_READIES
+        XXCHA_LEADER_READIES,
+        AGENDA_DECK_LOOKAHEAD
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";
@@ -61,7 +62,10 @@ public class AiExperiments {
 
     public static final String ENABLED_KEY = "aiExperimentsOn";
     private static final Set<Experiment> OFF_BY_DEFAULT = EnumSet.of(
-            Experiment.DESPERATION_PUBLIC, Experiment.DESPERATION_STATUS_SECRET, Experiment.DESPERATION_ACTION_SECRET);
+            Experiment.DESPERATION_PUBLIC,
+            Experiment.DESPERATION_STATUS_SECRET,
+            Experiment.DESPERATION_ACTION_SECRET,
+            Experiment.AGENDA_DECK_LOOKAHEAD);
     private static final Set<Experiment> UNDER_TEST = abExperiments().orElse(EnumSet.noneOf(Experiment.class));
 
     public static boolean enabled(Player seat, Experiment experiment) {

@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.brain.SearchMemo;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,6 +20,7 @@ public class AgendaPrior {
     static final double MIN_VOTE = 0.02;
     static final double MAX_VOTE = 1.0;
     static final double PIVOTAL_SHARE = 0.25;
+    static final double AVERAGE_DECK_SPREAD = 4.1;
     private static final String COVERT = "covert";
     private static final String SPREAD_MEMO = "agendaPrior.spread";
     private static final String EXPECTED_MEMO = "agendaPrior.expected";
@@ -103,6 +106,12 @@ public class AgendaPrior {
                 () -> deckAverage(game, agenda -> expected(game, seat, agenda)), DECK_EXPECTED_MEMO, seat);
     }
 
+    static double deckSpread(Game game, Player seat) {
+        return AiExperiments.enabled(seat, Experiment.AGENDA_DECK_LOOKAHEAD)
+                ? fullDeckSpread(game, seat)
+                : AVERAGE_DECK_SPREAD;
+    }
+
     static double fullDeckSpread(Game game, Player seat) {
         return SearchMemo.remember(
                 () -> deckAverage(game, agenda -> spread(game, seat, agenda)), DECK_SPREAD_MEMO, seat);
@@ -124,7 +133,7 @@ public class AgendaPrior {
     }
 
     private static double perVote(Game game, Player seat, Optional<String> agenda) {
-        double spread = agenda.map(known -> spread(game, seat, known)).orElseGet(() -> fullDeckSpread(game, seat));
+        double spread = agenda.map(known -> spread(game, seat, known)).orElseGet(() -> deckSpread(game, seat));
         int tableVotes = game.getRealPlayers().stream()
                 .mapToInt(player -> VoteCapacity.of(game, player))
                 .sum();

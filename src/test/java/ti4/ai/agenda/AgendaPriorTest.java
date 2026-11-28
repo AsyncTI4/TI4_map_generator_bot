@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.within;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
@@ -44,7 +47,8 @@ class AgendaPriorTest extends BaseTi4Test {
     }
 
     // A vote kept for the next agenda is worth a share of what is at stake there, per vote at the table. Without
-    // knowing the next card it uses the deck average; knowing it, that card's stakes.
+    // knowing the next card it uses the average deck spread measured in self-play (20261128-0407-agenda-prior-measure);
+    // knowing it, that card's stakes.
     @Test
     void aKeptVoteIsWorthTheNextAgendasStakes() {
         int tableVotes = test.game.getRealPlayers().stream()
@@ -55,7 +59,7 @@ class AgendaPriorTest extends BaseTi4Test {
         assertThat(deck)
                 .isCloseTo(
                         Math.clamp(
-                                AgendaPrior.PIVOTAL_SHARE * AgendaPrior.fullDeckSpread(test.game, sol) / tableVotes,
+                                AgendaPrior.PIVOTAL_SHARE * AgendaPrior.AVERAGE_DECK_SPREAD / tableVotes,
                                 AgendaPrior.MIN_VOTE,
                                 AgendaPrior.MAX_VOTE),
                         within(1e-9));
@@ -87,5 +91,21 @@ class AgendaPriorTest extends BaseTi4Test {
 
         assertThat(AgendaPeek.keepOnTop(test.game, sol, best)).isTrue();
         assertThat(AgendaPeek.keepOnTop(test.game, sol, worst)).isFalse();
+    }
+
+    // AGENDA_DECK_LOOKAHEAD brings back the full look-ahead: the spread averaged over every agenda left in the deck.
+    @Test
+    void theDeckLookAheadIsBehindItsExperiment() {
+        AiExperiments.enable(sol, Set.of(Experiment.AGENDA_DECK_LOOKAHEAD));
+        int tableVotes = test.game.getRealPlayers().stream()
+                .mapToInt(player -> VoteCapacity.of(test.game, player))
+                .sum();
+        assertThat(AgendaPrior.marginalVote(test.game, sol))
+                .isCloseTo(
+                        Math.clamp(
+                                AgendaPrior.PIVOTAL_SHARE * AgendaPrior.fullDeckSpread(test.game, sol) / tableVotes,
+                                AgendaPrior.MIN_VOTE,
+                                AgendaPrior.MAX_VOTE),
+                        within(1e-9));
     }
 }
