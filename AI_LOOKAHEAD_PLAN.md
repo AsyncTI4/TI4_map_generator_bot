@@ -193,6 +193,10 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   CPU-s over 22 rounds each, 286 against 433 per round (-34%). No game is identical now, but every split is late:
   turn order first differs in round 5, 5, 3 and 5. The follow reserve key gap is still open on this side, so
   the next check waits for the cache-key fixes from the Styx session.
+- 2026-11-28: with those fixes (52134360c2, jobs 20261127-180926; baseline 703556b100 drops only the caches and
+  keeps every key fix): all 4 games identical, same scores and same turns. 17,230 against 26,046 game-thread
+  CPU-s (-34%). Game CPU still ranges 1,513 to 6,368 s: agenda phases took 37% of thinking in the fast game and
+  53% in the slowest, at up to 6 s per tick.
 
 ## Unknowns
 
